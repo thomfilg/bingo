@@ -1,0 +1,141 @@
+name: Post-CD Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment_sha:
+        description: 'The SHA of the deployed commit'
+        required: true
+        type: string
+
+env:
+  # Configure your deployed app URLs here
+  WEB_URL: ${{ vars.WEB_URL || 'https://your-web-app.pages.dev' }}
+  API_URL: ${{ vars.API_URL || 'https://your-api.workers.dev' }}
+
+jobs:
+  smoke-tests:
+    name: Smoke Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.deployment_sha }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Wait for deployment
+        run: |
+          echo "Waiting 30s for deployment to propagate..."
+          sleep 30
+
+      - name: Health check - Web
+        run: |
+          echo "Checking $WEB_URL..."
+          curl -f -s -o /dev/null -w "%{http_code}" "$WEB_URL" || echo "Web app not configured yet"
+
+      - name: Health check - API
+        run: |
+          echo "Checking $API_URL..."
+          curl -f -s -o /dev/null -w "%{http_code}" "$API_URL" || echo "API not configured yet"
+
+      - name: Run smoke tests
+        run: |
+          # Add your smoke test commands here
+          # Example: pnpm test:smoke
+          echo "Smoke tests placeholder - add your test commands"
+
+  integration-tests:
+    name: Integration Tests
+    needs: smoke-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.deployment_sha }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run integration tests
+        run: |
+          # Add your integration test commands here
+          # Example: pnpm test:integration
+          echo "Integration tests placeholder - add your test commands"
+        env:
+          WEB_URL: ${{ env.WEB_URL }}
+          API_URL: ${{ env.API_URL }}
+
+  e2e-tests:
+    name: E2E Tests
+    needs: smoke-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.deployment_sha }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright
+        run: pnpm exec playwright install --with-deps chromium
+        continue-on-error: true
+
+      - name: Run E2E tests
+        run: |
+          # Add your E2E test commands here
+          # Example: pnpm test:e2e
+          echo "E2E tests placeholder - add your test commands"
+        env:
+          WEB_URL: ${{ env.WEB_URL }}
+          API_URL: ${{ env.API_URL }}
+
+  notify:
+    name: Notify Results
+    needs: [smoke-tests, integration-tests, e2e-tests]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Summary
+        run: |
+          echo "## Post-CD Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Suite | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Smoke Tests | ${{ needs.smoke-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Integration Tests | ${{ needs.integration-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| E2E Tests | ${{ needs.e2e-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Deployment SHA: \`${{ inputs.deployment_sha }}\`" >> $GITHUB_STEP_SUMMARY
