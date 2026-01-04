@@ -1,0 +1,152 @@
+name: Post-CD Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment_sha:
+        description: 'The SHA of the deployed commit'
+        required: true
+        type: string
+
+env:
+  WEB_URL: ${{ vars.WEB_URL || 'https://your-web-app.pages.dev' }}
+  API_URL: ${{ vars.API_URL || 'https://your-api.workers.dev' }}
+
+jobs:
+  smoke-tests:
+    name: Smoke Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.deployment_sha }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Wait for deployment
+        run: |
+          echo "Waiting 30s for deployment to propagate..."
+          sleep 30
+
+      - name: Health check - Web
+        run: |
+          echo "Checking $WEB_URL..."
+          curl -f -s -o /dev/null -w "%{http_code}" "$WEB_URL" || echo "Web app not configured yet"
+
+      - name: Health check - API
+        run: |
+          echo "Checking $API_URL..."
+          curl -f -s -o /dev/null -w "%{http_code}" "$API_URL" || echo "API not configured yet"
+
+      - name: Run smoke tests
+        run: |
+          if grep -q '"test:smoke"' package.json; then
+            pnpm run test:smoke
+          else
+            echo "No smoke tests configured, skipping"
+          fi
+        env:
+          WEB_URL: ${{ env.WEB_URL }}
+          API_URL: ${{ env.API_URL }}
+
+  integration-tests:
+    name: Integration Tests
+    needs: smoke-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.deployment_sha }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run integration tests
+        run: |
+          if grep -q '"test:integration"' package.json; then
+            pnpm run test:integration
+          else
+            echo "No integration tests configured, skipping"
+          fi
+        env:
+          WEB_URL: ${{ env.WEB_URL }}
+          API_URL: ${{ env.API_URL }}
+
+  e2e-tests:
+    name: E2E Tests
+    needs: smoke-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.deployment_sha }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright
+        run: |
+          if grep -q '"test:e2e"' package.json; then
+            pnpm exec playwright install --with-deps chromium
+          fi
+        continue-on-error: true
+
+      - name: Run E2E tests
+        run: |
+          if grep -q '"test:e2e"' package.json; then
+            pnpm run test:e2e
+          else
+            echo "No e2e tests configured, skipping"
+          fi
+        env:
+          WEB_URL: ${{ env.WEB_URL }}
+          API_URL: ${{ env.API_URL }}
+
+  notify:
+    name: Notify Results
+    needs: [smoke-tests, integration-tests, e2e-tests]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Summary
+        run: |
+          echo "## Post-CD Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Suite | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Smoke Tests | ${{ needs.smoke-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Integration Tests | ${{ needs.integration-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| E2E Tests | ${{ needs.e2e-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Deployment SHA: \`${{ inputs.deployment_sha }}\`" >> $GITHUB_STEP_SUMMARY

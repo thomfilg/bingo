@@ -1,0 +1,166 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+  detect-workers:
+    name: Detect Workers
+    runs-on: ubuntu-latest
+    outputs:
+      workers: ${{ steps.detect.outputs.workers }}
+      has_workers: ${{ steps.detect.outputs.has_workers }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Detect workers
+        id: detect
+        run: |
+          workers=$(find . -name "wrangler.toml" -not -path "./node_modules/*" -exec dirname {} \; | sort -u | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "workers=$workers" >> $GITHUB_OUTPUT
+          count=$(echo "$workers" | jq 'length')
+          if [ "$count" -gt 0 ]; then
+            echo "has_workers=true" >> $GITHUB_OUTPUT
+            echo "Found $count worker(s)"
+          else
+            echo "has_workers=false" >> $GITHUB_OUTPUT
+            echo "No workers found"
+          fi
+
+  detect-apps:
+    name: Detect Apps
+    runs-on: ubuntu-latest
+    outputs:
+      apps: ${{ steps.detect.outputs.apps }}
+      has_apps: ${{ steps.detect.outputs.has_apps }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Detect apps with deploy config
+        id: detect
+        run: |
+          apps="[]"
+          for config in $(find . -path "*/deploy/config.json" -not -path "./node_modules/*"); do
+            app=$(cat "$config" | jq -c '.')
+            apps=$(echo "$apps" | jq --argjson app "$app" '. + [$app]')
+          done
+          echo "apps=$apps" >> $GITHUB_OUTPUT
+          count=$(echo "$apps" | jq 'length')
+          if [ "$count" -gt 0 ]; then
+            echo "has_apps=true" >> $GITHUB_OUTPUT
+            echo "Found $count app(s)"
+          else
+            echo "has_apps=false" >> $GITHUB_OUTPUT
+            echo "No apps found"
+          fi
+
+  deploy-workers:
+    name: Deploy Workers
+    needs: [build, detect-workers]
+    if: needs.detect-workers.outputs.has_workers == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        worker: ${{ fromJson(needs.detect-workers.outputs.workers) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Deploy to Cloudflare
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: ${{ matrix.worker }}
+          command: deploy
+
+  deploy-apps:
+    name: Deploy Apps
+    needs: [build, detect-apps]
+    if: needs.detect-apps.outputs.has_apps == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: ${{ fromJson(needs.detect-apps.outputs.apps) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build app
+        run: ${{ matrix.app.build.command }}
+
+      - name: Deploy to Cloudflare Pages
+        if: matrix.app.provider == 'cloudflare-pages'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy ${{ matrix.app.build.outputPath }} --project-name=${{ matrix.app.name }}
+
+  trigger-post-cd:
+    name: Trigger Post-CD
+    needs: [deploy-workers, deploy-apps]
+    if: always() && !cancelled() && !failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger post-cd workflow
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'post-cd.yml',
+              ref: context.ref,
+              inputs: {
+                deployment_sha: context.sha
+              }
+            })
