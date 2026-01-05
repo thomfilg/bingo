@@ -33,6 +33,12 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Credentials - ignore all except example files and scripts
+credentials/*
+!credentials/*.example.*
+!credentials/*.sh
+
 # Misc
 .DS_Store
 *.pem
+tasks

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "trello": {
+      "command": "bash",
+      "args": ["./credentials/run-mcp.sh", "trello", "@delorenj/mcp-server-trello"]
+    }
+  }
+}
