@@ -39,15 +39,16 @@ jobs:
 
       - name: Detect workers
         id: detect
+        shell: bash
         run: |
           workers=$(find . -name "wrangler.toml" -not -path "./node_modules/*" -exec dirname {} \; | sort -u | jq -R -s -c 'split("\n") | map(select(length > 0))')
-          echo "workers=$workers" >> $GITHUB_OUTPUT
+          echo "workers=$workers" >> "$GITHUB_OUTPUT"
           count=$(echo "$workers" | jq 'length')
           if [ "$count" -gt 0 ]; then
-            echo "has_workers=true" >> $GITHUB_OUTPUT
+            echo "has_workers=true" >> "$GITHUB_OUTPUT"
             echo "Found $count worker(s)"
           else
-            echo "has_workers=false" >> $GITHUB_OUTPUT
+            echo "has_workers=false" >> "$GITHUB_OUTPUT"
             echo "No workers found"
           fi
 
@@ -63,19 +64,22 @@ jobs:
 
       - name: Detect apps with deploy config
         id: detect
+        shell: bash
         run: |
           apps="[]"
-          for config in $(find . -path "*/deploy/config.json" -not -path "./node_modules/*"); do
-            app=$(cat "$config" | jq -c '.')
-            apps=$(echo "$apps" | jq --argjson app "$app" '. + [$app]')
-          done
-          echo "apps=$apps" >> $GITHUB_OUTPUT
+          while IFS= read -r config; do
+            if [ -n "$config" ]; then
+              app=$(cat "$config" | jq -c '.')
+              apps=$(echo "$apps" | jq --argjson app "$app" '. + [$app]')
+            fi
+          done < <(find . -path "*/deploy/config.json" -not -path "./node_modules/*")
+          echo "apps=$apps" >> "$GITHUB_OUTPUT"
           count=$(echo "$apps" | jq 'length')
           if [ "$count" -gt 0 ]; then
-            echo "has_apps=true" >> $GITHUB_OUTPUT
+            echo "has_apps=true" >> "$GITHUB_OUTPUT"
             echo "Found $count app(s)"
           else
-            echo "has_apps=false" >> $GITHUB_OUTPUT
+            echo "has_apps=false" >> "$GITHUB_OUTPUT"
             echo "No apps found"
           fi
 
@@ -85,6 +89,7 @@ jobs:
     if: needs.detect-workers.outputs.has_workers == 'true'
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         worker: ${{ fromJson(needs.detect-workers.outputs.workers) }}
     steps:
@@ -116,6 +121,7 @@ jobs:
     if: needs.detect-apps.outputs.has_apps == 'true'
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         app: ${{ fromJson(needs.detect-apps.outputs.apps) }}
     steps:
@@ -135,7 +141,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build app
-        run: ${{ matrix.app.build.command }}
+        shell: bash
+        run: |
+          build_cmd="${{ matrix.app.build.command }}"
+          eval "$build_cmd"
 
       - name: Deploy to Cloudflare Pages
         if: matrix.app.provider == 'cloudflare-pages'
