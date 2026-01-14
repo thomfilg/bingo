@@ -179,6 +179,10 @@ function getProjectType() {
  */
 function createCodeCheckRequest(modifiedFiles, projectType) {
   const filesList = modifiedFiles.map(f => f.path).join(', ');
+  // Create a truncated file list for display (show first 2 files, then "...")
+  const displayFilesList = modifiedFiles.length <= 2 
+    ? filesList 
+    : modifiedFiles.slice(0, 2).map(f => f.path).join(', ') + '...';
 
   console.log(`\n🔍 Code Quality Check Request Generated`);
   console.log(`Project Type: ${projectType}`);
@@ -231,7 +235,7 @@ Please provide a structured assessment with specific recommendations for improve
     console.log(`│                                                             │`);
     console.log(`│ Option 2 - Using /run-agent command:                       │`);
     console.log(`│   /run-agent code-review Review the recently modified      │`);
-    console.log(`│   files: ${filesList.substring(0, 25)}...│`);
+    console.log(`│   files: ${displayFilesList.padEnd(40).substring(0, 40)} │`);
     console.log(`│                                                             │`);
     console.log(`│ Option 3 - Manual review:                                  │`);
     console.log(`│   Review the prompt in .claude-code-check-request.json     │`);
