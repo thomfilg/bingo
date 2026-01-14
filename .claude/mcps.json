@@ -1,0 +1,138 @@
+{
+  "mcpServers": {
+    "pg_as_dashboard": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://postgres:mypassword@localhost:5432/as_dashboard"
+      ],
+      "type": "stdio"
+    },
+    "pg_status_site": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://postgres:mypassword@localhost:5432/status-site"
+      ],
+      "type": "stdio"
+    },
+    "docker": {
+      "command": "sh",
+      "args": [
+        "-c",
+        "docker.exe mcp gateway run || docker mcp gateway run"
+      ],
+      "type": "stdio",
+      "env": {}
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ],
+      "gallery": true
+    },
+    "playwright2": {
+      "type": "stdio",
+      "command": "sh",
+      "args": [
+        "-c",
+        "npx playwright install chrome && npx @playwright/mcp@latest"
+      ],
+      "gallery": true
+    },
+    "playwright-mcp-server": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-v",
+        "/local-directory:/local-directory",
+        "mcp/mcp-playwright"
+      ]
+    },
+    "kubernetes": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-kubernetes@latest"
+      ]
+    },
+    "terraform": {
+      "type": "stdio",
+      "command": "sh",
+      "args": [
+        "-c",
+        "if command -v docker.exe >/dev/null 2>&1; then docker.exe run -i --rm hashicorp/terraform-mcp-server; else docker run -i --rm hashicorp/terraform-mcp-server; fi"
+      ]
+    },
+    "aws-sso": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@aashari/mcp-server-aws-sso@latest"
+      ]
+    },
+    "domain-checker": {
+      "command": "sh",
+      "args": [
+        "-c",
+        "if command -v docker.exe >/dev/null 2>&1; then docker.exe run --rm -i domain-checker-mcp:latest; else docker run --rm -i domain-checker-mcp:latest; fi"
+      ],
+      "type": "stdio"
+    },
+    
+    "vault-radar": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "run", "--rm", "-i",
+        "-e", "HCP_PROJECT_ID=${HCP_PROJECT_ID}",
+        "-e", "HCP_CLIENT_ID=${HCP_CLIENT_ID}",
+        "-e", "HCP_CLIENT_SECRET=${HCP_CLIENT_SECRET}",
+        "hashicorp/vault-radar-mcp-server:latest"
+      ]
+    }
+  },
+  "atlassian": {
+    "command": "docker",
+    "args": [
+      "run",
+      "-i",
+      "--rm",
+      "-e",
+      "CONFLUENCE_URL",
+      "-e",
+      "CONFLUENCE_USERNAME",
+      "-e",
+      "JIRA_URL",
+      "-e",
+      "JIRA_USERNAME",
+      "-e",
+      "CONFLUENCE_API_TOKEN",
+      "-e",
+      "CONFLUENCE_PERSONAL_TOKEN",
+      "-e",
+      "JIRA_API_TOKEN",
+      "-e",
+      "JIRA_PERSONAL_TOKEN",
+      "mcp/atlassian"
+    ],
+    "env": {
+      "CONFLUENCE_URL": "https://personal.atlassian.net/wiki",
+      "CONFLUENCE_USERNAME": "thomfilg@gmail.com",
+      "JIRA_URL": "https://personal.atlassian.net",
+      "JIRA_USERNAME": "thomfilg@gmail.com",
+      "CONFLUENCE_API_TOKEN": "${ATLASSIAN_API_TOKEN}",
+      "CONFLUENCE_PERSONAL_TOKEN": "${ATLASSIAN_API_TOKEN}",
+      "JIRA_API_TOKEN": "${ATLASSIAN_API_TOKEN}",
+      "JIRA_PERSONAL_TOKEN": "${ATLASSIAN_API_TOKEN}"
+    }
+  }
+}
