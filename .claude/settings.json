@@ -7,6 +7,10 @@
           {
             "type": "command",
             "command": ".claude/hooks/set-git-author.sh"
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/setup-credentials.sh"
           }
         ]
       }
