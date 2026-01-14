@@ -13,7 +13,7 @@ fi
 
 # Build credentials JSON from environment variables
 # Only create if at least one secret is available
-if [ -n "$TRELLO_API_KEY" ] || [ -n "$GITHUB_PERSONAL_ACCESS_TOKEN" ]; then
+if [ -n "$TRELLO_API_KEY" ] || [ -n "$GH_PERSONAL_ACCESS_TOKEN" ]; then
   mkdir -p "$REPO_ROOT/credentials"
 
   cat > "$CREDS_FILE" << EOF
@@ -24,7 +24,7 @@ if [ -n "$TRELLO_API_KEY" ] || [ -n "$GITHUB_PERSONAL_ACCESS_TOKEN" ]; then
     "boardId": "${TRELLO_BOARD_ID:-}"
   },
   "github": {
-    "personalAccessToken": "${GITHUB_PERSONAL_ACCESS_TOKEN:-}"
+    "personalAccessToken": "${GH_PERSONAL_ACCESS_TOKEN:-}"
   }
 }
 EOF
