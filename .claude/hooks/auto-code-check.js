@@ -3,11 +3,18 @@
 /**
  * Auto Code Check Hook
  *
- * This hook automatically invokes the code-checker agent when Claude completes
- * tasks involving code implementation, modification, or development.
+ * This hook automatically detects code changes and creates a request for
+ * code quality analysis when Claude completes tasks involving code
+ * implementation, modification, or development.
  *
- * It analyzes the current working directory for recently modified files and
- * triggers a code quality assessment if coding activities are detected.
+ * IMPORTANT: This hook runs as a Node.js script in git hook context and
+ * cannot directly invoke Claude agents. Instead, it:
+ * 1. Detects recently modified code files
+ * 2. Creates a structured request file for code quality analysis
+ * 3. Provides instructions for manual review
+ *
+ * To trigger the actual code quality check, use the generated request file
+ * with Claude's code-checker agent manually or via a command.
  */
 
 const fs = require('fs');
@@ -164,18 +171,21 @@ function getProjectType() {
 }
 
 /**
- * Invoke the code-checker agent
+ * Create a code quality check request
+ *
+ * Note: This function creates a request file but cannot directly invoke the
+ * code-checker agent because hooks run outside Claude's execution context.
+ * The generated request file serves as a manual trigger mechanism.
  */
-function invokeCodeChecker(modifiedFiles, projectType) {
+function createCodeCheckRequest(modifiedFiles, projectType) {
   const filesList = modifiedFiles.map(f => f.path).join(', ');
 
-  console.log(`\n🔍 Code Quality Check Triggered`);
+  console.log(`\n🔍 Code Quality Check Request Generated`);
   console.log(`Project Type: ${projectType}`);
-  console.log(`Modified Files: ${filesList}`);
-  console.log(`Invoking code-checker agent...\n`);
+  console.log(`Modified Files: ${filesList}\n`);
 
   try {
-    // Create a prompt for the code-checker agent
+    // Create a structured prompt for the code-checker agent
     const prompt = `
 Please analyze the code quality of this ${projectType} project.
 
@@ -193,8 +203,6 @@ Focus on:
 Please provide a structured assessment with specific recommendations for improvement.
     `.trim();
 
-    // Use Claude's agent invocation (this would need to be adapted based on how agents are actually invoked)
-    // For now, we'll create a file that can be picked up by Claude
     const reportPath = path.join(process.cwd(), '.claude-code-check-request.json');
     const request = {
       timestamp: new Date().toISOString(),
@@ -213,12 +221,26 @@ Please provide a structured assessment with specific recommendations for improve
 
     fs.writeFileSync(reportPath, JSON.stringify(request, null, 2));
 
-    console.log(`📝 Code check request created: ${reportPath}`);
-    console.log(`💡 Tip: You can manually trigger code analysis by asking Claude to review these files.`);
+    console.log(`📝 Request file created: ${reportPath}\n`);
+    console.log(`┌─────────────────────────────────────────────────────────────┐`);
+    console.log(`│ 🤖 To trigger code quality analysis, run:                  │`);
+    console.log(`│                                                             │`);
+    console.log(`│ Option 1 - Using Claude directly:                          │`);
+    console.log(`│   Ask Claude: "Please run the code-checker agent on the    │`);
+    console.log(`│   files listed in .claude-code-check-request.json"         │`);
+    console.log(`│                                                             │`);
+    console.log(`│ Option 2 - Using /run-agent command:                       │`);
+    console.log(`│   /run-agent code-review Review the recently modified      │`);
+    console.log(`│   files: ${filesList.substring(0, 25)}...│`);
+    console.log(`│                                                             │`);
+    console.log(`│ Option 3 - Manual review:                                  │`);
+    console.log(`│   Review the prompt in .claude-code-check-request.json     │`);
+    console.log(`│   and invoke the code-checker agent manually               │`);
+    console.log(`└─────────────────────────────────────────────────────────────┘\n`);
 
   } catch (error) {
-    debug(`Error invoking code-checker: ${error.message}`);
-    console.log(`⚠️  Could not automatically invoke code-checker. Error: ${error.message}`);
+    debug(`Error creating code check request: ${error.message}`);
+    console.log(`⚠️  Could not create code check request. Error: ${error.message}`);
   }
 }
 
@@ -260,8 +282,8 @@ function main() {
     const projectType = getProjectType();
     debug(`Detected project type: ${projectType}`);
 
-    // Invoke code checker
-    invokeCodeChecker(nonLockFiles, projectType);
+    // Create code check request
+    createCodeCheckRequest(nonLockFiles, projectType);
 
   } catch (error) {
     debug(`Error in main execution: ${error.message}`);
@@ -278,5 +300,5 @@ module.exports = {
   getRecentlyModifiedFiles,
   isProjectDirectory,
   getProjectType,
-  invokeCodeChecker
+  createCodeCheckRequest
 };

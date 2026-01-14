@@ -42,3 +42,6 @@ credentials/*
 .DS_Store
 *.pem
 tasks
+
+# Claude generated files
+.claude-code-check-request.json
