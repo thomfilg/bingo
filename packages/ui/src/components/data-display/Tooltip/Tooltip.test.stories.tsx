@@ -1,8 +1,8 @@
-import React from 'react';
+import { Delete, Help, Info } from '@mui/icons-material';
+import { Box, Button, IconButton, Stack, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor } from 'storybook/test';
-import { Button, Stack, Box, IconButton, Typography } from '@mui/material';
-import { Help, Delete, Info } from '@mui/icons-material';
+import React from 'react';
+import { expect, userEvent, waitFor,within } from 'storybook/test';
 
 import { Tooltip } from './Tooltip';
 
@@ -89,7 +89,6 @@ export const ClickInteraction: Story = {
   name: '🖱️ Click Interaction Test',
   args: {
     title: 'Click tooltip',
-    trigger: 'click',
     variant: 'light',
   },
   render: (args) => (

@@ -1,17 +1,21 @@
-import React from 'react';
-import { Typography, alpha, Theme } from '@mui/material';
+import type { Theme} from '@mui/material';
+import { alpha,Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import React from 'react';
 
-import { TextProps } from './Text.types';
+import type { TextProps } from './Text.types';
 
 const getColorFromTheme = (theme: Theme, color: string) => {
   if (color === 'neutral') {
     return theme.palette.text.primary;
   }
 
+  if (color === 'secondary') {
+    return theme.palette.text.secondary;
+  }
+
   const colorMap: Record<string, string> = {
     primary: theme.palette.primary.main,
-    secondary: theme.palette.secondary.main,
     success: theme.palette.success.main,
     warning: theme.palette.warning.main,
     danger: theme.palette.error.main,
@@ -132,8 +136,7 @@ export const Text = React.forwardRef<HTMLElement, TextProps>(
       ...props
     },
     ref,
-  ) => {
-    return (
+  ) => (
       <StyledText
         ref={ref}
         customVariant={variant}
@@ -148,8 +151,7 @@ export const Text = React.forwardRef<HTMLElement, TextProps>(
       >
         {children}
       </StyledText>
-    );
-  },
+    ),
 );
 
 Text.displayName = 'Text';

@@ -1,6 +1,6 @@
+import { Box,Button, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, fn } from 'storybook/test';
-import { Button, Typography, Box } from '@mui/material';
+import { expect, fn,userEvent, within } from 'storybook/test';
 
 import { Modal, ModalContent } from './Modal';
 
@@ -27,8 +27,8 @@ export const BasicInteraction: Story = {
   },
   render: (args) => (
     <Modal {...args}>
-      <ModalContent>
-        <Box data-testid="modal-content">
+      <ModalContent dataTestId="basic-modal-content">
+        <Box data-testid="modal-inner-content">
           <Typography variant="h6" data-testid="modal-title">
             Test Modal
           </Typography>
@@ -48,7 +48,7 @@ export const BasicInteraction: Story = {
   play: async ({ step }) => {
     await step('Verify modal is open and content is accessible', async () => {
       // Modal content should be in document since modal is open by default
-      const modalContent = within(document.body).getByTestId('modal-content');
+      const modalContent = within(document.body).getByTestId('modal-inner-content');
       const modalTitle = within(document.body).getByTestId('modal-title');
       const cancelButton = within(document.body).getByTestId('cancel-button');
       const confirmButton = within(document.body).getByTestId('confirm-button');
@@ -84,7 +84,7 @@ export const KeyboardNavigation: Story = {
   },
   render: (args) => (
     <Modal {...args}>
-      <ModalContent>
+      <ModalContent dataTestId="keyboard-modal-content">
         <Box data-testid="keyboard-modal">
           <Typography
             id="keyboard-modal-title"
@@ -138,7 +138,7 @@ export const ResponsiveDesign: Story = {
   },
   render: (args) => (
     <Modal {...args}>
-      <ModalContent>
+      <ModalContent dataTestId="responsive-modal-content">
         <Box data-testid="responsive-modal">
           <Typography variant="h6" gutterBottom>
             Responsive Modal Test
@@ -173,7 +173,7 @@ export const VisualStates: Story = {
   },
   render: (args) => (
     <Modal {...args}>
-      <ModalContent>
+      <ModalContent dataTestId="visual-states-modal-content">
         <Box data-testid="visual-states-modal">
           <Typography variant="h6" gutterBottom>
             Visual States Test
@@ -213,7 +213,7 @@ export const EdgeCases: Story = {
   },
   render: (args) => (
     <Modal {...args}>
-      <ModalContent>
+      <ModalContent dataTestId="edge-case-modal-content">
         <Box data-testid="edge-case-modal">
           <Typography variant="h6" gutterBottom>
             Edge Cases Test

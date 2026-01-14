@@ -1,4 +1,4 @@
-import { ReactNode, HTMLAttributes } from 'react';
+import type { HTMLAttributes,ReactNode } from 'react';
 
 export type DrawerVariant = 'left' | 'right' | 'top' | 'bottom' | 'glass';
 export type DrawerAnchor = 'left' | 'right' | 'top' | 'bottom';
@@ -17,15 +17,18 @@ export interface DrawerProps extends Omit<HTMLAttributes<HTMLDivElement>, 'child
   hideBackdrop?: boolean;
   keepMounted?: boolean;
   className?: string;
+  dataTestId?: string;
 }
 
 export interface DrawerHeaderProps {
   children: ReactNode;
   onClose?: () => void;
   showCloseButton?: boolean;
+  dataTestId?: string;
 }
 
 export interface DrawerContentProps {
   children: ReactNode;
   padding?: boolean;
+  dataTestId?: string;
 }

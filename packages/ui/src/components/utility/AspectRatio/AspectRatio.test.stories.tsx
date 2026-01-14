@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor } from 'storybook/test';
 import { Box, Typography } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, waitFor,within } from 'storybook/test';
 
 import { AspectRatio } from './AspectRatio';
 

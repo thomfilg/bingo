@@ -1,36 +1,36 @@
-import React, { useState } from 'react';
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import {
-  Box,
-  Button,
-  Typography,
-  TextField,
-  List,
-  ListItem,
-  ListItemText,
-  Avatar,
-  Chip,
-  Switch,
-  FormControlLabel,
-  Stack,
-  Paper,
-  Grid,
-  Card,
-  CardContent,
-  IconButton,
-  Slider,
-  Divider,
-} from '@mui/material';
-import PersonIcon from '@mui/icons-material/Person';
-import SettingsIcon from '@mui/icons-material/Settings';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
+import PersonIcon from '@mui/icons-material/Person';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import SettingsIcon from '@mui/icons-material/Settings';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import {
+  Avatar,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  Divider,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Paper,
+  Slider,
+  Stack,
+  Switch,
+  TextField,
+  Typography,
+} from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import React, { useState } from 'react';
 
-import { SheetProps } from './Sheet.types';
 import { Sheet } from './Sheet';
+import type { SheetProps } from './Sheet.types';
 
 const meta: Meta<typeof Sheet> = {
   title: 'DataDisplay/Sheet',

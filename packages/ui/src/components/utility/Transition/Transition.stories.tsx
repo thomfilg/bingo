@@ -1,6 +1,6 @@
+import { Box, Button, ButtonGroup,Card, CardContent, Paper, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { Button, Box, Typography, Paper, Card, CardContent, ButtonGroup } from '@mui/material';
 
 import { Transition } from './Transition';
 import type { TransitionVariant } from './Transition.types';

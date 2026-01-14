@@ -1,4 +1,4 @@
-import { FormHTMLAttributes } from 'react';
+import type { FormHTMLAttributes } from 'react';
 
 export type FormVariant = 'vertical' | 'horizontal' | 'inline' | 'stepped';
 
@@ -7,6 +7,7 @@ export interface FormProps extends FormHTMLAttributes<HTMLFormElement> {
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
   spacing?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   children: React.ReactNode;
+  dataTestId?: string;
 }
 
 export interface FormFieldProps {
@@ -16,6 +17,7 @@ export interface FormFieldProps {
   error?: string;
   helperText?: string;
   children: React.ReactNode;
+  dataTestId?: string;
 }
 
 export interface FormLabelProps {
@@ -23,15 +25,18 @@ export interface FormLabelProps {
   error?: boolean;
   children: React.ReactNode;
   htmlFor?: string;
+  dataTestId?: string;
 }
 
 export interface FormControlProps {
   error?: boolean;
   fullWidth?: boolean;
   children: React.ReactNode;
+  dataTestId?: string;
 }
 
 export interface FormMessageProps {
   error?: boolean;
   children: React.ReactNode;
+  dataTestId?: string;
 }

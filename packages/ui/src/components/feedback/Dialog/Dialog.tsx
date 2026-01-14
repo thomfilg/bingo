@@ -1,27 +1,28 @@
-import React from 'react';
+import { Close as CloseIcon } from '@mui/icons-material';
+import type {
+  SxProps,
+  Theme} from '@mui/material';
 import {
-  Dialog as MuiDialog,
-  DialogTitle as MuiDialogTitle,
-  DialogContent as MuiDialogContent,
-  DialogActions as MuiDialogActions,
-  IconButton,
-  Typography,
-  Box,
-  Drawer,
-  useTheme,
   alpha,
   Backdrop,
+  Box,
+  Dialog as MuiDialog,
+  DialogActions as MuiDialogActions,
+  DialogContent as MuiDialogContent,
+  DialogTitle as MuiDialogTitle,
+  Drawer,
+  IconButton,
   keyframes,
-  SxProps,
-  Theme,
+  Typography,
+  useTheme,
 } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
+import React from 'react';
 
-import {
-  DialogProps,
-  DialogHeaderProps,
-  DialogContentProps,
+import type {
   DialogActionsProps,
+  DialogContentProps,
+  DialogHeaderProps,
+  DialogProps,
 } from './Dialog.types';
 
 // Define pulse animation
@@ -56,6 +57,7 @@ export const Dialog: React.FC<DialogProps> = ({
   borderRadius = 'lg',
   onClose,
   open,
+  dataTestId,
   ...props
 }) => {
   const theme = useTheme();
@@ -192,6 +194,7 @@ export const Dialog: React.FC<DialogProps> = ({
         anchor="right"
         open={open}
         onClose={onClose}
+        data-testid={dataTestId || 'dialog'}
         {...props}
       >
         <Box
@@ -208,6 +211,7 @@ export const Dialog: React.FC<DialogProps> = ({
               subtitle={description}
               showCloseButton={showCloseButton}
               onClose={onClose}
+              dataTestId={dataTestId}
             />
           )}
           {children}
@@ -226,7 +230,7 @@ export const Dialog: React.FC<DialogProps> = ({
       BackdropComponent={BackdropComponent}
       BackdropProps={{
         sx: {
-          backgroundColor: glass 
+          backgroundColor: glass
             ? alpha(theme.palette.common.black, 0.2)
             : alpha(theme.palette.common.black, 0.5),
           backdropFilter: glass ? 'blur(8px)' : 'none',
@@ -234,6 +238,7 @@ export const Dialog: React.FC<DialogProps> = ({
       }}
       PaperProps={{
         sx: getVariantStyles(),
+        'data-testid': dataTestId || 'dialog',
       }}
       {...props}
     >
@@ -243,6 +248,7 @@ export const Dialog: React.FC<DialogProps> = ({
           subtitle={description}
           showCloseButton={showCloseButton}
           onClose={onClose}
+          dataTestId={dataTestId}
         />
       )}
       {children}
@@ -256,6 +262,7 @@ export const DialogHeader: React.FC<DialogHeaderProps> = ({
   subtitle,
   showCloseButton = true,
   onClose,
+  dataTestId,
 }) => {
   if (children) {
     return (
@@ -267,6 +274,7 @@ export const DialogHeader: React.FC<DialogHeaderProps> = ({
 
   return (
     <MuiDialogTitle
+      data-testid={dataTestId ? `${dataTestId}-title` : 'dialog-title'}
       sx={{
         display: 'flex',
         alignItems: 'center',
@@ -288,6 +296,7 @@ export const DialogHeader: React.FC<DialogHeaderProps> = ({
         <IconButton
           aria-label="close"
           onClick={onClose}
+          data-testid={dataTestId ? `${dataTestId}-close` : 'dialog-close'}
           sx={{
             color: 'text.secondary',
             '&:hover': {
@@ -306,10 +315,11 @@ export const DialogContent: React.FC<DialogContentProps> = ({
   children,
   dividers = false,
   dense = false,
+  dataTestId,
   ...props
-}) => {
-  return (
+}) => (
     <MuiDialogContent
+      data-testid={dataTestId ? `${dataTestId}-content` : 'dialog-content'}
       dividers={dividers}
       sx={{
         padding: dense ? 1.5 : 3,
@@ -324,12 +334,12 @@ export const DialogContent: React.FC<DialogContentProps> = ({
       {children}
     </MuiDialogContent>
   );
-};
 
 export const DialogActions: React.FC<DialogActionsProps> = ({
   children,
   alignment = 'right',
   spacing = 1,
+  dataTestId,
   ...props
 }) => {
   const getJustifyContent = () => {
@@ -344,6 +354,7 @@ export const DialogActions: React.FC<DialogActionsProps> = ({
 
   return (
     <MuiDialogActions
+      data-testid={dataTestId ? `${dataTestId}-actions` : 'dialog-actions'}
       sx={{
         justifyContent: getJustifyContent(),
         gap: spacing,

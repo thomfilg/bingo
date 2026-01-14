@@ -32,21 +32,24 @@ The Toast component provides a non-intrusive notification system for displaying 
 | action     | `{ label: string; onClick: () => void }`                                | `undefined` | Action button configuration              |
 | promise    | `{ loading: string; success: string; error: string }`                   | `undefined` | Messages for promise-based notifications |
 | onClose    | `() => void`                                                            | `undefined` | Callback when toast is closed            |
+| dataTestId | `string`                                                                | `'toast'`   | Test ID for testing and automation       |
 
 ### ToastContainer Props
 
-| Prop      | Type                                                                                              | Default          | Description                         |
-| --------- | ------------------------------------------------------------------------------------------------- | ---------------- | ----------------------------------- |
-| position  | `'top-left' \| 'top-center' \| 'top-right' \| 'bottom-left' \| 'bottom-center' \| 'bottom-right'` | `'bottom-right'` | Position of the toast container     |
-| maxToasts | `number`                                                                                          | `5`              | Maximum number of toasts to display |
-| gap       | `number`                                                                                          | `12`             | Gap between toasts in pixels        |
+| Prop       | Type                                                                                              | Default              | Description                         |
+| ---------- | ------------------------------------------------------------------------------------------------- | -------------------- | ----------------------------------- |
+| position   | `'top-left' \| 'top-center' \| 'top-right' \| 'bottom-left' \| 'bottom-center' \| 'bottom-right'` | `'bottom-right'`     | Position of the toast container     |
+| maxToasts  | `number`                                                                                          | `5`                  | Maximum number of toasts to display |
+| gap        | `number`                                                                                          | `12`                 | Gap between toasts in pixels        |
+| className  | `string`                                                                                          | `undefined`          | CSS class name for styling          |
+| dataTestId | `string`                                                                                          | `'toast-container'`  | Test ID for testing and automation  |
 
 ## Usage
 
 ### Basic Usage
 
 ```tsx
-import { ToastProvider, useToast, ToastContainer } from '@repo/ui';
+import { ToastProvider, useToast, ToastContainer } from '@procurement/ui';
 
 // Wrap your app with ToastProvider
 function App() {
@@ -212,6 +215,329 @@ const handleSubmit = async (formData) => {
   });
 };
 ```
+
+## Testing
+
+The Toast component includes comprehensive testIds for automated testing. All testIds can be customized via the `dataTestId` prop.
+
+### TestIds Structure
+
+#### ToastContainer TestIds
+
+| Element | Default TestId | Description |
+| ------- | -------------- | ----------- |
+| Container | `toast-container` | Main container wrapping all toasts |
+| Toast Item Wrapper | `toast-container-item-{index}` | Individual toast wrapper with index |
+
+#### Toast TestIds
+
+| Element | Default TestId | Description |
+| ------- | -------------- | ----------- |
+| Toast Alert | `toast` | Main toast alert container |
+| Message | `toast-message` | Toast message typography |
+| Action Button | `toast-action` | Action button (when action prop is provided) |
+| Close Button | `toast-close` | Close button (when closable is true) |
+
+### Custom TestIds
+
+You can provide custom testIds to both the ToastContainer and individual toasts:
+
+```tsx
+// Container with custom testId
+<ToastContainer dataTestId="custom-toast-container" />
+
+// Individual toast with custom testId
+addToast({
+  message: 'Custom toast',
+  dataTestId: 'custom-toast',
+});
+```
+
+When using custom testIds, the child elements follow the pattern:
+- Message: `{dataTestId}-message`
+- Action: `{dataTestId}-action`
+- Close: `{dataTestId}-close`
+
+### Testing Examples
+
+#### Unit Testing with React Testing Library
+
+```tsx
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { ToastProvider, useToast, ToastContainer } from './Toast';
+
+describe('Toast Component', () => {
+  const TestComponent = () => {
+    const { addToast } = useToast();
+
+    return (
+      <div>
+        <button onClick={() => addToast({ message: 'Test message' })}>
+          Show Toast
+        </button>
+        <ToastContainer />
+      </div>
+    );
+  };
+
+  it('displays toast with correct message', async () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    const button = screen.getByText('Show Toast');
+    await userEvent.click(button);
+
+    expect(screen.getByTestId('toast')).toBeInTheDocument();
+    expect(screen.getByTestId('toast-message')).toHaveTextContent('Test message');
+  });
+
+  it('closes toast when close button is clicked', async () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    const button = screen.getByText('Show Toast');
+    await userEvent.click(button);
+
+    const closeButton = screen.getByTestId('toast-close');
+    await userEvent.click(closeButton);
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('toast')).not.toBeInTheDocument();
+    });
+  });
+
+  it('calls action callback when action button is clicked', async () => {
+    const actionCallback = vi.fn();
+
+    const TestComponentWithAction = () => {
+      const { addToast } = useToast();
+
+      return (
+        <div>
+          <button
+            onClick={() =>
+              addToast({
+                message: 'Action toast',
+                action: { label: 'Undo', onClick: actionCallback },
+              })
+            }
+          >
+            Show Toast
+          </button>
+          <ToastContainer />
+        </div>
+      );
+    };
+
+    render(
+      <ToastProvider>
+        <TestComponentWithAction />
+      </ToastProvider>
+    );
+
+    await userEvent.click(screen.getByText('Show Toast'));
+    await userEvent.click(screen.getByTestId('toast-action'));
+
+    expect(actionCallback).toHaveBeenCalledTimes(1);
+  });
+
+  it('auto-dismisses after specified duration', async () => {
+    const TestComponentWithDuration = () => {
+      const { addToast } = useToast();
+
+      return (
+        <div>
+          <button onClick={() => addToast({ message: 'Quick toast', duration: 1000 })}>
+            Show Toast
+          </button>
+          <ToastContainer />
+        </div>
+      );
+    };
+
+    render(
+      <ToastProvider>
+        <TestComponentWithDuration />
+      </ToastProvider>
+    );
+
+    await userEvent.click(screen.getByText('Show Toast'));
+    expect(screen.getByTestId('toast')).toBeInTheDocument();
+
+    await waitFor(
+      () => {
+        expect(screen.queryByTestId('toast')).not.toBeInTheDocument();
+      },
+      { timeout: 2000 }
+    );
+  });
+
+  it('displays multiple toasts with correct indices', async () => {
+    const TestMultipleToasts = () => {
+      const { addToast } = useToast();
+
+      return (
+        <div>
+          <button
+            onClick={() => {
+              addToast({ message: 'First toast' });
+              addToast({ message: 'Second toast' });
+            }}
+          >
+            Show Toasts
+          </button>
+          <ToastContainer />
+        </div>
+      );
+    };
+
+    render(
+      <ToastProvider>
+        <TestMultipleToasts />
+      </ToastProvider>
+    );
+
+    await userEvent.click(screen.getByText('Show Toasts'));
+
+    expect(screen.getByTestId('toast-container-item-0')).toBeInTheDocument();
+    expect(screen.getByTestId('toast-container-item-1')).toBeInTheDocument();
+  });
+});
+```
+
+#### E2E Testing with Playwright
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test.describe('Toast Component', () => {
+  test('should display and dismiss toast', async ({ page }) => {
+    await page.goto('/toast-demo');
+
+    // Trigger toast
+    await page.click('button:has-text("Show Toast")');
+
+    // Verify toast appears
+    const toast = page.getByTestId('toast');
+    await expect(toast).toBeVisible();
+
+    // Verify message
+    const message = page.getByTestId('toast-message');
+    await expect(message).toHaveText('Operation successful');
+
+    // Click close button
+    await page.getByTestId('toast-close').click();
+
+    // Verify toast is dismissed
+    await expect(toast).not.toBeVisible();
+  });
+
+  test('should handle action button click', async ({ page }) => {
+    await page.goto('/toast-demo');
+
+    await page.click('button:has-text("Show Action Toast")');
+
+    // Click action button
+    const actionButton = page.getByTestId('toast-action');
+    await expect(actionButton).toBeVisible();
+    await actionButton.click();
+
+    // Verify action was performed (depends on implementation)
+    await expect(page.getByText('Action performed')).toBeVisible();
+  });
+
+  test('should display multiple toasts', async ({ page }) => {
+    await page.goto('/toast-demo');
+
+    // Trigger multiple toasts
+    await page.click('button:has-text("Show Multiple")');
+
+    // Verify container and items
+    const container = page.getByTestId('toast-container');
+    await expect(container).toBeVisible();
+
+    await expect(page.getByTestId('toast-container-item-0')).toBeVisible();
+    await expect(page.getByTestId('toast-container-item-1')).toBeVisible();
+  });
+
+  test('should respect maxToasts limit', async ({ page }) => {
+    await page.goto('/toast-demo');
+
+    // Trigger more toasts than maxToasts
+    await page.click('button:has-text("Show Many Toasts")');
+
+    // Verify only maxToasts (5) are visible
+    const items = page.getByTestId(/toast-container-item-/);
+    await expect(items).toHaveCount(5);
+  });
+});
+```
+
+#### Integration Testing with Custom TestIds
+
+```tsx
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { ToastProvider, useToast, ToastContainer } from './Toast';
+
+describe('Toast with Custom TestIds', () => {
+  it('uses custom testIds correctly', async () => {
+    const TestComponent = () => {
+      const { addToast } = useToast();
+
+      return (
+        <div>
+          <button
+            onClick={() =>
+              addToast({
+                message: 'Custom toast',
+                dataTestId: 'notification-toast',
+                action: { label: 'Retry', onClick: vi.fn() },
+              })
+            }
+          >
+            Show Toast
+          </button>
+          <ToastContainer dataTestId="notification-container" />
+        </div>
+      );
+    };
+
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    await userEvent.click(screen.getByText('Show Toast'));
+
+    expect(screen.getByTestId('notification-container')).toBeInTheDocument();
+    expect(screen.getByTestId('notification-toast')).toBeInTheDocument();
+    expect(screen.getByTestId('notification-toast-message')).toBeInTheDocument();
+    expect(screen.getByTestId('notification-toast-action')).toBeInTheDocument();
+    expect(screen.getByTestId('notification-toast-close')).toBeInTheDocument();
+  });
+});
+```
+
+### Testing Best Practices
+
+1. **Always wrap with ToastProvider**: Tests must include the ToastProvider wrapper
+2. **Use waitFor for async operations**: Toast dismissal and animations require waitFor
+3. **Test auto-dismiss behavior**: Verify toasts disappear after specified duration
+4. **Test user interactions**: Click events on close and action buttons
+5. **Test multiple toasts**: Verify stacking and maxToasts behavior
+6. **Test variant styling**: Ensure correct icons and colors for each variant
+7. **Test accessibility**: Verify ARIA attributes and keyboard navigation
+8. **Test promise notifications**: Verify loading, success, and error states
+9. **Custom testIds**: Use custom testIds for domain-specific testing scenarios
 
 ## Related Components
 

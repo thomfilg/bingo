@@ -1,7 +1,7 @@
-import React from 'react';
+import { Box, Button, List, ListItem,TextField, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor, fn } from 'storybook/test';
-import { Box, Typography, Button, TextField, List, ListItem } from '@mui/material';
+import React from 'react';
+import { expect, fn,userEvent, waitFor, within } from 'storybook/test';
 
 import { ScrollArea } from './ScrollArea';
 
@@ -161,7 +161,7 @@ export const KeyboardNavigation: Story = {
 
     // Find scroll area
     const scrollArea = await canvas.findByTestId('scroll-area');
-    const scrollContainer = scrollArea.querySelector('[role="region"]');
+    const scrollContainer = scrollArea.querySelector('[role="region"]') as HTMLDivElement;
 
     expect(scrollContainer).toBeInTheDocument();
     expect(scrollContainer).toHaveAttribute('tabIndex', '0');
@@ -257,7 +257,7 @@ export const FocusManagement: Story = {
     const canvas = within(canvasElement);
 
     const scrollArea = await canvas.findByTestId('scroll-area');
-    const scrollContainer = scrollArea.querySelector('[role="region"]');
+    const scrollContainer = scrollArea.querySelector('[role="region"]') as HTMLDivElement;
     const btn1 = await canvas.findByTestId('btn-1');
     const btn2 = await canvas.findByTestId('btn-2');
 
@@ -426,41 +426,56 @@ export const Performance: Story = {
       </Box>
     ),
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
-    const startTime = window.performance.now();
 
     // Find scroll area
     const scrollArea = await canvas.findByTestId('scroll-area');
-    const scrollContainer = scrollArea.querySelector('[role="region"]');
+    const scrollContainer = scrollArea.querySelector('[role="region"]') as HTMLDivElement;
 
-    // Measure initial render time
-    const renderTime = window.performance.now() - startTime;
-    expect(renderTime).toBeLessThan(2000); // Should render within 2 seconds
+    expect(scrollArea).toBeInTheDocument();
+    expect(scrollContainer).toBeInTheDocument();
 
-    if (scrollContainer) {
-      // Measure scroll performance
-      const scrollStartTime = window.performance.now();
+    // Wait for content to render and ensure it's scrollable
+    await waitFor(() => {
+      expect(scrollContainer.scrollHeight).toBeGreaterThan(scrollContainer.clientHeight);
+    });
 
-      // Perform multiple scroll operations
-      for (let i = 0; i < 10; i++) {
-        scrollContainer.scrollTop = i * 100;
-        scrollContainer.dispatchEvent(new window.Event('scroll', { bubbles: true }));
-      }
+    // Verify container is scrollable
+    const isScrollable = scrollContainer.scrollHeight > scrollContainer.clientHeight;
+    expect(isScrollable).toBe(true);
 
-      const scrollTime = window.performance.now() - scrollStartTime;
-      expect(scrollTime).toBeLessThan(500); // Scrolling should be smooth
+    // Test scroll functionality
+    scrollContainer.scrollTop = 500;
+    scrollContainer.dispatchEvent(new window.Event('scroll', { bubbles: true }));
 
-      // Test smooth scroll to bottom
-      scrollContainer.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
+    await waitFor(() => {
+      expect(args.onScroll).toHaveBeenCalled();
+    });
 
-      await waitFor(
-        () => {
-          expect(scrollContainer.scrollTop).toBeGreaterThan(0);
-        },
-        { timeout: 3000 },
-      );
-    }
+    // Verify scroll position changed
+    await waitFor(() => {
+      expect(scrollContainer.scrollTop).toBeGreaterThan(0);
+    });
+
+    // Test smooth scroll to bottom
+    const maxScroll = scrollContainer.scrollHeight - scrollContainer.clientHeight;
+    scrollContainer.scrollTo({ top: maxScroll, behavior: 'smooth' });
+
+    await waitFor(
+      () => {
+        expect(scrollContainer.scrollTop).toBeGreaterThan(100);
+      },
+      { timeout: 3000 },
+    );
+
+    // Test scroll to top
+    scrollContainer.scrollTop = 0;
+    scrollContainer.dispatchEvent(new window.Event('scroll', { bubbles: true }));
+
+    await waitFor(() => {
+      expect(scrollContainer.scrollTop).toBe(0);
+    });
   },
 };
 

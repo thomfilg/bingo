@@ -1,6 +1,6 @@
-export { Collapsible, CollapsibleTrigger, CollapsibleContent } from './Collapsible';
+export { Collapsible, CollapsibleContent,CollapsibleTrigger } from './Collapsible';
 export type {
+  CollapsibleContentProps,
   CollapsibleProps,
   CollapsibleTriggerProps,
-  CollapsibleContentProps,
 } from './Collapsible.types';

@@ -1,10 +1,10 @@
+import { ExpandLess,ExpandMore } from '@mui/icons-material';
+import { Box,Button, Card, Stack, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor } from 'storybook/test';
 import { useState } from 'react';
-import { Typography, Button, Card, Stack, Box } from '@mui/material';
-import { ExpandMore, ExpandLess } from '@mui/icons-material';
+import { expect, userEvent, waitFor,within } from 'storybook/test';
 
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from './Collapsible';
+import { Collapsible, CollapsibleContent,CollapsibleTrigger } from './Collapsible';
 
 const meta: Meta<typeof Collapsible> = {
   title: 'Layout/Collapsible/Tests',

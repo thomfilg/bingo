@@ -1,16 +1,17 @@
-import React, { forwardRef } from 'react';
+import type {
+  Theme} from '@mui/material';
 import {
-  Switch as MuiSwitch,
-  Box,
-  Typography,
-  FormHelperText,
   alpha,
+  Box,
+  FormHelperText,
   keyframes,
-  Theme,
+  Switch as MuiSwitch,
+  Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import React, { forwardRef } from 'react';
 
-import { SwitchProps } from './Switch.types';
+import type { SwitchProps } from './Switch.types';
 
 const glowAnimation = keyframes`
   0% {
@@ -413,6 +414,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
       loading = false,
       ripple = false,
       pulse = false,
+      dataTestId,
       ...props
     },
     ref,
@@ -441,7 +443,8 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
             'aria-label': props['aria-label'],
             'aria-describedby': props['aria-describedby'],
             ...props.inputProps,
-          }}
+            ...(dataTestId ? { 'data-testid': dataTestId } : { 'data-testid': 'switch' }),
+          } as React.InputHTMLAttributes<HTMLInputElement>}
           {...props}
         />
 
@@ -515,10 +518,14 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
 
     if (!label) {
       return (
-        <Box>
+        <Box data-testid={dataTestId ? `${dataTestId}-container` : 'switch-container'}>
           {switchElement}
           {helperText && (
-            <FormHelperText error={error} sx={{ mt: 1 }}>
+            <FormHelperText
+              error={error}
+              sx={{ mt: 1 }}
+              data-testid={dataTestId ? `${dataTestId}-helper` : 'switch-helper'}
+            >
               {helperText}
             </FormHelperText>
           )}
@@ -527,7 +534,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
     }
 
     return (
-      <Box>
+      <Box data-testid={dataTestId ? `${dataTestId}-container` : 'switch-container'}>
         <LabelContainer labelPosition={labelPosition} error={error}>
           {labelPosition === 'start' && switchElement}
 
@@ -536,6 +543,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
               variant="body2"
               fontWeight={500}
               color={error ? 'error.main' : 'text.primary'}
+              data-testid={dataTestId ? `${dataTestId}-label` : 'switch-label'}
             >
               {label}
             </Typography>
@@ -554,7 +562,11 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
         </LabelContainer>
 
         {helperText && (
-          <FormHelperText error={error} sx={{ mt: 1 }}>
+          <FormHelperText
+            error={error}
+            sx={{ mt: 1 }}
+            data-testid={dataTestId ? `${dataTestId}-helper` : 'switch-helper'}
+          >
             {helperText}
           </FormHelperText>
         )}

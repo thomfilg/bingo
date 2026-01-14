@@ -1,12 +1,12 @@
-export { Command, CommandInput, CommandList, CommandGroup, CommandEmpty, CommandLoading, CommandSeparator } from './Command';
+export { Command, CommandEmpty, CommandGroup, CommandInput, CommandList, CommandLoading, CommandSeparator } from './Command';
 export type {
-  CommandProps,
-  CommandInputProps,
-  CommandListProps,
-  CommandGroupProps,
-  CommandItemProps,
   CommandEmptyProps,
-  CommandLoadingProps,
-  CommandSeparatorProps,
+  CommandGroupProps,
+  CommandInputProps,
   CommandItem,
+  CommandItemProps,
+  CommandListProps,
+  CommandLoadingProps,
+  CommandProps,
+  CommandSeparatorProps,
 } from './Command.types';

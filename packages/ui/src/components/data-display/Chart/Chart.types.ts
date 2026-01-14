@@ -1,4 +1,4 @@
-import { CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 
 export type ChartType = 'line' | 'bar' | 'area' | 'pie' | 'radar' | 'scatter' | 'composed';
 
@@ -59,4 +59,7 @@ export interface ChartProps {
   percentage?: boolean;
   showValues?: boolean;
   responsive?: boolean;
+  innerRadius?: number;
+  centerLabel?: string | { label: string; value: string | number };
+  'data-testid'?: string;
 }

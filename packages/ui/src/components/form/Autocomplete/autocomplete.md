@@ -327,3 +327,433 @@ const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 - No memory leaks; event listeners cleaned on unmount.
 - Handles 500 suggestions smoothly; optional virtualization path documented.
 - Docs updated with examples for search, filter, and command palette scenarios.
+
+---
+
+## 15) Testing
+
+### Test IDs Overview
+
+This section describes all `data-testid` attributes available in the Autocomplete component for testing purposes.
+
+### Container Elements
+
+#### `autocomplete-container`
+- **Element:** Root container Box
+- **Location:** Main wrapper element containing the entire autocomplete
+- **Usage:** Query the root container to verify component is rendered
+```typescript
+const container = await canvas.findByTestId('autocomplete-container');
+expect(container).toBeInTheDocument();
+```
+
+#### `selected-items-container`
+- **Element:** Container for selected item chips (multiple mode only)
+- **Location:** ChipContainer Box that wraps all selected chips
+- **Conditional:** Only rendered when `multiple={true}` and `selectedItems.length > 0`
+- **Usage:** Query container to verify chips are rendered
+```typescript
+const chipContainer = await canvas.findByTestId('selected-items-container');
+expect(chipContainer).toBeInTheDocument();
+```
+
+### Chip Elements (Multiple Mode)
+
+#### `selected-chip-${index}`
+- **Element:** Individual selected item chip
+- **Location:** Each Chip component in the selected items container
+- **Conditional:** Only in multiple mode with selected items
+- **Index:** Zero-based index of selected item
+- **Usage:** Query specific chips or all chips
+```typescript
+// Get all chips
+const chips = await canvas.findAllByTestId(/selected-chip-/);
+expect(chips).toHaveLength(2);
+
+// Get specific chip
+const firstChip = await canvas.findByTestId('selected-chip-0');
+expect(firstChip).toHaveTextContent('Option 1');
+```
+
+### Dropdown Elements
+
+#### `suggestions-dropdown`
+- **Element:** Dropdown Paper container
+- **Location:** MUI Paper component that wraps the suggestions list
+- **Conditional:** Only rendered when dropdown is `open`
+- **Usage:** Query to verify dropdown is visible
+```typescript
+// Wait for dropdown to appear
+const dropdown = await canvas.findByTestId('suggestions-dropdown');
+expect(dropdown).toBeVisible();
+```
+
+#### `suggestions-list`
+- **Element:** List element containing all suggestions
+- **Location:** MUI List component inside the dropdown Paper
+- **Conditional:** Only rendered when dropdown is `open`
+- **Usage:** Query list to get suggestions container
+```typescript
+const list = await canvas.findByTestId('suggestions-list');
+expect(list).toBeInTheDocument();
+
+// Count suggestions
+const items = await within(list).findAllByRole('option');
+expect(items).toHaveLength(expectedCount);
+```
+
+#### `suggestion-item-${index}`
+- **Element:** Individual suggestion list item
+- **Location:** Each ListItem in the suggestions list
+- **Index:** Zero-based index of suggestion in filtered list
+- **Usage:** Query specific suggestion or all suggestions
+```typescript
+// Get all suggestions
+const suggestions = await canvas.findAllByTestId(/suggestion-item-/);
+expect(suggestions).toHaveLength(5);
+
+// Click specific suggestion
+const firstSuggestion = await canvas.findByTestId('suggestion-item-0');
+await userEvent.click(firstSuggestion);
+```
+
+### Test Patterns
+
+#### Single Selection Test
+```typescript
+play: async ({ canvasElement, args }) => {
+  const canvas = within(canvasElement);
+
+  // Find input and type
+  const input = canvas.getByRole('combobox');
+  await userEvent.type(input, 'test');
+
+  // Wait for dropdown to appear
+  const dropdown = await canvas.findByTestId('suggestions-dropdown');
+  expect(dropdown).toBeVisible();
+
+  // Get suggestions
+  const suggestions = await canvas.findAllByTestId(/suggestion-item-/);
+  expect(suggestions.length).toBeGreaterThan(0);
+
+  // Click first suggestion
+  await userEvent.click(suggestions[0]);
+
+  // Verify selection
+  expect(args.onSelect).toHaveBeenCalled();
+}
+```
+
+#### Multiple Selection Test
+```typescript
+play: async ({ canvasElement, args }) => {
+  const canvas = within(canvasElement);
+
+  const input = canvas.getByRole('combobox');
+
+  // Select first item
+  await userEvent.type(input, 'option 1');
+  const dropdown1 = await canvas.findByTestId('suggestions-dropdown');
+  const suggestion1 = await within(dropdown1).findByTestId('suggestion-item-0');
+  await userEvent.click(suggestion1);
+
+  // Wait for chip to appear
+  await waitFor(async () => {
+    const chip = await canvas.findByTestId('selected-chip-0');
+    expect(chip).toBeInTheDocument();
+  }, { timeout: 1000 });
+
+  // Clear input
+  await userEvent.clear(input);
+
+  // Select second item
+  await userEvent.type(input, 'option 2');
+  const dropdown2 = await canvas.findByTestId('suggestions-dropdown');
+  const suggestion2 = await within(dropdown2).findByTestId('suggestion-item-0');
+  await userEvent.click(suggestion2);
+
+  // Verify both chips exist
+  await waitFor(async () => {
+    const chips = await canvas.findAllByTestId(/selected-chip-/);
+    expect(chips).toHaveLength(2);
+  }, { timeout: 1000 });
+}
+```
+
+#### Remove Selected Item Test
+```typescript
+play: async ({ canvasElement, args }) => {
+  const canvas = within(canvasElement);
+
+  // Wait for chips to render
+  const chips = await canvas.findAllByTestId(/selected-chip-/);
+  expect(chips).toHaveLength(2);
+
+  // Click delete button on first chip
+  const deleteButton = within(chips[0]).getByTestId('CancelIcon');
+  await userEvent.click(deleteButton);
+
+  // Verify chip was removed
+  await waitFor(async () => {
+    const remainingChips = await canvas.findAllByTestId(/selected-chip-/);
+    expect(remainingChips).toHaveLength(1);
+  }, { timeout: 1000 });
+
+  // Verify callback was called
+  expect(args.onSelectedItemsChange).toHaveBeenCalled();
+}
+```
+
+#### Dropdown Visibility Test
+```typescript
+play: async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+
+  const input = canvas.getByRole('combobox');
+
+  // Initially, dropdown should not exist
+  expect(canvas.queryByTestId('suggestions-dropdown')).not.toBeInTheDocument();
+
+  // Type to trigger dropdown
+  await userEvent.type(input, 'test');
+
+  // Wait for dropdown to appear
+  await waitFor(async () => {
+    const dropdown = await canvas.findByTestId('suggestions-dropdown');
+    expect(dropdown).toBeVisible();
+  }, { timeout: 1000 });
+
+  // Press Escape to close
+  await userEvent.keyboard('{Escape}');
+
+  // Verify dropdown is gone
+  await waitFor(() => {
+    expect(canvas.queryByTestId('suggestions-dropdown')).not.toBeInTheDocument();
+  }, { timeout: 500 });
+}
+```
+
+#### Keyboard Navigation Test
+```typescript
+play: async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+
+  const input = canvas.getByRole('combobox');
+  await userEvent.type(input, 'test');
+
+  // Wait for suggestions
+  await canvas.findByTestId('suggestions-dropdown');
+  const suggestions = await canvas.findAllByTestId(/suggestion-item-/);
+
+  // Press ArrowDown to highlight first item
+  await userEvent.keyboard('{ArrowDown}');
+
+  // Verify first item is highlighted (via aria-selected or background color)
+  const firstItem = suggestions[0];
+  expect(firstItem).toHaveAttribute('aria-selected', 'true');
+
+  // Press Enter to select
+  await userEvent.keyboard('{Enter}');
+
+  // Verify dropdown closes
+  await waitFor(() => {
+    expect(canvas.queryByTestId('suggestions-dropdown')).not.toBeInTheDocument();
+  }, { timeout: 500 });
+}
+```
+
+#### Ghost Text Test
+```typescript
+play: async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+
+  const input = canvas.getByRole('combobox');
+
+  // Type partial match
+  await userEvent.type(input, 'opt');
+
+  // Wait for suggestions
+  await canvas.findByTestId('suggestions-dropdown');
+
+  // Verify input value (ghost text is visual only, not in input value)
+  expect(input).toHaveValue('opt');
+
+  // Press Tab to accept ghost text
+  await userEvent.tab();
+
+  // Input should now have complete value
+  expect(input).toHaveValue('option'); // Assuming ghost suggested "option"
+}
+```
+
+### Props That Affect Test Behavior
+
+#### `multiple`
+- **Type:** `boolean`
+- **Default:** `false`
+- **Impact:**
+  - When `true`: Shows chips, allows multiple selections
+  - When `false`: Single selection only, no chips
+- **TestIds affected:**
+  - `selected-items-container` (only when true)
+  - `selected-chip-${index}` (only when true)
+
+#### `allowFreeText`
+- **Type:** `boolean`
+- **Default:** `true`
+- **Impact:** When true, allows user to submit text not in suggestions
+
+#### `async`
+- **Type:** `boolean`
+- **Default:** `false`
+- **Impact:** When true, shows loading spinner while fetching suggestions
+
+#### `showGhostText`
+- **Type:** `boolean`
+- **Default:** `true`
+- **Impact:** When true, shows inline suggestion completion
+
+#### `maxVisibleItems`
+- **Type:** `number`
+- **Default:** `10`
+- **Impact:** Limits number of suggestions shown in dropdown
+
+### Common Test Scenarios
+
+#### 1. Basic Rendering
+```typescript
+const container = await canvas.findByTestId('autocomplete-container');
+expect(container).toBeInTheDocument();
+
+const input = canvas.getByRole('combobox');
+expect(input).toBeInTheDocument();
+```
+
+#### 2. Suggestions Appear on Input
+```typescript
+const input = canvas.getByRole('combobox');
+await userEvent.type(input, 'search term');
+
+const dropdown = await canvas.findByTestId('suggestions-dropdown');
+expect(dropdown).toBeVisible();
+```
+
+#### 3. Clicking a Suggestion
+```typescript
+await userEvent.type(input, 'test');
+const suggestions = await canvas.findAllByTestId(/suggestion-item-/);
+await userEvent.click(suggestions[0]);
+
+expect(args.onSelect).toHaveBeenCalledWith(expectedItem);
+```
+
+#### 4. Multiple Selections
+```typescript
+// Make selections...
+const chips = await canvas.findAllByTestId(/selected-chip-/);
+expect(chips).toHaveLength(expectedCount);
+```
+
+#### 5. Removing a Selection
+```typescript
+const chip = await canvas.findByTestId('selected-chip-0');
+const deleteButton = within(chip).getByTestId('CancelIcon');
+await userEvent.click(deleteButton);
+
+await waitFor(() => {
+  expect(canvas.queryByTestId('selected-chip-0')).not.toBeInTheDocument();
+});
+```
+
+### Troubleshooting
+
+#### Issue: "Unable to find dropdown"
+
+**Reason:** Dropdown only renders when `open` state is true
+
+**Solution:** Type in input first to trigger dropdown:
+```typescript
+const input = canvas.getByRole('combobox');
+await userEvent.type(input, 'text');
+const dropdown = await canvas.findByTestId('suggestions-dropdown');
+```
+
+#### Issue: "Chip testIds not found"
+
+**Reason:** Chips only render in `multiple` mode with selected items
+
+**Solution:** Verify component has `multiple={true}` and items are selected:
+```typescript
+// Only query chips if multiple mode is enabled
+if (args.multiple) {
+  const chips = await canvas.findAllByTestId(/selected-chip-/);
+}
+```
+
+#### Issue: "Test timing out when finding suggestions"
+
+**Reason:** Debounce delay or async loading
+
+**Solution:** Increase timeout and wait for dropdown:
+```typescript
+await waitFor(async () => {
+  const suggestions = await canvas.findAllByTestId(/suggestion-item-/);
+  expect(suggestions.length).toBeGreaterThan(0);
+}, { timeout: 2000 });
+```
+
+#### Issue: "Suggestions not visible after typing"
+
+**Reason:** No matching suggestions or `open` state is false
+
+**Solution:** Check filtered results and verify suggestions exist:
+```typescript
+// Check if dropdown exists at all
+const dropdown = canvas.queryByTestId('suggestions-dropdown');
+if (!dropdown) {
+  // Dropdown didn't open - check why
+  // - Is there a matching suggestion?
+  // - Was user closed dropdown previously?
+}
+```
+
+### Best Practices
+
+1. **Always wait for dropdown** before querying suggestions
+2. **Use regex patterns** for dynamic testIds: `/selected-chip-/`, `/suggestion-item-/`
+3. **Check conditional rendering** before asserting existence (multiple mode, open state)
+4. **Clear input between selections** in multiple mode tests
+5. **Use waitFor** when expecting DOM changes (chips added/removed, dropdown opens/closes)
+6. **Account for debounce** - default 150ms delay before suggestions update
+
+### Related Elements Without TestIds
+
+#### Input Field
+- **Query Method:** `canvas.getByRole('combobox')`
+- **ARIA Attributes:**
+  - `role="combobox"`
+  - `aria-expanded` (true when dropdown open)
+  - `aria-controls` (points to listbox ID)
+  - `aria-activedescendant` (points to active suggestion)
+
+#### List Container
+- **Query Method:** `canvas.getByRole('listbox')`
+- **Location:** The List element inside `suggestions-list` testId
+
+#### List Items
+- **Query Method:** `canvas.getAllByRole('option')`
+- **Alternative:** Use `suggestion-item-${index}` testIds
+
+#### Ghost Text
+- **No direct query** - visual only, not in DOM as queryable element
+- **Test approach:** Verify behavior by Tab/ArrowRight completion
+
+### Change Log
+
+- **2025-10-08:** Initial testId implementation
+  - Added `autocomplete-container`
+  - Added `selected-items-container`
+  - Added `selected-chip-${index}`
+  - Added `suggestions-dropdown`
+  - Added `suggestions-list`
+  - Added `suggestion-item-${index}`

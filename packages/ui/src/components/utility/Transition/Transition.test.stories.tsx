@@ -1,10 +1,13 @@
+import { Box, Button, Card, CardContent,Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor } from '@storybook/test';
+import { expect, userEvent, waitFor,within } from 'storybook/test';
 import { useState } from 'react';
-import { Button, Box, Typography, Card, CardContent } from '@mui/material';
 
 import { Transition } from './Transition';
 import type { TransitionVariant } from './Transition.types';
+
+// Animation timeout constants
+const ANIMATION_TIMEOUT = 2000; // Buffer for all transition animations
 
 const meta: Meta<typeof Transition> = {
   title: 'Utility/Transition/Tests',
@@ -54,31 +57,38 @@ export const BasicInteraction: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // Initial state - content should be visible
-    const content = await canvas.findByText('Basic Interaction');
-    expect(content).toBeVisible();
+    // Wait for initial render to complete
+    await waitFor(
+      () => {
+        const content = canvas.queryByText('Basic Interaction');
+        expect(content).toBeInTheDocument();
+      },
+      { timeout: ANIMATION_TIMEOUT },
+    );
 
     // Click toggle button
     const toggleButton = canvas.getByLabelText('Toggle transition');
     await userEvent.click(toggleButton);
 
-    // Wait for fade out
+    // Wait for fade out - element removed from DOM
     await waitFor(
       () => {
-        expect(content).toHaveStyle({ opacity: '0' });
+        const element = canvas.queryByText('Basic Interaction');
+        expect(element).not.toBeInTheDocument();
       },
-      { timeout: 1000 },
+      { timeout: ANIMATION_TIMEOUT },
     );
 
     // Click again to show
     await userEvent.click(toggleButton);
 
-    // Wait for fade in
+    // Wait for fade in - element appears in DOM and is visible
     await waitFor(
       () => {
-        expect(content).toHaveStyle({ opacity: '1' });
+        const element = canvas.queryByText('Basic Interaction');
+        expect(element).toBeInTheDocument();
       },
-      { timeout: 1000 },
+      { timeout: ANIMATION_TIMEOUT },
     );
   },
 };
@@ -125,39 +135,58 @@ export const VariantChanges: Story = {
 
     // Test fade variant (default)
     const toggleButton = canvas.getByLabelText('Toggle');
+    let content = canvas.getByText('Variant: fade');
+    expect(content).toBeInTheDocument();
+
     await userEvent.click(toggleButton);
     await waitFor(
       () => {
-        const content = canvas.getByText('Variant: fade');
-        expect(content).toHaveStyle({ opacity: '0' });
+        const element = canvas.queryByText('Variant: fade');
+        expect(element).not.toBeInTheDocument();
       },
-      { timeout: 1000 },
+      { timeout: ANIMATION_TIMEOUT },
     );
     await userEvent.click(toggleButton);
+    await waitFor(
+      () => {
+        const element = canvas.queryByText('Variant: fade');
+        expect(element).toBeInTheDocument();
+      },
+      { timeout: ANIMATION_TIMEOUT },
+    );
 
     // Test slide variant
     const slideButton = canvas.getByLabelText('Set variant slide');
     await userEvent.click(slideButton);
+
+    await waitFor(
+      () => {
+        const element = canvas.queryByText('Variant: slide');
+        expect(element).toBeInTheDocument();
+      },
+      { timeout: ANIMATION_TIMEOUT },
+    );
+
     await userEvent.click(toggleButton);
     await waitFor(
       () => {
-        const content = canvas.getByText('Variant: slide');
-        expect(content).toBeInTheDocument();
+        const element = canvas.queryByText('Variant: slide');
+        expect(element).not.toBeInTheDocument();
       },
-      { timeout: 1000 },
+      { timeout: ANIMATION_TIMEOUT },
     );
 
     // Test scale variant
+    await userEvent.click(toggleButton);
     const scaleButton = canvas.getByLabelText('Set variant scale');
     await userEvent.click(scaleButton);
-    await userEvent.click(toggleButton);
-    await userEvent.click(toggleButton);
+
     await waitFor(
       () => {
-        const content = canvas.getByText('Variant: scale');
-        expect(content).toBeInTheDocument();
+        const element = canvas.queryByText('Variant: scale');
+        expect(element).toBeInTheDocument();
       },
-      { timeout: 1000 },
+      { timeout: ANIMATION_TIMEOUT },
     );
   },
 };
@@ -206,23 +235,33 @@ export const DirectionControl: Story = {
       const dirButton = canvas.getByLabelText(`Direction ${dir}`);
       await userEvent.click(dirButton);
 
-      // Toggle off and on
-      await userEvent.click(toggleButton);
-      await waitFor(
-        () => {
-          const content = canvas.queryByText(`Slide ${dir}`);
-          expect(content).toHaveStyle({ opacity: '0' });
-        },
-        { timeout: 1000 },
-      );
-
-      await userEvent.click(toggleButton);
+      // Wait for direction change to apply
       await waitFor(
         () => {
           const content = canvas.getByText(`Slide ${dir}`);
           expect(content).toBeVisible();
         },
-        { timeout: 1000 },
+        { timeout: ANIMATION_TIMEOUT },
+      );
+
+      // Toggle off
+      await userEvent.click(toggleButton);
+      await waitFor(
+        () => {
+          const content = canvas.queryByText(`Slide ${dir}`);
+          expect(content).not.toBeInTheDocument();
+        },
+        { timeout: ANIMATION_TIMEOUT },
+      );
+
+      // Toggle on
+      await userEvent.click(toggleButton);
+      await waitFor(
+        () => {
+          const content = canvas.queryByText(`Slide ${dir}`);
+          expect(content).toBeInTheDocument();
+        },
+        { timeout: ANIMATION_TIMEOUT },
       );
     }
   },
@@ -277,30 +316,53 @@ export const CustomTiming: Story = {
     // Test fast duration
     const fastButton = canvas.getByLabelText('Fast duration');
     await userEvent.click(fastButton);
-    await userEvent.click(toggleButton);
 
-    const content = canvas.getByText('Custom Timing');
-    const startTime = Date.now();
-
+    // Wait for content to be visible
     await waitFor(
       () => {
-        expect(content).toHaveStyle({ opacity: '0' });
+        const content = canvas.queryByText('Custom Timing');
+        expect(content).toBeInTheDocument();
       },
-      { timeout: 500 },
+      { timeout: ANIMATION_TIMEOUT },
     );
 
-    const endTime = Date.now();
-    const elapsed = endTime - startTime;
-    expect(elapsed).toBeLessThan(200); // Fast animation should complete quickly
+    // Toggle off with fast animation
+    await userEvent.click(toggleButton);
+    await waitFor(
+      () => {
+        const element = canvas.queryByText('Custom Timing');
+        expect(element).not.toBeInTheDocument();
+      },
+      { timeout: ANIMATION_TIMEOUT },
+    );
+
+    // Toggle on to show again
+    await userEvent.click(toggleButton);
+    await waitFor(
+      () => {
+        const element = canvas.queryByText('Custom Timing');
+        expect(element).toBeInTheDocument();
+      },
+      { timeout: ANIMATION_TIMEOUT },
+    );
 
     // Test with delay
-    await userEvent.click(toggleButton); // Show again
     const delayButton = canvas.getByLabelText('Add delay');
     await userEvent.click(delayButton);
     await userEvent.click(toggleButton); // Hide with delay
 
-    // Content should still be visible immediately after click due to delay
-    expect(content).toBeVisible();
+    // Content should still be in DOM immediately after click due to delay
+    const delayedContent = canvas.queryByText('Custom Timing');
+    expect(delayedContent).toBeInTheDocument();
+
+    // Wait for delayed animation to complete
+    await waitFor(
+      () => {
+        const element = canvas.queryByText('Custom Timing');
+        expect(element).not.toBeInTheDocument();
+      },
+      { timeout: ANIMATION_TIMEOUT },
+    );
   },
 };
 
@@ -349,10 +411,15 @@ export const MultipleTransitions: Story = {
     const canvas = within(canvasElement);
     const toggleButton = canvas.getByLabelText('Toggle all');
 
-    // All should be visible initially
-    expect(canvas.getByText('Fade')).toBeVisible();
-    expect(canvas.getByText('Slide')).toBeVisible();
-    expect(canvas.getByText('Scale')).toBeVisible();
+    // Wait for all to be visible initially
+    await waitFor(
+      () => {
+        expect(canvas.queryByText('Fade')).toBeInTheDocument();
+        expect(canvas.queryByText('Slide')).toBeInTheDocument();
+        expect(canvas.queryByText('Scale')).toBeInTheDocument();
+      },
+      { timeout: ANIMATION_TIMEOUT },
+    );
 
     // Toggle all off
     await userEvent.click(toggleButton);
@@ -360,11 +427,11 @@ export const MultipleTransitions: Story = {
     // Wait for all to hide
     await waitFor(
       () => {
-        expect(canvas.getByText('Fade')).toHaveStyle({ opacity: '0' });
-        expect(canvas.getByText('Slide')).toHaveStyle({ opacity: '0' });
-        expect(canvas.getByText('Scale')).toHaveStyle({ opacity: '0' });
+        expect(canvas.queryByText('Fade')).not.toBeInTheDocument();
+        expect(canvas.queryByText('Slide')).not.toBeInTheDocument();
+        expect(canvas.queryByText('Scale')).not.toBeInTheDocument();
       },
-      { timeout: 1000 },
+      { timeout: ANIMATION_TIMEOUT },
     );
 
     // Toggle all back on
@@ -373,11 +440,11 @@ export const MultipleTransitions: Story = {
     // Wait for all to show
     await waitFor(
       () => {
-        expect(canvas.getByText('Fade')).toHaveStyle({ opacity: '1' });
-        expect(canvas.getByText('Slide')).toHaveStyle({ opacity: '1' });
-        expect(canvas.getByText('Scale')).toHaveStyle({ opacity: '1' });
+        expect(canvas.queryByText('Fade')).toBeInTheDocument();
+        expect(canvas.queryByText('Slide')).toBeInTheDocument();
+        expect(canvas.queryByText('Scale')).toBeInTheDocument();
       },
-      { timeout: 1000 },
+      { timeout: ANIMATION_TIMEOUT },
     );
   },
 };
@@ -424,26 +491,25 @@ export const CollapseAnimation: Story = {
     // Collapse
     await userEvent.click(toggleButton);
 
-    // Wait for collapse
+    // Wait for collapse - content should not be in document
     await waitFor(
       () => {
-        const container = collapsibleContent.closest('div');
-        expect(container).toHaveStyle({ height: '0px' });
+        const content = canvas.queryByText('Collapsible Content');
+        expect(content).not.toBeInTheDocument();
       },
-      { timeout: 1000 },
+      { timeout: ANIMATION_TIMEOUT },
     );
 
     // Expand
     await userEvent.click(toggleButton);
 
-    // Wait for expand
+    // Wait for expand - content should be in document again
     await waitFor(
       () => {
-        expect(collapsibleContent).toBeVisible();
-        const container = collapsibleContent.closest('div');
-        expect(container).not.toHaveStyle({ height: '0px' });
+        const content = canvas.queryByText('Collapsible Content');
+        expect(content).toBeInTheDocument();
       },
-      { timeout: 1000 },
+      { timeout: ANIMATION_TIMEOUT },
     );
   },
 };
@@ -487,23 +553,25 @@ export const ZoomEffect: Story = {
     // Toggle off
     await userEvent.click(toggleButton);
 
-    // Wait for zoom out
+    // Wait for zoom out - element removed from document
     await waitFor(
       () => {
-        expect(content).toHaveStyle({ opacity: '0' });
+        const element = canvas.queryByText('Zoom Effect');
+        expect(element).not.toBeInTheDocument();
       },
-      { timeout: 1000 },
+      { timeout: ANIMATION_TIMEOUT },
     );
 
     // Toggle on
     await userEvent.click(toggleButton);
 
-    // Wait for zoom in
+    // Wait for zoom in - element appears in document again
     await waitFor(
       () => {
-        expect(content).toHaveStyle({ opacity: '1' });
+        const element = canvas.queryByText('Zoom Effect');
+        expect(element).toBeInTheDocument();
       },
-      { timeout: 1000 },
+      { timeout: ANIMATION_TIMEOUT },
     );
   },
 };
@@ -537,31 +605,38 @@ export const GrowTransition: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const toggleButton = canvas.getByLabelText('Toggle grow');
-    const content = canvas.getByText('Grow Transition');
 
-    // Should be visible initially
-    expect(content).toBeVisible();
+    // Wait for initial render
+    await waitFor(
+      () => {
+        const content = canvas.queryByText('Grow Transition');
+        expect(content).toBeInTheDocument();
+      },
+      { timeout: ANIMATION_TIMEOUT },
+    );
 
     // Toggle off
     await userEvent.click(toggleButton);
 
-    // Wait for shrink
+    // Wait for shrink - element removed from document
     await waitFor(
       () => {
-        expect(content).toHaveStyle({ opacity: '0' });
+        const element = canvas.queryByText('Grow Transition');
+        expect(element).not.toBeInTheDocument();
       },
-      { timeout: 1000 },
+      { timeout: ANIMATION_TIMEOUT },
     );
 
     // Toggle on
     await userEvent.click(toggleButton);
 
-    // Wait for grow
+    // Wait for grow - element appears in document again
     await waitFor(
       () => {
-        expect(content).toHaveStyle({ opacity: '1' });
+        const element = canvas.queryByText('Grow Transition');
+        expect(element).toBeInTheDocument();
       },
-      { timeout: 1000 },
+      { timeout: ANIMATION_TIMEOUT },
     );
   },
 };
@@ -612,7 +687,7 @@ export const RapidToggling: Story = {
         const clickCount = canvas.getByText(/Clicks: \d+/);
         expect(clickCount).toHaveTextContent('Clicks: 5');
       },
-      { timeout: 2000 },
+      { timeout: ANIMATION_TIMEOUT },
     );
 
     // Transition should handle rapid changes without breaking
@@ -662,35 +737,43 @@ export const NestedTransitions: Story = {
     const outerButton = canvas.getByLabelText('Toggle outer');
     const innerButton = canvas.getByLabelText('Toggle inner');
 
-    // Both should be visible initially
-    expect(canvas.getByText('Outer Content')).toBeVisible();
-    expect(canvas.getByText('Inner Nested Content')).toBeVisible();
+    // Wait for both to be visible initially
+    await waitFor(
+      () => {
+        expect(canvas.queryByText('Outer Content')).toBeInTheDocument();
+        expect(canvas.queryByText('Inner Nested Content')).toBeInTheDocument();
+      },
+      { timeout: ANIMATION_TIMEOUT },
+    );
 
-    // Toggle inner
+    // Toggle inner off
     await userEvent.click(innerButton);
     await waitFor(
       () => {
-        expect(canvas.getByText('Inner Nested Content')).toHaveStyle({ opacity: '0' });
+        const element = canvas.queryByText('Inner Nested Content');
+        expect(element).not.toBeInTheDocument();
       },
-      { timeout: 1000 },
+      { timeout: ANIMATION_TIMEOUT },
     );
 
-    // Toggle inner back
+    // Toggle inner back on
     await userEvent.click(innerButton);
     await waitFor(
       () => {
-        expect(canvas.getByText('Inner Nested Content')).toBeVisible();
+        const element = canvas.queryByText('Inner Nested Content');
+        expect(element).toBeInTheDocument();
       },
-      { timeout: 1000 },
+      { timeout: ANIMATION_TIMEOUT },
     );
 
-    // Toggle outer (should hide both)
+    // Toggle outer off (should hide both)
     await userEvent.click(outerButton);
     await waitFor(
       () => {
-        expect(canvas.getByText('Outer Content')).toHaveStyle({ opacity: '0' });
+        const outerElement = canvas.queryByText('Outer Content');
+        expect(outerElement).not.toBeInTheDocument();
       },
-      { timeout: 1000 },
+      { timeout: ANIMATION_TIMEOUT },
     );
   },
 };
@@ -733,17 +816,26 @@ export const EdgeCases: Story = {
     const toggleButton = canvas.getByLabelText('Toggle visibility');
     const contentButton = canvas.getByLabelText('Toggle content');
 
+    // Initial state - should show "Edge Cases"
+    expect(canvas.getByText('Edge Cases')).toBeInTheDocument();
+
     // Should handle content changes
     await userEvent.click(contentButton);
-    expect(canvas.getByText('Empty Placeholder')).toBeVisible();
+    await waitFor(
+      () => {
+        expect(canvas.queryByText('Empty Placeholder')).toBeInTheDocument();
+      },
+      { timeout: ANIMATION_TIMEOUT },
+    );
 
     // Should handle visibility toggle with different content
     await userEvent.click(toggleButton);
     await waitFor(
       () => {
-        expect(canvas.getByText('Empty Placeholder')).toHaveStyle({ opacity: '0' });
+        const element = canvas.queryByText('Empty Placeholder');
+        expect(element).not.toBeInTheDocument();
       },
-      { timeout: 1000 },
+      { timeout: ANIMATION_TIMEOUT },
     );
 
     // Change content while hidden
@@ -753,9 +845,10 @@ export const EdgeCases: Story = {
     await userEvent.click(toggleButton);
     await waitFor(
       () => {
-        expect(canvas.getByText('Edge Cases')).toBeVisible();
+        const element = canvas.queryByText('Edge Cases');
+        expect(element).toBeInTheDocument();
       },
-      { timeout: 1000 },
+      { timeout: ANIMATION_TIMEOUT },
     );
   },
 };

@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Stack } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Select } from './Select';
 

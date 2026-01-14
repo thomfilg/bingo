@@ -1,7 +1,9 @@
-import React, { forwardRef, KeyboardEvent, ReactElement } from 'react';
-import { Chip as MuiChip, Avatar } from '@mui/material';
+import CancelIcon from '@mui/icons-material/Cancel';
+import { Avatar, Chip as MuiChip } from '@mui/material';
+import type { KeyboardEvent, ReactElement } from 'react';
+import React, { forwardRef } from 'react';
 
-import { ChipProps } from './Chip.types';
+import type { ChipProps } from './Chip.types';
 
 export const Chip = forwardRef<HTMLDivElement, ChipProps>(({
   label,
@@ -18,6 +20,7 @@ export const Chip = forwardRef<HTMLDivElement, ChipProps>(({
   onClick,
   onDelete,
   className,
+  dataTestId,
   ...props
 }, ref) => {
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -53,16 +56,36 @@ export const Chip = forwardRef<HTMLDivElement, ChipProps>(({
   // Determine if clickable
   const clickable = !disabled && (!!onClick || selectable);
 
+  // Enhance icon with test ID if present
+  const enhancedIcon = icon && React.isValidElement(icon)
+    ? React.cloneElement(icon as ReactElement, {
+        'data-testid': dataTestId ? `${dataTestId}-icon` : 'chip-icon',
+      } as Record<string, unknown>)
+    : undefined;
+
+  // Wrap label with test ID
+  const enhancedLabel = (
+    <span data-testid={dataTestId ? `${dataTestId}-label` : 'chip-label'}>
+      {label}
+    </span>
+  );
+
+  // Custom delete icon with test ID
+  const enhancedDeleteIcon = deletable ? (
+    <CancelIcon data-testid={dataTestId ? `${dataTestId}-delete` : 'chip-delete'} />
+  ) : undefined;
+
   return (
     <MuiChip
       ref={ref}
-      label={label}
+      label={enhancedLabel}
       variant={variant}
       size={size}
       color={color as 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' | 'default' | undefined}
       avatar={getAvatarComponent()}
-      icon={icon && React.isValidElement(icon) ? icon : undefined}
+      icon={enhancedIcon}
       onDelete={deletable ? onDelete : undefined}
+      deleteIcon={enhancedDeleteIcon}
       disabled={disabled}
       clickable={clickable}
       onClick={clickable ? onClick : undefined}
@@ -70,23 +93,24 @@ export const Chip = forwardRef<HTMLDivElement, ChipProps>(({
       className={className}
       role={role}
       aria-selected={selectable ? selected : undefined}
+      data-testid={dataTestId || 'chip'}
       sx={{
-        // Enhanced styling for glass effect and states
+        // Enhanced styling for outlined variant
         ...(variant === 'outlined' && {
-          backgroundColor: 'rgba(255, 255, 255, 0.1)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          backgroundColor: 'transparent',
         }),
         ...(selected && {
-          backgroundColor: (theme) => 
-            theme.palette.mode === 'dark' 
+          backgroundColor: (theme) =>
+            theme.palette.mode === 'dark'
               ? 'rgba(255, 255, 255, 0.16)'
               : 'rgba(0, 0, 0, 0.08)',
         }),
         '&:hover': {
           ...(clickable && !disabled && {
             transform: 'translateY(-1px)',
-            boxShadow: (theme) => 
+            boxShadow: (theme) =>
               theme.palette.mode === 'dark'
                 ? '0 4px 12px rgba(0, 0, 0, 0.3)'
                 : '0 4px 12px rgba(0, 0, 0, 0.15)',

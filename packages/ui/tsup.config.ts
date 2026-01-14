@@ -1,5 +1,5 @@
-import { defineConfig } from 'tsup';
 import { glob } from 'glob';
+import { defineConfig } from 'tsup';
 
 export default defineConfig(() => {
   const component = process.env.COMPONENT;
@@ -9,7 +9,6 @@ export default defineConfig(() => {
     : ['src/index.ts'];
 
   if (component && entry.length === 0) {
-    // eslint-disable-next-line no-console
     console.error(`Component "${component}" not found!`);
     process.exit(1);
   }

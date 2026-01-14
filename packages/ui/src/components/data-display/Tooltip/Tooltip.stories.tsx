@@ -1,6 +1,6 @@
+import { Delete,Help, Info, Settings } from '@mui/icons-material';
+import { Avatar, Box, Button, IconButton, Stack, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Button, Stack, Box, IconButton, Avatar, Typography } from '@mui/material';
-import { Help, Info, Settings, Delete } from '@mui/icons-material';
 
 import { Tooltip } from './Tooltip';
 
@@ -385,7 +385,7 @@ export const AllStates: Story = {
         <Tooltip title="Tooltip with both effects" glow pulse>
           <Button variant="outlined">Glow + Pulse</Button>
         </Tooltip>
-        <Tooltip title="Disabled element" disabled>
+        <Tooltip title="Disabled element">
           <span>
             <Button variant="outlined" disabled>
               Disabled

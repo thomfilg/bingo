@@ -24,7 +24,7 @@ The Avatar component displays user profile pictures, initials, or icons in a vis
 ### Basic Usage
 
 ```tsx
-import { Avatar } from '@repo/ui';
+import { Avatar } from '@procurement/ui';
 
 // With image
 <Avatar
@@ -111,7 +111,7 @@ import { Avatar } from '@repo/ui';
 ### Avatar Groups
 
 ```tsx
-import { AvatarGroup } from '@repo/ui';
+import { AvatarGroup } from '@procurement/ui';
 
 <AvatarGroup max={3} overlap={8}>
   <Avatar fallback="A1" />
@@ -179,15 +179,17 @@ import { AvatarGroup } from '@repo/ui';
 | `animationDelay`      | `number`                                                                     | `0`         | Delay before fade-in animation (ms)                    |
 | `className`           | `string`                                                                     | -           | Additional CSS classes                                 |
 | `children`            | `ReactNode`                                                                  | -           | Custom content for the avatar                          |
+| `dataTestId`          | `string`                                                                     | -           | Test ID for automated testing                          |
 
 ## AvatarGroup Props
 
-| Prop        | Type        | Default | Description                          |
-| ----------- | ----------- | ------- | ------------------------------------ |
-| `max`       | `number`    | `4`     | Maximum number of avatars to display |
-| `overlap`   | `number`    | `8`     | Pixel overlap between avatars        |
-| `className` | `string`    | -       | Additional CSS classes               |
-| `children`  | `ReactNode` | -       | Avatar components to group           |
+| Prop         | Type        | Default | Description                          |
+| ------------ | ----------- | ------- | ------------------------------------ |
+| `max`        | `number`    | `4`     | Maximum number of avatars to display |
+| `overlap`    | `number`    | `8`     | Pixel overlap between avatars        |
+| `className`  | `string`    | -       | Additional CSS classes               |
+| `children`   | `ReactNode` | -       | Avatar components to group           |
+| `dataTestId` | `string`    | -       | Test ID for automated testing        |
 
 ## Accessibility
 
@@ -262,6 +264,302 @@ The Avatar component is fully accessible with:
 - Firefox: Full support
 - Safari: Full support
 - Mobile browsers: Full support with touch interactions
+
+## Testing
+
+The Avatar component includes comprehensive test IDs for automated testing. Use the `dataTestId` prop to enable test identification.
+
+### Test ID Structure
+
+When `dataTestId` is provided, the following test IDs are automatically generated:
+
+| Element              | Test ID Pattern              | Description                                      |
+| -------------------- | ---------------------------- | ------------------------------------------------ |
+| Main Avatar          | `{dataTestId}`               | The main avatar container element                |
+| Image Content        | `{dataTestId}-children`      | When custom children are rendered                |
+| Fallback Content     | `{dataTestId}-fallback`      | When fallback text/initials are displayed        |
+| Icon Content         | `{dataTestId}-icon`          | When an icon is displayed                        |
+| Default Content      | `{dataTestId}-default`       | When default Person icon is displayed            |
+| Loading Overlay      | `{dataTestId}-loading`       | Loading state overlay with spinner               |
+| Status Badge         | `{dataTestId}-badge`         | Status indicator badge (variant="status")        |
+| AvatarGroup          | `{dataTestId}`               | The AvatarGroup container                        |
+| Overflow Avatar      | `{dataTestId}-overflow`      | The "+N" overflow counter avatar in AvatarGroup  |
+
+### Testing Examples
+
+#### Basic Avatar Tests
+
+```tsx
+import { render, screen } from '@testing-library/react';
+import { Avatar } from '@procurement/ui';
+
+describe('Avatar', () => {
+  it('should render with image', () => {
+    render(<Avatar src="/user.jpg" alt="John Doe" dataTestId="user-avatar" />);
+    const avatar = screen.getByTestId('user-avatar');
+    expect(avatar).toBeInTheDocument();
+  });
+
+  it('should display fallback text', () => {
+    render(<Avatar fallback="JD" dataTestId="user-avatar" />);
+    const fallback = screen.getByTestId('user-avatar-fallback');
+    expect(fallback).toHaveTextContent('JD');
+  });
+
+  it('should show loading state', () => {
+    render(<Avatar loading dataTestId="user-avatar" />);
+    const loadingOverlay = screen.getByTestId('user-avatar-loading');
+    expect(loadingOverlay).toBeInTheDocument();
+  });
+
+  it('should display icon', () => {
+    render(<Avatar icon={<PersonIcon />} dataTestId="user-avatar" />);
+    const iconContent = screen.getByTestId('user-avatar-icon');
+    expect(iconContent).toBeInTheDocument();
+  });
+});
+```
+
+#### Status Badge Tests
+
+```tsx
+it('should render status badge', () => {
+  render(
+    <Avatar
+      variant="status"
+      status="online"
+      fallback="JD"
+      dataTestId="status-avatar"
+    />
+  );
+  const badge = screen.getByTestId('status-avatar-badge');
+  expect(badge).toBeInTheDocument();
+});
+
+it('should not render badge without status variant', () => {
+  render(<Avatar fallback="JD" dataTestId="regular-avatar" />);
+  const badge = screen.queryByTestId('regular-avatar-badge');
+  expect(badge).not.toBeInTheDocument();
+});
+```
+
+#### Interactive Avatar Tests
+
+```tsx
+import { render, screen, fireEvent } from '@testing-library/react';
+
+it('should handle click events', () => {
+  const handleClick = vi.fn();
+  render(
+    <Avatar
+      interactive
+      onClick={handleClick}
+      fallback="CL"
+      dataTestId="clickable-avatar"
+    />
+  );
+
+  const avatar = screen.getByTestId('clickable-avatar');
+  fireEvent.click(avatar);
+  expect(handleClick).toHaveBeenCalledTimes(1);
+});
+
+it('should be keyboard accessible', () => {
+  render(<Avatar interactive fallback="KB" dataTestId="keyboard-avatar" />);
+  const avatar = screen.getByTestId('keyboard-avatar');
+
+  expect(avatar).toHaveAttribute('tabIndex', '0');
+  expect(avatar).toHaveAttribute('role', 'button');
+});
+```
+
+#### Image Error Handling Tests
+
+```tsx
+it('should display fallback on image error', async () => {
+  render(
+    <Avatar
+      src="/broken-image.jpg"
+      fallback="ER"
+      dataTestId="error-avatar"
+      showFallbackOnError
+    />
+  );
+
+  const avatar = screen.getByTestId('error-avatar');
+  const img = avatar.querySelector('img');
+
+  // Trigger image error
+  fireEvent.error(img!);
+
+  // Fallback should be displayed
+  const fallback = await screen.findByTestId('error-avatar-fallback');
+  expect(fallback).toHaveTextContent('ER');
+});
+```
+
+#### AvatarGroup Tests
+
+```tsx
+it('should render avatar group with overflow', () => {
+  render(
+    <AvatarGroup max={3} dataTestId="team-avatars">
+      <Avatar fallback="A1" />
+      <Avatar fallback="A2" />
+      <Avatar fallback="A3" />
+      <Avatar fallback="A4" />
+      <Avatar fallback="A5" />
+    </AvatarGroup>
+  );
+
+  const group = screen.getByTestId('team-avatars');
+  expect(group).toBeInTheDocument();
+
+  const overflow = screen.getByTestId('team-avatars-overflow');
+  expect(overflow).toHaveTextContent('+2');
+});
+
+it('should not render overflow when under max', () => {
+  render(
+    <AvatarGroup max={5} dataTestId="small-team">
+      <Avatar fallback="A1" />
+      <Avatar fallback="A2" />
+    </AvatarGroup>
+  );
+
+  const overflow = screen.queryByTestId('small-team-overflow');
+  expect(overflow).not.toBeInTheDocument();
+});
+```
+
+#### Size and Variant Tests
+
+```tsx
+it('should render different sizes', () => {
+  const { rerender } = render(<Avatar size="xs" fallback="XS" dataTestId="sized-avatar" />);
+  let avatar = screen.getByTestId('sized-avatar');
+  expect(avatar).toHaveStyle({ width: '24px', height: '24px' });
+
+  rerender(<Avatar size="xl" fallback="XL" dataTestId="sized-avatar" />);
+  avatar = screen.getByTestId('sized-avatar');
+  expect(avatar).toHaveStyle({ width: '64px', height: '64px' });
+});
+
+it('should apply variant styles', () => {
+  const { rerender } = render(
+    <Avatar variant="circle" fallback="CI" dataTestId="variant-avatar" />
+  );
+  let avatar = screen.getByTestId('variant-avatar');
+  expect(avatar).toHaveStyle({ borderRadius: '50%' });
+
+  rerender(<Avatar variant="square" fallback="SQ" dataTestId="variant-avatar" />);
+  avatar = screen.getByTestId('variant-avatar');
+  expect(avatar).toHaveStyle({ borderRadius: '0' });
+});
+```
+
+#### Accessibility Tests
+
+```tsx
+it('should have proper ARIA attributes', () => {
+  render(
+    <Avatar
+      src="/user.jpg"
+      alt="John Doe"
+      dataTestId="accessible-avatar"
+    />
+  );
+
+  const avatar = screen.getByTestId('accessible-avatar');
+  expect(avatar).toHaveAttribute('aria-label', 'John Doe');
+});
+
+it('should use custom aria-label', () => {
+  render(
+    <Avatar
+      fallback="JD"
+      aria-label="User Profile Picture"
+      dataTestId="custom-aria-avatar"
+    />
+  );
+
+  const avatar = screen.getByTestId('custom-aria-avatar');
+  expect(avatar).toHaveAttribute('aria-label', 'User Profile Picture');
+});
+```
+
+#### Visual Effects Tests
+
+```tsx
+it('should apply glow effect', () => {
+  render(<Avatar glow fallback="GL" dataTestId="glow-avatar" />);
+  const avatar = screen.getByTestId('glow-avatar');
+  expect(avatar).toHaveStyle({ boxShadow: expect.stringContaining('0 0 20px') });
+});
+
+it('should apply pulse animation', () => {
+  render(<Avatar pulse fallback="PL" dataTestId="pulse-avatar" />);
+  const avatar = screen.getByTestId('pulse-avatar');
+  const styles = window.getComputedStyle(avatar);
+  expect(styles.position).toBe('relative');
+});
+
+it('should apply bordered style', () => {
+  render(<Avatar bordered fallback="BD" dataTestId="bordered-avatar" />);
+  const avatar = screen.getByTestId('bordered-avatar');
+  expect(avatar).toHaveStyle({ border: expect.stringContaining('2px solid') });
+});
+```
+
+### Testing Best Practices
+
+1. **Always provide dataTestId**: Include `dataTestId` for all avatars in your application
+2. **Test content types**: Verify correct content rendering (image, fallback, icon)
+3. **Test loading states**: Ensure loading indicators appear and disappear correctly
+4. **Test error scenarios**: Verify fallback behavior when images fail to load
+5. **Test interactions**: Validate click handlers and keyboard navigation
+6. **Test accessibility**: Ensure ARIA attributes and screen reader support
+7. **Test visual effects**: Verify glow, pulse, and other visual enhancements
+8. **Test groups**: Validate AvatarGroup overflow counting and layout
+
+### Integration Testing
+
+For E2E testing with Playwright:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('avatar displays user profile', async ({ page }) => {
+  await page.goto('/profile');
+
+  const avatar = page.getByTestId('user-avatar');
+  await expect(avatar).toBeVisible();
+
+  // Check if image loaded
+  const img = avatar.locator('img');
+  await expect(img).toHaveAttribute('src', /user-profile/);
+});
+
+test('avatar group shows overflow count', async ({ page }) => {
+  await page.goto('/team');
+
+  const avatarGroup = page.getByTestId('team-avatars');
+  await expect(avatarGroup).toBeVisible();
+
+  const overflow = page.getByTestId('team-avatars-overflow');
+  await expect(overflow).toContainText('+');
+});
+
+test('interactive avatar responds to clicks', async ({ page }) => {
+  await page.goto('/profile');
+
+  const avatar = page.getByTestId('clickable-avatar');
+  await avatar.click();
+
+  // Verify navigation or modal opened
+  await expect(page).toHaveURL(/profile-details/);
+});
+```
 
 ## Related Components
 

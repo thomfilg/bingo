@@ -7,7 +7,7 @@ The Text component is a versatile typography component that provides consistent 
 ## Usage
 
 ```tsx
-import { Text } from '@repo/ui';
+import { Text } from '@procurement/ui';
 
 // Basic usage
 <Text>Basic text content</Text>
@@ -40,7 +40,7 @@ import { Text } from '@repo/ui';
 | Prop            | Type                                                                          | Default     | Description                             |
 | --------------- | ----------------------------------------------------------------------------- | ----------- | --------------------------------------- |
 | `variant`       | `'body' \| 'heading' \| 'caption' \| 'code'`                                  | `'body'`    | Text variant affecting typography style |
-| `color`         | `'primary' \| 'secondary' \| 'success' \| 'warning' \| 'danger' \| 'neutral'` | `'primary'` | Text color from theme palette           |
+| `color`         | `'primary' \| 'secondary' \| 'success' \| 'warning' \| 'danger' \| 'neutral'` | `'neutral'` | Text color from theme palette. `secondary` uses muted text color for less emphasis |
 | `size`          | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`                                        | `'md'`      | Text size variant                       |
 | `weight`        | `'light' \| 'normal' \| 'medium' \| 'semibold' \| 'bold'`                     | `'normal'`  | Font weight                             |
 | `as`            | `React.ElementType`                                                           | `'span'`    | HTML element to render                  |
@@ -48,6 +48,19 @@ import { Text } from '@repo/ui';
 | `underline`     | `boolean`                                                                     | `false`     | Apply underline decoration              |
 | `strikethrough` | `boolean`                                                                     | `false`     | Apply strikethrough decoration          |
 | `children`      | `React.ReactNode`                                                             | -           | Text content                            |
+
+## Colors
+
+The `color` prop determines the text color using the theme palette:
+
+- **neutral** (default): Uses primary text color for maximum readability
+- **secondary**: Uses muted/secondary text color for less emphasis (e.g., descriptions, captions)
+- **primary**: Uses the primary brand color for emphasis
+- **success**: Green color for positive messages
+- **warning**: Orange/yellow color for warnings
+- **danger**: Red color for errors or critical messages
+
+All colors maintain WCAG AA contrast ratios for accessibility.
 
 ## Variants
 

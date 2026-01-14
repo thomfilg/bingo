@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Box, Typography } from '@mui/material';
-import { MessageCircle, Edit3, FileText, Star } from 'lucide-react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Edit3, FileText, MessageCircle, Star } from 'lucide-react';
 
 import { Textarea } from './Textarea';
 

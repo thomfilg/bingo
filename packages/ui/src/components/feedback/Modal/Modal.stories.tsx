@@ -1,7 +1,7 @@
+import { Close as CloseIcon } from '@mui/icons-material';
+import { Box, Button, IconButton,Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { Button, Typography, Box, IconButton } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
 
 import { Modal, ModalContent } from './Modal';
 

@@ -59,4 +59,10 @@ export interface InputOTPProps {
    * Disabled state
    */
   disabled?: boolean;
+
+  /**
+   * Test ID for automated testing
+   * Container will have this ID, and individual slots will have {dataTestId}-slot-{index}
+   */
+  dataTestId?: string;
 }

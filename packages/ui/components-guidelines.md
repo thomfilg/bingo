@@ -64,7 +64,7 @@ Where:
 ### Story Template Structure
 
 ```ts
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ComponentName } from './ComponentName';
 
 const meta: Meta<typeof ComponentName> = {
@@ -107,7 +107,7 @@ export const Default: Story = { args: {} };
 ### Test File Structure
 
 ```ts
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';;
 import { userEvent, within, expect, waitFor, fn } from '@storybook/test';
 import { ComponentName } from './ComponentName';
 

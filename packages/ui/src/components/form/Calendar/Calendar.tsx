@@ -1,8 +1,8 @@
-import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { Box, IconButton, Typography, Paper } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
+import { Box, IconButton, Paper, Typography } from '@mui/material';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import type { CalendarProps, MonthMatrix, MonthMatrixDay, DayRenderArgs } from './Calendar.types';
+import type { CalendarProps, DayRenderArgs, MonthMatrix, MonthMatrixDay } from './Calendar.types';
 
 // Date utility functions
 const normalizeDate = (date: Date): Date => {
@@ -11,11 +11,9 @@ const normalizeDate = (date: Date): Date => {
   return normalized;
 };
 
-const isSameDay = (date1: Date, date2: Date): boolean => {
-  return date1.getFullYear() === date2.getFullYear() &&
+const isSameDay = (date1: Date, date2: Date): boolean => date1.getFullYear() === date2.getFullYear() &&
          date1.getMonth() === date2.getMonth() &&
          date1.getDate() === date2.getDate();
-};
 
 const isBetween = (date: Date, start: Date, end: Date): boolean => {
   const normalized = normalizeDate(date);
@@ -45,9 +43,7 @@ const startOfWeek = (date: Date, firstDayOfWeek: number = 0): Date => {
 };
 
 
-const endOfMonth = (date: Date): Date => {
-  return new Date(date.getFullYear(), date.getMonth() + 1, 0);
-};
+const endOfMonth = (date: Date): Date => new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
 // Generate month matrix for calendar grid
 const generateMonthMatrix = (month: number, year: number, firstDayOfWeek: number = 0): MonthMatrix => {
@@ -57,7 +53,7 @@ const generateMonthMatrix = (month: number, year: number, firstDayOfWeek: number
   
   const weeks: MonthMatrixDay[][] = [];
   let currentWeek: MonthMatrixDay[] = [];
-  let currentDate = new Date(startDate);
+  const currentDate = new Date(startDate);
 
   for (let i = 0; i < 42; i++) { // 6 weeks max
     const inCurrentMonth = currentDate.getMonth() === month;
@@ -397,6 +393,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(({
         aria-disabled={dayArgs.disabled}
         aria-current={dayArgs.today ? 'date' : undefined}
         className={baseClasses.join(' ')}
+        data-testid={`calendar-date-${date.getDate()}`}
         onClick={() => handleDateClick(date)}
         onMouseEnter={() => handleDateMouseEnter(date)}
         onMouseLeave={handleDateMouseLeave}
@@ -434,6 +431,8 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(({
           },
         }}
       >
+        {dayArgs.selected && <Box component="span" data-testid="calendar-selected-date" sx={{ display: 'none' }} />}
+        {dayArgs.today && <Box component="span" data-testid="calendar-today" sx={{ display: 'none' }} />}
         {(!inCurrentMonth && !showOutsideDays) ? '' : date.getDate()}
       </Box>
     );
@@ -461,23 +460,23 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(({
     return (
       <Box key={`month-${monthIndex}`} sx={{ minWidth: 280 }}>
         {/* Header */}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }} data-testid="calendar-header">
           {monthIndex === 0 && (
-            <IconButton onClick={goToPreviousMonth} size="small">
+            <IconButton onClick={goToPreviousMonth} size="small" data-testid="calendar-prev-month">
               <ChevronLeft />
             </IconButton>
           )}
-          
+
           <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', flex: 1, textAlign: 'center' }}>
             {renderHeader ? renderHeader({ month: matrix.month, year: matrix.year }) : monthName}
           </Typography>
-          
+
           {monthIndex === monthsToShow - 1 && (
-            <IconButton onClick={goToNextMonth} size="small">
+            <IconButton onClick={goToNextMonth} size="small" data-testid="calendar-next-month">
               <ChevronRight />
             </IconButton>
           )}
-          
+
           {monthIndex !== 0 && monthIndex !== monthsToShow - 1 && (
             <Box sx={{ width: 32 }} /> // Spacer for alignment
           )}
@@ -489,6 +488,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(({
             <Box
               key={`weekday-${index}`}
               role="columnheader"
+              data-testid={`calendar-weekday-${index}`}
               sx={{
                 display: 'flex',
                 alignItems: 'center',
@@ -508,6 +508,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(({
         <Box
           role="grid"
           aria-labelledby={`month-${monthIndex}`}
+          data-testid="calendar-grid"
           sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 0.5 }}
         >
           {matrix.weeks.map((week) => 
@@ -538,6 +539,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(({
       aria-label="Calendar"
       tabIndex={0}
       onKeyDown={handleKeyDown}
+      data-testid="calendar-container"
       sx={{
         p: 3,
         display: 'flex',

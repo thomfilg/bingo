@@ -1,24 +1,24 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import { Delete as DeleteIcon, Edit as EditIcon, Star as StarIcon } from '@mui/icons-material';
 import {
+  Avatar,
+  Box,
+  Button,
+  Chip,
+  IconButton,
+  Paper,
+  Stack,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
-  Chip,
-  Avatar,
-  Stack,
-  Box,
   Typography,
-  Button,
-  IconButton,
 } from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon, Star as StarIcon } from '@mui/icons-material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
 
 import { Table } from './Table';
-import { ColumnConfig, SortConfig } from './Table.types';
+import type { ColumnConfig, SortConfig } from './Table.types';
 
 const meta: Meta<typeof Table> = {
   title: 'DataDisplay/Table',

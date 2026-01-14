@@ -1,10 +1,10 @@
 /* eslint-env browser */
+import { Box,Button, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor, fn } from 'storybook/test';
 import React, { useState } from 'react';
-import { Button, Typography, Box } from '@mui/material';
+import { expect, fn,userEvent, waitFor, within } from 'storybook/test';
 
-import { Dialog, DialogHeader, DialogContent, DialogActions } from './Dialog';
+import { Dialog, DialogActions,DialogContent, DialogHeader } from './Dialog';
 
 const meta: Meta<typeof Dialog> = {
   title: 'Feedback/Dialog/Tests',

@@ -1,15 +1,14 @@
-import React from 'react';
 import { 
+  alpha,
   Checkbox as MuiCheckbox, 
+  CircularProgress,
   FormControlLabel, 
   FormHelperText,
-  styled,
-  alpha,
-  CircularProgress,
-  keyframes
-} from '@mui/material';
+  keyframes,
+  styled} from '@mui/material';
+import React from 'react';
 
-import { CheckboxProps } from './Checkbox.types';
+import type { CheckboxProps } from './Checkbox.types';
 
 const pulse = keyframes`
   0% {

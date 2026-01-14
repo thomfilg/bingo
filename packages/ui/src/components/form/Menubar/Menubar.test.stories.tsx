@@ -1,14 +1,14 @@
-import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor, fn } from 'storybook/test';
-import { Box, Typography, IconButton, Avatar } from '@mui/material';
-import HomeIcon from '@mui/icons-material/Home';
-import SettingsIcon from '@mui/icons-material/Settings';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
+import HomeIcon from '@mui/icons-material/Home';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import SettingsIcon from '@mui/icons-material/Settings';
+import { Avatar,Box, IconButton, Typography } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import React from 'react';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { Menubar } from './Menubar';
-import { MenubarItem } from './Menubar.types';
+import type { MenubarItem } from './Menubar.types';
 
 const meta: Meta<typeof Menubar> = {
   title: 'Form/Menubar/Tests',

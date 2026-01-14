@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor, fn } from 'storybook/test';
+import { expect, fn,userEvent, waitFor, within } from 'storybook/test';
 
 import { InputOTP } from './InputOTP';
 
@@ -474,5 +474,123 @@ export const Integration: Story = {
     // Final state verification
     expect(inputs[0]).toBeEnabled();
     expect(inputs[0]).toBeVisible();
+  },
+};
+
+// Test 12: TestID Implementation
+export const TestIDImplementation: Story = {
+  args: {
+    variant: 'numeric',
+    length: 6,
+    color: 'primary',
+    size: 'md',
+    dataTestId: 'otp-input',
+    onChange: fn(),
+    onComplete: fn(),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+
+    // Test container testId
+    const container = canvas.getByTestId('otp-input');
+    expect(container).toBeInTheDocument();
+    expect(container).toBeVisible();
+
+    // Test individual slot testIds
+    for (let i = 0; i < 6; i++) {
+      const slot = canvas.getByTestId(`otp-input-slot-${i}`);
+      expect(slot).toBeInTheDocument();
+      expect(slot).toBeVisible();
+      expect(slot).toHaveAttribute('maxLength', '1');
+    }
+
+    // Test interaction with testIds
+    const firstSlot = canvas.getByTestId('otp-input-slot-0');
+    const secondSlot = canvas.getByTestId('otp-input-slot-1');
+    const lastSlot = canvas.getByTestId('otp-input-slot-5');
+
+    // Type in first slot using testId
+    await userEvent.type(firstSlot, '1');
+    await waitFor(() => {
+      expect(firstSlot).toHaveValue('1');
+      expect(args.onChange).toHaveBeenCalledWith('1');
+    });
+
+    // Type in second slot using testId
+    await userEvent.type(secondSlot, '2');
+    await waitFor(() => {
+      expect(secondSlot).toHaveValue('2');
+      expect(args.onChange).toHaveBeenCalledWith('12');
+    });
+
+    // Complete entire OTP using testIds
+    await userEvent.type(canvas.getByTestId('otp-input-slot-2'), '3');
+    await userEvent.type(canvas.getByTestId('otp-input-slot-3'), '4');
+    await userEvent.type(canvas.getByTestId('otp-input-slot-4'), '5');
+    await userEvent.type(lastSlot, '6');
+
+    // Verify completion callback
+    await waitFor(() => {
+      expect(args.onComplete).toHaveBeenCalledWith('123456');
+      expect(args.onChange).toHaveBeenLastCalledWith('123456');
+    });
+
+    // Verify all slots have correct values
+    for (let i = 0; i < 6; i++) {
+      const slot = canvas.getByTestId(`otp-input-slot-${i}`);
+      expect(slot).toHaveValue(String(i + 1));
+    }
+  },
+};
+
+// Test 13: TestID with Different Lengths
+export const TestIDWithDifferentLengths: Story = {
+  args: {
+    variant: 'numeric',
+    length: 4,
+    dataTestId: 'short-otp',
+    onChange: fn(),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Test container
+    const container = canvas.getByTestId('short-otp');
+    expect(container).toBeInTheDocument();
+
+    // Test exactly 4 slots exist
+    for (let i = 0; i < 4; i++) {
+      const slot = canvas.getByTestId(`short-otp-slot-${i}`);
+      expect(slot).toBeInTheDocument();
+    }
+
+    // Verify no extra slots exist
+    expect(canvas.queryByTestId('short-otp-slot-4')).not.toBeInTheDocument();
+    expect(canvas.queryByTestId('short-otp-slot-5')).not.toBeInTheDocument();
+  },
+};
+
+// Test 14: TestID Without DataTestId Prop
+export const TestIDWithoutDataTestIdProp: Story = {
+  args: {
+    variant: 'numeric',
+    length: 6,
+    onChange: fn(),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const inputs = canvas.getAllByRole('textbox');
+
+    // Component should work without testIds
+    expect(inputs).toHaveLength(6);
+
+    // Verify testIds are not present when prop is not provided
+    inputs.forEach((input) => {
+      expect(input.getAttribute('data-testid')).toBeNull();
+    });
+
+    // Functionality should still work
+    await userEvent.type(inputs[0], '1');
+    expect(inputs[0]).toHaveValue('1');
   },
 };

@@ -1,12 +1,12 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
 import {
-  Star,
-  Warning as MuiWarning,
+  CheckCircle,
   Notifications,
   Security,
-  CheckCircle,
+  Star,
+  Warning as MuiWarning,
 } from '@mui/icons-material';
-import { Stack, Box, Typography, Button } from '@mui/material';
+import { Box, Button,Stack, Typography } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import React from 'react';
 
 import { Alert } from './Alert';

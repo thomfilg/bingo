@@ -1,24 +1,24 @@
-import React, { useState } from 'react';
+import { ChevronRight, ExpandMore, Menu as MenuIcon } from '@mui/icons-material';
 import {
+  alpha,
   Box,
+  Collapse,
+  Divider,
+  Fade,
+  Grow,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Badge,
-  Collapse,
-  Typography,
-  Divider,
-  alpha,
   Paper,
-  Fade,
-  Grow,
+  Popover,
+  Typography,
 } from '@mui/material';
-import { styled, keyframes } from '@mui/material/styles';
-import { ExpandMore, ChevronRight, Menu as MenuIcon } from '@mui/icons-material';
+import { keyframes,styled } from '@mui/material/styles';
+import React, { useState } from 'react';
 
-import { NavigationMenuProps, NavigationMenuItem } from './NavigationMenu.types';
+import type { NavigationMenuItem,NavigationMenuProps } from './NavigationMenu.types';
 
 // Animation keyframes
 const slideIn = keyframes`
@@ -45,8 +45,8 @@ const pulseGlow = keyframes`
 `;
 
 const NavigationContainer = styled(Box, {
-  shouldForwardProp: (prop) => !['variant', 'collapsed'].includes(prop as string),
-})<{ variant?: string; collapsed?: boolean }>(({ theme, variant, collapsed }) => ({
+  shouldForwardProp: (prop) => !['variant', 'collapsed', 'minimal'].includes(prop as string),
+})<{ variant?: string; collapsed?: boolean; minimal?: boolean }>(({ theme, variant, collapsed, minimal }) => ({
   display: 'flex',
   position: 'relative',
   animation: `${slideIn} 0.4s ease-out`,
@@ -54,39 +54,45 @@ const NavigationContainer = styled(Box, {
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.95)} 0%, ${alpha(theme.palette.background.paper, 0.98)} 100%)`,
-    backdropFilter: 'blur(10px)',
-    borderRadius: theme.spacing(2),
-    boxShadow: `0 8px 32px ${alpha(theme.palette.common.black, 0.08)}`,
+    ...(!minimal && {
+      background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.95)} 0%, ${alpha(theme.palette.background.paper, 0.98)} 100%)`,
+      backdropFilter: 'blur(10px)',
+      borderRadius: theme.spacing(2),
+      boxShadow: `0 8px 32px ${alpha(theme.palette.common.black, 0.08)}`,
+    }),
   }),
   ...(variant === 'vertical' && {
     flexDirection: 'column',
     width: collapsed ? 80 : 280,
     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
     height: '100%',
-    background: `linear-gradient(180deg, ${alpha(theme.palette.background.paper, 0.98)} 0%, ${alpha(theme.palette.background.paper, 0.95)} 100%)`,
-    backdropFilter: 'blur(12px)',
-    borderRadius: theme.spacing(2),
-    boxShadow: `0 12px 40px ${alpha(theme.palette.common.black, 0.1)}`,
-    '&::before': {
-      content: '""',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      height: '200px',
-      background: `radial-gradient(ellipse at top, ${alpha(theme.palette.primary.main, 0.05)} 0%, transparent 70%)`,
-      pointerEvents: 'none',
-    },
+    ...(!minimal && {
+      background: `linear-gradient(180deg, ${alpha(theme.palette.background.paper, 0.98)} 0%, ${alpha(theme.palette.background.paper, 0.95)} 100%)`,
+      backdropFilter: 'blur(12px)',
+      borderRadius: theme.spacing(2),
+      boxShadow: `0 12px 40px ${alpha(theme.palette.common.black, 0.1)}`,
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '200px',
+        background: `radial-gradient(ellipse at top, ${alpha(theme.palette.primary.main, 0.05)} 0%, transparent 70%)`,
+        pointerEvents: 'none',
+      },
+    }),
   }),
   ...(variant === 'mega' && {
     flexDirection: 'column',
     width: '100%',
-    background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.98)} 0%, ${alpha(theme.palette.background.default, 0.95)} 100%)`,
-    backdropFilter: 'blur(15px)',
-    borderRadius: theme.spacing(3),
-    overflow: 'hidden',
-    boxShadow: `0 20px 60px ${alpha(theme.palette.common.black, 0.12)}`,
+    ...(!minimal && {
+      background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.98)} 0%, ${alpha(theme.palette.background.default, 0.95)} 100%)`,
+      backdropFilter: 'blur(15px)',
+      borderRadius: theme.spacing(3),
+      overflow: 'hidden',
+      boxShadow: `0 20px 60px ${alpha(theme.palette.common.black, 0.12)}`,
+    }),
   }),
 }));
 
@@ -123,9 +129,9 @@ const StyledListItem = styled(ListItem, {
 );
 
 const StyledListItemButton = styled(ListItemButton, {
-  shouldForwardProp: (prop) => !['variant', 'active', 'size', 'collapsed'].includes(prop as string),
-})<{ variant?: string; active?: boolean; size?: string; collapsed?: boolean }>(
-  ({ theme, variant, active, size, collapsed }) => ({
+  shouldForwardProp: (prop) => !['variant', 'active', 'size', 'collapsed', 'minimal'].includes(prop as string),
+})<{ variant?: string; active?: boolean; size?: string; collapsed?: boolean; minimal?: boolean }>(
+  ({ theme, variant, active, size, collapsed, minimal }) => ({
     borderRadius: theme.spacing(1.5),
     margin: theme.spacing(0.5),
     position: 'relative',
@@ -178,7 +184,8 @@ const StyledListItemButton = styled(ListItemButton, {
       margin: theme.spacing(0, 0.5),
       background: alpha(theme.palette.background.paper, 0.6),
       backdropFilter: 'blur(8px)',
-      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+      border: `none`,
+      // border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
     }),
 
     ...(collapsed && {
@@ -189,48 +196,64 @@ const StyledListItemButton = styled(ListItemButton, {
       },
     }),
 
-    '&:hover': {
-      transform: 'translateY(-2px)',
-      boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.15)}`,
-      backgroundColor: alpha(theme.palette.primary.main, 0.04),
+    '&:hover': minimal
+      ? {
+          // Simple hover for minimal variant
+          backgroundColor: alpha(theme.palette.action.hover, 0.08),
+          color: theme.palette.primary.main,
 
-      '&::before': {
-        opacity: 1,
-      },
+          '& .MuiListItemIcon-root': {
+            color: theme.palette.primary.main,
+          },
+        }
+      : {
+          // Fancy hover for non-minimal variant
+          background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.15)} 0%, ${alpha(theme.palette.primary.main, 0.08)} 100%)`,
+          color: theme.palette.primary.main,
+          boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.15)}`,
+          backgroundColor: alpha(theme.palette.primary.main, 0.04),
 
-      '& .MuiListItemIcon-root': {
-        transform: collapsed
-          ? 'scale(1.1)'
-          : size === 'sm'
-            ? 'scale(0.95) rotate(-5deg)'
-            : size === 'lg'
-              ? 'scale(1.25) rotate(-5deg)'
-              : 'scale(1.1) rotate(-5deg)',
-        transition: 'transform 0.3s ease',
-      },
+          '&::before': {
+            opacity: 1,
+          },
 
-      '& .MuiListItemText-primary': {
-        transform: 'translateX(4px)',
-        transition: 'transform 0.3s ease',
-      },
-    },
+          '& .MuiListItemIcon-root': {
+            color: theme.palette.primary.main,
+            transform: collapsed
+              ? 'scale(1.1)'
+              : size === 'sm'
+                ? 'scale(0.95) rotate(-5deg)'
+                : size === 'lg'
+                  ? 'scale(1.25) rotate(-5deg)'
+                  : 'scale(1.1) rotate(-5deg)',
+            transition: 'all 0.3s ease',
+          },
 
-    '&:active': {
-      transform: 'scale(0.98)',
-      '&::after': {
-        transform: 'translate(-50%, -50%) scale(2)',
-      },
-    },
+          '& .MuiListItemText-primary': {
+            transform: 'translateX(4px)',
+            transition: 'transform 0.3s ease',
+          },
+        },
+
+    '&:active': minimal
+      ? {
+          // Simple active state for minimal variant
+          opacity: 0.7,
+        }
+      : {
+          // Fancy active state for non-minimal variant
+          transform: 'scale(0.98)',
+          '&::after': {
+            transform: 'translate(-50%, -50%) scale(2)',
+          },
+        },
 
     ...(active && {
-      background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.15)} 0%, ${alpha(theme.palette.primary.main, 0.08)} 100%)`,
       color: theme.palette.primary.main,
-      boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`,
-      animation: `${pulseGlow} 2s infinite`,
+      cursor: 'default',
 
       '& .MuiListItemIcon-root': {
         color: theme.palette.primary.main,
-        filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
       },
 
       '&::before': {
@@ -239,9 +262,21 @@ const StyledListItemButton = styled(ListItemButton, {
       },
 
       '&:hover': {
-        backgroundColor: alpha(theme.palette.primary.main, 0.2),
-        transform: 'translateY(-3px) scale(1.02)',
-        boxShadow: `0 12px 32px ${alpha(theme.palette.primary.main, 0.25)}`,
+        background: 'none',
+        transform: 'none',
+        boxShadow: 'none',
+
+        '&::before': {
+          opacity: 1,
+        },
+
+        '& .MuiListItemIcon-root': {
+          transform: 'none',
+        },
+
+        '& .MuiListItemText-primary': {
+          transform: 'none',
+        },
       },
     }),
   }),
@@ -355,6 +390,7 @@ interface MenuItemRendererProps {
   variant: string;
   size: string;
   collapsed: boolean;
+  minimal: boolean;
   level: number;
   onItemClick?: (item: NavigationMenuItem) => void;
 }
@@ -364,14 +400,17 @@ const MenuItemRenderer: React.FC<MenuItemRendererProps> = ({
   variant,
   size,
   collapsed,
+  minimal,
   level,
   onItemClick,
 }) => {
   const [open, setOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const closeTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasChildren = item.children && item.children.length > 0;
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    if (hasChildren) {
+    if (hasChildren && variant !== 'horizontal') {
       setOpen(!open);
     }
     if (item.onClick) {
@@ -382,6 +421,44 @@ const MenuItemRenderer: React.FC<MenuItemRendererProps> = ({
     }
   };
 
+  const clearCloseTimer = () => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  };
+
+  const handleMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
+    if (hasChildren && variant === 'horizontal') {
+      clearCloseTimer();
+      setAnchorEl(event.currentTarget);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (variant === 'horizontal' && hasChildren) {
+      // Delay closing to allow user to move to popover
+      closeTimerRef.current = setTimeout(() => {
+        setAnchorEl(null);
+      }, 150);
+    }
+  };
+
+  const handlePopoverMouseEnter = () => {
+    clearCloseTimer();
+  };
+
+  const handlePopoverMouseLeave = () => {
+    setAnchorEl(null);
+  };
+
+  // Cleanup timer on unmount
+  React.useEffect(() => {
+    return () => {
+      clearCloseTimer();
+    };
+  }, []);
+
   const itemContent = (
     <StyledListItem key={item.id} variant={variant} active={item.active} size={size} level={level}>
       <StyledListItemButton
@@ -389,8 +466,11 @@ const MenuItemRenderer: React.FC<MenuItemRendererProps> = ({
         active={item.active}
         size={size}
         collapsed={collapsed}
+        minimal={minimal}
         disabled={item.disabled}
         onClick={handleClick}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         {...(item.href && !hasChildren
           ? {
               component: 'a' as React.ElementType,
@@ -418,46 +498,62 @@ const MenuItemRenderer: React.FC<MenuItemRendererProps> = ({
         )}
         {!collapsed && (
           <Fade in={!collapsed} timeout={400}>
-            <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 1 }}>
               <ListItemText
                 primary={item.label}
                 secondary={item.description}
-                primaryTypographyProps={{
-                  variant: size === 'sm' ? 'body2' : size === 'lg' ? 'h6' : 'body1',
-                  sx: {
-                    fontWeight: item.active ? 600 : 400,
-                    transition: 'all 0.3s ease',
-                  },
+                sx={{
+                  flex: 1,
+                  minWidth: 0, // Allows text truncation if needed
                 }}
-                secondaryTypographyProps={{
-                  sx: {
-                    opacity: 0.7,
-                    transition: 'all 0.3s ease',
+                slotProps={{
+                  primary: {
+                    variant: size === 'sm' ? 'body2' : size === 'lg' ? 'h6' : 'body1',
+                    sx: {
+                      fontWeight: item.active ? 600 : 400,
+                      transition: 'all 0.3s ease',
+                    },
+                  },
+                  secondary: {
+                    sx: {
+                      opacity: 0.7,
+                      transition: 'all 0.3s ease',
+                    },
                   },
                 }}
               />
               {item.badge && (
-                <Badge
-                  badgeContent={item.badge}
-                  color="error"
+                <Box
+                  component="span"
                   sx={{
-                    mr: 1,
-                    '& .MuiBadge-badge': {
-                      animation:
-                        typeof item.badge === 'number' && item.badge > 0
-                          ? `${pulseGlow} 2s infinite`
-                          : 'none',
-                      background: 'linear-gradient(135deg, #ff5252 0%, #ff1744 100%)',
-                      boxShadow: '0 2px 8px rgba(255, 23, 68, 0.4)',
-                    },
+                    flexShrink: 0,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minWidth: 20,
+                    height: 20,
+                    px: 0.75,
+                    borderRadius: '10px',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    color: '#fff',
+                    background: 'linear-gradient(135deg, #ff5252 0%, #ff1744 100%)',
+                    boxShadow: '0 2px 8px rgba(255, 23, 68, 0.4)',
+                    animation:
+                      typeof item.badge === 'number' && item.badge > 0
+                        ? `${pulseGlow} 2s infinite`
+                        : 'none',
                   }}
-                />
+                >
+                  {item.badge}
+                </Box>
               )}
               {hasChildren && (
                 <Box
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
+                    flexShrink: 0, // Prevents expand icon from shrinking
                     transition: 'transform 0.3s ease',
                     transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
                   }}
@@ -472,6 +568,74 @@ const MenuItemRenderer: React.FC<MenuItemRendererProps> = ({
     </StyledListItem>
   );
 
+  // Horizontal variant with children - use Popover
+  if (hasChildren && variant === 'horizontal') {
+    return (
+      <React.Fragment key={item.id}>
+        {itemContent}
+        <Popover
+          open={Boolean(anchorEl)}
+          anchorEl={anchorEl}
+          onClose={() => setAnchorEl(null)}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
+          disableRestoreFocus
+          sx={{
+            pointerEvents: 'none',
+          }}
+          slotProps={{
+            paper: {
+              onMouseEnter: handlePopoverMouseEnter,
+              onMouseLeave: handlePopoverMouseLeave,
+              sx: {
+                pointerEvents: 'auto',
+                mt: 0.5,
+                borderRadius: 2,
+                boxShadow: (theme) => `0 12px 40px ${alpha(theme.palette.common.black, 0.15)}`,
+                border: (theme) => `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                background: (theme) =>
+                  `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.background.default, 0.95)} 100%)`,
+                backdropFilter: 'blur(10px)',
+                minWidth: 200,
+              },
+            },
+          }}
+        >
+          <List sx={{ p: 1 }}>
+            {item.children?.map((child) => {
+              const childHasChildren = child.children && child.children.length > 0;
+
+              // Only close popover when clicking leaf nodes (items without children)
+              if (childHasChildren) {
+                return renderMenuItem(child, 'vertical', size, false, minimal, 0, onItemClick);
+              }
+
+              // For leaf nodes, wrap with onClick to close the popover
+              return (
+                <Box
+                  key={child.id}
+                  onClick={() => {
+                    clearCloseTimer();
+                    setAnchorEl(null);
+                  }}
+                >
+                  {renderMenuItem(child, 'vertical', size, false, minimal, 0, onItemClick)}
+                </Box>
+              );
+            })}
+          </List>
+        </Popover>
+      </React.Fragment>
+    );
+  }
+
+  // Vertical variant with children - use Collapse
   if (hasChildren && variant !== 'horizontal') {
     return (
       <React.Fragment key={item.id}>
@@ -480,7 +644,7 @@ const MenuItemRenderer: React.FC<MenuItemRendererProps> = ({
           <Collapse in={open} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
               {item.children?.map((child) =>
-                renderMenuItem(child, variant, size, collapsed, level + 1, onItemClick),
+                renderMenuItem(child, variant, size, collapsed, minimal, level + 1, onItemClick),
               )}
             </List>
           </Collapse>
@@ -497,21 +661,21 @@ const renderMenuItem = (
   variant: string = 'vertical',
   size: string = 'md',
   collapsed: boolean = false,
+  minimal: boolean = false,
   level: number = 0,
   onItemClick?: (item: NavigationMenuItem) => void,
-): React.ReactNode => {
-  return (
+): React.ReactNode => (
     <MenuItemRenderer
       key={item.id}
       item={item}
       variant={variant}
       size={size}
       collapsed={collapsed}
+      minimal={minimal}
       level={level}
       onItemClick={onItemClick}
     />
   );
-};
 
 export const NavigationMenu = React.forwardRef<HTMLDivElement, NavigationMenuProps>(
   (
@@ -519,6 +683,7 @@ export const NavigationMenu = React.forwardRef<HTMLDivElement, NavigationMenuPro
       variant = 'vertical',
       items,
       size = 'md',
+      minimal = false,
       collapsible = false,
       collapsed: controlledCollapsed,
       onCollapseChange,
@@ -549,11 +714,19 @@ export const NavigationMenu = React.forwardRef<HTMLDivElement, NavigationMenuPro
         <NavigationContainer
           ref={ref}
           variant={variant}
+          minimal={minimal}
           className={className}
           style={{ maxWidth, ...style }}
           {...props}
         >
-          <Paper elevation={1} sx={{ width: '100%', overflow: 'hidden' }}>
+          <Paper
+            elevation={minimal ? 0 : 1}
+            sx={{
+              width: '100%',
+              overflow: 'hidden',
+              background: minimal ? 'transparent' : undefined,
+            }}
+          >
             {logo && <LogoContainer>{logo}</LogoContainer>}
             <Box
               sx={{
@@ -599,7 +772,7 @@ export const NavigationMenu = React.forwardRef<HTMLDivElement, NavigationMenuPro
                           animationFillMode: 'both',
                         }}
                       >
-                        {renderMenuItem(item, variant, size, false, 0)}
+                        {renderMenuItem(item, variant, size, false, minimal, 0)}
                       </Box>
                     ))}
                   </List>
@@ -615,17 +788,19 @@ export const NavigationMenu = React.forwardRef<HTMLDivElement, NavigationMenuPro
       <NavigationContainer
         ref={ref}
         variant={variant}
+        minimal={minimal}
         collapsed={collapsed}
         className={className}
         style={style}
         {...props}
       >
         <Paper
-          elevation={variant === 'horizontal' ? 1 : 0}
+          elevation={minimal ? 0 : variant === 'horizontal' ? 1 : 0}
           sx={{
             width: '100%',
             height: variant === 'vertical' ? '100%' : 'auto',
             overflow: 'hidden',
+            background: minimal ? 'transparent' : undefined,
           }}
         >
           {logo && variant === 'vertical' && (
@@ -659,7 +834,7 @@ export const NavigationMenu = React.forwardRef<HTMLDivElement, NavigationMenuPro
                     animationFillMode: 'both',
                   }}
                 >
-                  {renderMenuItem(item, variant, size, collapsed, 0)}
+                  {renderMenuItem(item, variant, size, collapsed, minimal, 0)}
                 </Box>
                 {showDividers && index < items.length - 1 && (
                   <Divider

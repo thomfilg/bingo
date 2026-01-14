@@ -1,25 +1,25 @@
-import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import {
+  ChevronLeft as PrevIcon,
+  ChevronRight as NextIcon,
+  Close as CloseIcon,
+  Pause as PauseIcon,
+  PlayArrow as PlayIcon,
+  RestartAlt as ResetZoomIcon,
+  ZoomIn as ZoomInIcon,
+  ZoomOut as ZoomOutIcon,
+} from '@mui/icons-material';
 import {
   Box,
-  IconButton,
-  Typography,
+  CircularProgress,
   Dialog,
   DialogContent,
   Fade,
-  CircularProgress,
+  IconButton,
+  Typography,
 } from '@mui/material';
-import {
-  Close as CloseIcon,
-  ChevronLeft as PrevIcon,
-  ChevronRight as NextIcon,
-  ZoomIn as ZoomInIcon,
-  ZoomOut as ZoomOutIcon,
-  RestartAlt as ResetZoomIcon,
-  PlayArrow as PlayIcon,
-  Pause as PauseIcon,
-} from '@mui/icons-material';
+import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 
-import { LightboxProps, LightboxRef } from './Lightbox.types';
+import type { LightboxProps, LightboxRef } from './Lightbox.types';
 
 export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
   (
@@ -36,6 +36,7 @@ export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
       zoomable = true,
       className,
       style,
+      dataTestId,
     },
     ref,
   ) => {
@@ -50,7 +51,7 @@ export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
     const [preloadedImages, setPreloadedImages] = useState<Set<string>>(new Set());
 
     // Refs
-    const autoplayTimerRef = useRef<number>();
+    const autoplayTimerRef = useRef<number | undefined>(undefined);
     const touchStartRef = useRef<{ x: number; y: number } | null>(null);
     const isDraggingRef = useRef(false);
 
@@ -284,6 +285,7 @@ export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
             onLoadStart={() => setIsLoading(true)}
             onLoadedData={() => setIsLoading(false)}
             aria-label={currentItem.alt || `Video ${currentIndex + 1} of ${items.length}`}
+            data-testid={dataTestId ? `${dataTestId}-video` : 'lightbox-video'}
           />
         );
       }
@@ -306,6 +308,7 @@ export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
             onWheel={handleWheel}
             onDoubleClick={zoomLevel > 1 ? resetZoom : zoomIn}
             draggable={false}
+            data-testid={dataTestId ? `${dataTestId}-image` : 'lightbox-image'}
           />
         );
       }
@@ -332,6 +335,7 @@ export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
             background: 'rgba(0, 0, 0, 0.5)',
             borderRadius: 1,
           }}
+          data-testid={dataTestId ? `${dataTestId}-thumbnails` : 'lightbox-thumbnails'}
         >
           {items.map((item, index) => (
             <Box
@@ -349,6 +353,9 @@ export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
                   border: '2px solid rgba(255, 255, 255, 0.7)',
                 },
               }}
+              data-testid={
+                dataTestId ? `${dataTestId}-thumbnail-${index}` : `lightbox-thumbnail-${index}`
+              }
             >
               {item.type === 'video' ? (
                 <Box
@@ -404,6 +411,7 @@ export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
         style={style}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
+        data-testid={dataTestId || 'lightbox'}
       >
         {/* Visually hidden title for screen readers */}
         <Typography id="lightbox-title" variant="h6" sx={{ position: 'absolute', left: -10000 }}>
@@ -425,6 +433,7 @@ export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
             },
           }}
           aria-label="Close lightbox"
+          data-testid={dataTestId ? `${dataTestId}-close` : 'lightbox-close'}
         >
           <CloseIcon />
         </IconButton>
@@ -451,6 +460,7 @@ export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
                 },
               }}
               aria-label="Previous item"
+              data-testid={dataTestId ? `${dataTestId}-prev` : 'lightbox-prev'}
             >
               <PrevIcon />
             </IconButton>
@@ -474,6 +484,7 @@ export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
                 },
               }}
               aria-label="Next item"
+              data-testid={dataTestId ? `${dataTestId}-next` : 'lightbox-next'}
             >
               <NextIcon />
             </IconButton>
@@ -492,6 +503,7 @@ export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
               gap: 1,
               zIndex: 1000,
             }}
+            data-testid={dataTestId ? `${dataTestId}-zoom-controls` : 'lightbox-zoom-controls'}
           >
             <IconButton
               onClick={zoomIn}
@@ -503,6 +515,7 @@ export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
                 },
               }}
               aria-label="Zoom in"
+              data-testid={dataTestId ? `${dataTestId}-zoom-in` : 'lightbox-zoom-in'}
             >
               <ZoomInIcon />
             </IconButton>
@@ -516,6 +529,7 @@ export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
                 },
               }}
               aria-label="Zoom out"
+              data-testid={dataTestId ? `${dataTestId}-zoom-out` : 'lightbox-zoom-out'}
             >
               <ZoomOutIcon />
             </IconButton>
@@ -529,6 +543,7 @@ export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
                 },
               }}
               aria-label="Reset zoom"
+              data-testid={dataTestId ? `${dataTestId}-zoom-reset` : 'lightbox-zoom-reset'}
             >
               <ResetZoomIcon />
             </IconButton>
@@ -552,6 +567,7 @@ export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
               },
             }}
             aria-label={isAutoPlaying ? 'Pause slideshow' : 'Start slideshow'}
+            data-testid={dataTestId ? `${dataTestId}-autoplay` : 'lightbox-autoplay'}
           >
             {isAutoPlaying ? <PauseIcon /> : <PlayIcon />}
           </IconButton>
@@ -567,6 +583,7 @@ export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
             height: '100vh',
             overflow: 'hidden',
           }}
+          data-testid={dataTestId ? `${dataTestId}-content` : 'lightbox-content'}
         >
           {/* Loading indicator */}
           {isLoading && (
@@ -576,6 +593,7 @@ export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
                 color: 'white',
                 zIndex: 999,
               }}
+              data-testid={dataTestId ? `${dataTestId}-loading` : 'lightbox-loading'}
             />
           )}
 
@@ -588,6 +606,7 @@ export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
               width: '100%',
               height: '100%',
             }}
+            data-testid={dataTestId ? `${dataTestId}-image-container` : 'lightbox-image-container'}
           >
             {renderMedia()}
           </Box>
@@ -608,6 +627,7 @@ export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
                 padding: 2,
                 borderRadius: 1,
               }}
+              data-testid={dataTestId ? `${dataTestId}-caption` : 'lightbox-caption'}
             >
               {currentItem.caption}
             </Typography>
@@ -627,6 +647,7 @@ export const Lightbox = React.forwardRef<LightboxRef, LightboxProps>(
                 borderRadius: 1,
               }}
               aria-live="polite"
+              data-testid={dataTestId ? `${dataTestId}-counter` : 'lightbox-counter'}
             >
               {currentIndex + 1} / {items.length}
             </Typography>

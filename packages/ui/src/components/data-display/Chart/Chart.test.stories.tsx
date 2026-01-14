@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { within, expect, fn } from 'storybook/test';
+import { expect, fn, within } from 'storybook/test';
 
 import { Chart } from './Chart';
 

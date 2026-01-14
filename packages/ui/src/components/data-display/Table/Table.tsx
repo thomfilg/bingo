@@ -1,37 +1,36 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import {
-  Table as MuiTable,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  TableContainer,
-  Checkbox,
-  TableSortLabel,
-  Box,
-  IconButton,
-  Menu,
-  MenuItem,
-  FormControlLabel,
-  Switch,
-  alpha,
-  keyframes,
-  useTheme,
-  useMediaQuery,
-  Skeleton
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
 import { 
   MoreVert as MoreVertIcon
 } from '@mui/icons-material';
+import {
+  alpha,
+  Box,
+  Checkbox,
+  FormControlLabel,
+  IconButton,
+  keyframes,
+  Menu,
+  MenuItem,
+  Skeleton,
+  Switch,
+  Table as MuiTable,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+  useMediaQuery,
+  useTheme} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import React, { useCallback,useEffect, useMemo, useState } from 'react';
 
-import { 
-  TableProps, 
-  ColumnConfig, 
+import type {
+  ColumnConfig,
+  TableBodyProps,
   TableDensity,
   TableHeaderProps,
-  TableBodyProps
-} from './Table.types';
+  TableProps,
+  TableStripeColor} from './Table.types';
 
 // Define pulse animation
 const pulseAnimation = keyframes`
@@ -86,17 +85,32 @@ const StyledTableContainer = styled(TableContainer, {
   }),
 }));
 
+// Helper function to get stripe color from theme
+const getStripeColorFromTheme = (theme: { palette: { primary: { main: string }; secondary: { main: string }; info: { main: string }; success: { main: string }; warning: { main: string }; error: { main: string }; action: { hover: string } } }, stripeColor: TableStripeColor = 'neutral') => {
+  const colorMap: Record<TableStripeColor, string> = {
+    primary: theme.palette.primary.main,
+    secondary: theme.palette.secondary.main,
+    info: theme.palette.info.main,
+    success: theme.palette.success.main,
+    warning: theme.palette.warning.main,
+    error: theme.palette.error.main,
+    neutral: theme.palette.action.hover,
+  };
+  return colorMap[stripeColor];
+};
+
 const StyledTable = styled(MuiTable, {
-  shouldForwardProp: (prop) => 
-    !['customVariant', 'glow', 'pulse', 'hoverable', 'density', 'stickyHeader'].includes(prop as string),
-})<{ 
+  shouldForwardProp: (prop) =>
+    !['customVariant', 'glow', 'pulse', 'hoverable', 'density', 'stickyHeader', 'stripeColor'].includes(prop as string),
+})<{
   customVariant?: string;
-  glow?: boolean; 
+  glow?: boolean;
   pulse?: boolean;
   hoverable?: boolean;
   density?: TableDensity;
   stickyHeader?: boolean;
-}>(({ theme, customVariant, glow, pulse, hoverable, density, stickyHeader }) => {
+  stripeColor?: TableStripeColor;
+}>(({ theme, customVariant, glow, pulse, hoverable, density, stickyHeader, stripeColor = 'neutral' }) => {
   const densityConfig = getDensityConfig(density);
   
   return {
@@ -137,8 +151,8 @@ const StyledTable = styled(MuiTable, {
 
     ...(customVariant === 'striped' && {
       backgroundColor: theme.palette.background.paper,
-      '& .MuiTableRow-root:nth-of-type(even)': {
-        backgroundColor: alpha(theme.palette.action.hover, 0.5),
+      '& .MuiTableBody-root .MuiTableRow-root:nth-of-type(even)': {
+        backgroundColor: alpha(getStripeColorFromTheme(theme, stripeColor), stripeColor === 'neutral' ? 0.5 : 0.15),
       },
     }),
 
@@ -169,8 +183,9 @@ const StyledTable = styled(MuiTable, {
     // Hoverable rows
     ...(hoverable && {
       '& .MuiTableBody-root .MuiTableRow-root:hover': {
-        backgroundColor: alpha(theme.palette.action.hover, 0.8),
+        backgroundColor: alpha(theme.palette.primary.main, 0.08),
         cursor: 'pointer',
+        transition: 'background-color 0.15s ease-in-out',
       },
     }),
 
@@ -412,16 +427,12 @@ const EnhancedTableBody: React.FC<TableBodyProps> = React.memo(({
   overscan = 5,
 }) => {
   const getRowKey = useCallback(
-    (rowData: Record<string, unknown>, index: number): string | number => {
-      return rowKeyExtractor ? rowKeyExtractor(rowData, index) : (rowData.id as string | number) || index;
-    },
+    (rowData: Record<string, unknown>, index: number): string | number => rowKeyExtractor ? rowKeyExtractor(rowData, index) : (rowData.id as string | number) || index,
     [rowKeyExtractor]
   );
 
   const isRowSelected = useCallback(
-    (rowKey: string | number) => {
-      return selectedRows.includes(rowKey);
-    },
+    (rowKey: string | number) => selectedRows.includes(rowKey),
     [selectedRows]
   );
 
@@ -534,6 +545,7 @@ export const Table = React.forwardRef<globalThis.HTMLTableElement, TableProps>(
   ({
     // Basic props
     variant = 'default',
+    stripeColor = 'neutral',
     glow = false,
     pulse = false,
     hoverable = false,
@@ -627,6 +639,7 @@ export const Table = React.forwardRef<globalThis.HTMLTableElement, TableProps>(
           <StyledTable
             ref={ref}
             customVariant={variant}
+            stripeColor={stripeColor}
             glow={glow}
             pulse={pulse}
             hoverable={hoverable}
@@ -663,6 +676,7 @@ export const Table = React.forwardRef<globalThis.HTMLTableElement, TableProps>(
           <StyledTable
             ref={ref}
             customVariant={variant}
+            stripeColor={stripeColor}
             glow={glow}
             pulse={pulse}
             hoverable={hoverable}
@@ -703,7 +717,7 @@ export const Table = React.forwardRef<globalThis.HTMLTableElement, TableProps>(
     // Advanced table with columns and data
     if (columns && data) {
       const finalColumns = responsive ? visibleColumns : columns;
-      
+
       return (
         <Box position="relative">
           <StyledTableContainer
@@ -713,6 +727,7 @@ export const Table = React.forwardRef<globalThis.HTMLTableElement, TableProps>(
             <StyledTable
               ref={ref}
               customVariant={variant}
+              stripeColor={stripeColor}
               glow={glow}
               pulse={pulse}
               hoverable={hoverable}
@@ -799,6 +814,7 @@ export const Table = React.forwardRef<globalThis.HTMLTableElement, TableProps>(
       <StyledTable
         ref={ref}
         customVariant={variant}
+        stripeColor={stripeColor}
         glow={glow}
         pulse={pulse}
         hoverable={hoverable}

@@ -1,6 +1,6 @@
+import { Cookie, Payment, Security, Star, Update } from '@mui/icons-material';
+import { Box, Container, Stack, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Star, Security, Update, Cookie, Payment } from '@mui/icons-material';
-import { Stack, Box, Typography, Container } from '@mui/material';
 import React from 'react';
 import { fn } from 'storybook/test';
 

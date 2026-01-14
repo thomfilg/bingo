@@ -1,18 +1,18 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor, fn, fireEvent } from 'storybook/test';
 import {
-  Box,
-  Typography,
+  Alert,
   Avatar,
+  Box,
   ListItem,
   ListItemAvatar,
   ListItemText,
   Paper,
   Skeleton,
-  Alert,
+  Typography,
 } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, fireEvent,fn, userEvent, waitFor, within } from 'storybook/test';
 
-import { VirtualList, VirtualGrid } from './VirtualList';
+import { VirtualGrid,VirtualList } from './VirtualList';
 import type { VirtualListItem } from './VirtualList.types';
 
 const meta: Meta<typeof VirtualList> = {
@@ -29,8 +29,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 // Helper functions
-const generateItems = (count: number): VirtualListItem[] => {
-  return Array.from({ length: count }, (_, i) => ({
+const generateItems = (count: number): VirtualListItem[] => Array.from({ length: count }, (_, i) => ({
     id: i,
     data: {
       name: `Item ${i + 1}`,
@@ -38,10 +37,8 @@ const generateItems = (count: number): VirtualListItem[] => {
       avatar: `https://i.pravatar.cc/40?img=${(i % 70) + 1}`,
     },
   }));
-};
 
-const generateVariableItems = (count: number): VirtualListItem[] => {
-  return Array.from({ length: count }, (_, i) => ({
+const generateVariableItems = (count: number): VirtualListItem[] => Array.from({ length: count }, (_, i) => ({
     id: i,
     height: 60 + Math.floor(Math.random() * 100),
     data: {
@@ -54,7 +51,6 @@ const generateVariableItems = (count: number): VirtualListItem[] => {
       avatar: `https://i.pravatar.cc/40?img=${(i % 70) + 1}`,
     },
   }));
-};
 
 const SimpleItemRenderer = ({
   item,

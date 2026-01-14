@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Box, useTheme, Collapse } from '@mui/material';
+import { Box, Collapse,useTheme } from '@mui/material';
+import React, { useCallback,useEffect, useRef, useState } from 'react';
 
-import { CollapsibleProps, CollapsibleTriggerProps, CollapsibleContentProps } from './Collapsible.types';
+import type { CollapsibleContentProps,CollapsibleProps, CollapsibleTriggerProps } from './Collapsible.types';
 
 export const Collapsible: React.FC<CollapsibleProps> = ({
   children,
@@ -12,8 +12,10 @@ export const Collapsible: React.FC<CollapsibleProps> = ({
   onToggle,
   disabled = false,
   keepMounted = false,
+  maxHeight,
   sx,
   className,
+  dataTestId,
   ...otherProps
 }) => {
   const theme = useTheme();
@@ -45,9 +47,10 @@ export const Collapsible: React.FC<CollapsibleProps> = ({
   const measureHeight = useCallback(() => {
     if (contentRef.current) {
       const scrollHeight = contentRef.current.scrollHeight;
-      setHeight(scrollHeight);
+      // Cap at maxHeight if provided
+      setHeight(maxHeight ? Math.min(scrollHeight, maxHeight) : scrollHeight);
     }
-  }, []);
+  }, [maxHeight]);
 
   useEffect(() => {
     if (!open) {
@@ -74,11 +77,13 @@ export const Collapsible: React.FC<CollapsibleProps> = ({
         sx={{
           opacity: disabled ? 0.6 : 1,
           pointerEvents: disabled ? 'none' : 'auto',
+          ...(maxHeight && { maxHeight, overflow: 'hidden' }),
           ...sx,
         }}
         className={className}
         unmountOnExit={!keepMounted}
         data-disabled={disabled}
+        data-testid={dataTestId}
         role="region"
         aria-expanded={open && !disabled}
         aria-hidden={disabled || !open}
@@ -104,6 +109,7 @@ export const Collapsible: React.FC<CollapsibleProps> = ({
       }}
       className={className}
       data-disabled={disabled}
+      data-testid={dataTestId}
       role="region"
       aria-expanded={open && !disabled}
       aria-hidden={disabled || !open}
@@ -122,6 +128,7 @@ export const CollapsibleTrigger: React.FC<CollapsibleTriggerProps> = ({
   disabled = false,
   expanded = false,
   className,
+  dataTestId,
   ...otherProps
 }) => {
   const theme = useTheme();
@@ -132,6 +139,7 @@ export const CollapsibleTrigger: React.FC<CollapsibleTriggerProps> = ({
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
       className={className}
+      data-testid={dataTestId}
       aria-expanded={expanded}
       aria-disabled={disabled}
       role="button"
@@ -151,7 +159,7 @@ export const CollapsibleTrigger: React.FC<CollapsibleTriggerProps> = ({
         }),
         opacity: disabled ? 0.6 : 1,
         '&:hover': {
-          backgroundColor: disabled ? 'transparent' : 
+          backgroundColor: disabled ? 'transparent' :
             expanded ? theme.palette.action.selected : theme.palette.action.hover,
         },
         '&:focus': {

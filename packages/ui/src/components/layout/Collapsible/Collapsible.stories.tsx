@@ -1,8 +1,8 @@
+import { Box,Card, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-import { Typography, Card, Box } from '@mui/material';
 
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from './Collapsible';
+import { Collapsible, CollapsibleContent,CollapsibleTrigger } from './Collapsible';
 
 const meta: Meta<typeof Collapsible> = {
   title: 'Layout/Collapsible',

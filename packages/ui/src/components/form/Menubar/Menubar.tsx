@@ -1,27 +1,27 @@
-import React, { useState, useRef } from 'react';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import {
+  alpha,
   AppBar,
-  Toolbar,
+  Box,
   Button,
-  Menu,
-  MenuItem,
+  Chip,
+  CircularProgress,
+  Divider,
   ListItemIcon,
   ListItemText,
-  Divider,
-  Box,
+  Menu,
+  MenuItem,
+  Toolbar,
   Typography,
-  CircularProgress,
   useTheme,
-  alpha,
-  Chip,
 } from '@mui/material';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import React, { useRef,useState } from 'react';
 
-import {
-  MenubarProps,
+import type {
   MenubarGroupProps,
-  MenubarSeparatorProps,
   MenubarItem,
+  MenubarProps,
+  MenubarSeparatorProps,
 } from './Menubar.types';
 
 export const Menubar: React.FC<MenubarProps> = ({
@@ -453,8 +453,7 @@ export const MenubarSeparator: React.FC<MenubarSeparatorProps> = ({
   orientation = 'horizontal',
   className,
   style,
-}) => {
-  return (
+}) => (
     <Divider
       orientation={orientation === 'horizontal' ? 'vertical' : 'horizontal'}
       flexItem
@@ -466,4 +465,3 @@ export const MenubarSeparator: React.FC<MenubarSeparatorProps> = ({
       }}
     />
   );
-};

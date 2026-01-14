@@ -1,24 +1,24 @@
-import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
 import {
-  Box,
-  Typography,
-  IconButton,
-  Button,
-  Collapse,
-  useTheme,
-  alpha,
-  Portal,
-  CircularProgress,
-} from '@mui/material';
-import {
-  Close as CloseIcon,
   CheckCircle as SuccessIcon,
+  Close as CloseIcon,
   Error as ErrorIcon,
-  Warning as WarningIcon,
   Info as InfoIcon,
+  Warning as WarningIcon,
 } from '@mui/icons-material';
+import {
+  alpha,
+  Box,
+  Button,
+  CircularProgress,
+  Collapse,
+  IconButton,
+  Portal,
+  Typography,
+  useTheme,
+} from '@mui/material';
+import React, { createContext, useCallback, useContext, useRef,useState } from 'react';
 
-import { SonnerProps, SonnerContextType } from './Sonner.types';
+import type { SonnerContextType,SonnerProps } from './Sonner.types';
 
 const SonnerContext = createContext<SonnerContextType | null>(null);
 
@@ -76,44 +76,32 @@ export const SonnerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   );
 
   const toast = useCallback(
-    (message: React.ReactNode, options?: Partial<SonnerProps>) => {
-      return addToast({ ...options, title: message }, 'default');
-    },
+    (message: React.ReactNode, options?: Partial<SonnerProps>) => addToast({ ...options, title: message }, 'default'),
     [addToast],
   );
 
   const success = useCallback(
-    (message: React.ReactNode, options?: Partial<SonnerProps>) => {
-      return addToast({ ...options, title: message }, 'success');
-    },
+    (message: React.ReactNode, options?: Partial<SonnerProps>) => addToast({ ...options, title: message }, 'success'),
     [addToast],
   );
 
   const error = useCallback(
-    (message: React.ReactNode, options?: Partial<SonnerProps>) => {
-      return addToast({ ...options, title: message }, 'error');
-    },
+    (message: React.ReactNode, options?: Partial<SonnerProps>) => addToast({ ...options, title: message }, 'error'),
     [addToast],
   );
 
   const warning = useCallback(
-    (message: React.ReactNode, options?: Partial<SonnerProps>) => {
-      return addToast({ ...options, title: message }, 'warning');
-    },
+    (message: React.ReactNode, options?: Partial<SonnerProps>) => addToast({ ...options, title: message }, 'warning'),
     [addToast],
   );
 
   const info = useCallback(
-    (message: React.ReactNode, options?: Partial<SonnerProps>) => {
-      return addToast({ ...options, title: message }, 'info');
-    },
+    (message: React.ReactNode, options?: Partial<SonnerProps>) => addToast({ ...options, title: message }, 'info'),
     [addToast],
   );
 
   const loading = useCallback(
-    (message: React.ReactNode, options?: Partial<SonnerProps>) => {
-      return addToast({ ...options, title: message, persistent: true }, 'loading');
-    },
+    (message: React.ReactNode, options?: Partial<SonnerProps>) => addToast({ ...options, title: message, persistent: true }, 'loading'),
     [addToast],
   );
 

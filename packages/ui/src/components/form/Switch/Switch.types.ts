@@ -1,5 +1,5 @@
-import { SwitchProps as MuiSwitchProps } from '@mui/material';
-import { ReactNode, MouseEventHandler, FocusEventHandler } from 'react';
+import type { SwitchProps as MuiSwitchProps } from '@mui/material';
+import type { FocusEventHandler,MouseEventHandler, ReactNode } from 'react';
 
 export interface SwitchProps extends Omit<MuiSwitchProps, 'color' | 'size'> {
   /**
@@ -121,5 +121,10 @@ export interface SwitchProps extends Omit<MuiSwitchProps, 'color' | 'size'> {
    * Blur handler
    */
   onBlur?: FocusEventHandler<HTMLButtonElement>;
-  
+
+  /**
+   * Custom test ID for testing
+   */
+  dataTestId?: string;
+
 }

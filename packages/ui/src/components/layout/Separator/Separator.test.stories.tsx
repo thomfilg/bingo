@@ -1,6 +1,6 @@
+import { Box, Stack,Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { within, expect } from 'storybook/test';
-import { Box, Typography, Stack } from '@mui/material';
+import { expect,within } from 'storybook/test';
 
 import { Separator } from './Separator';
 
@@ -487,10 +487,10 @@ export const Performance: Story = {
     const canvas = within(canvasElement);
 
     await step('Measure render time for multiple separators', async () => {
-      // eslint-disable-next-line no-undef
+
       const startTime = performance.now();
       const separators = canvas.getAllByRole('separator');
-      // eslint-disable-next-line no-undef
+
       const endTime = performance.now();
 
       const renderTime = endTime - startTime;

@@ -1,5 +1,5 @@
+import { FormGroup,Stack } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Stack, FormGroup } from '@mui/material';
 
 import { Checkbox } from './Checkbox';
 

@@ -40,7 +40,7 @@ A beautiful and versatile Alert component with multiple variants, animations, an
 ### Basic Alert
 
 ```tsx
-import { Alert } from '@repo/ui';
+import { Alert } from '@procurement/ui';
 
 <Alert variant="info">
   This is a basic info alert message.
@@ -159,3 +159,51 @@ The Alert component integrates with the MUI theme system and responds to:
 - Spacing tokens
 - Border radius settings
 - Shadow/elevation tokens
+
+## Testing
+
+### Test IDs
+
+| Test ID | Element | Description |
+|---------|---------|-------------|
+| `alert` | Alert container | Main alert wrapper element |
+| `alert-icon` | Icon | Alert severity icon |
+| `alert-title` | Title | Alert title text |
+| `alert-message` | Message | Alert message content |
+| `alert-close` | Button | Close button (when closable) |
+
+Custom test IDs can be provided via the `dataTestId` prop:
+```typescript
+<Alert dataTestId="custom-alert" />
+// Results in: custom-alert, custom-alert-icon, custom-alert-title, etc.
+```
+
+### Testing Best Practices
+
+**Wait for Component to Render:**
+```typescript
+const alert = await canvas.findByTestId('alert');
+expect(alert).toBeInTheDocument();
+```
+
+**Test Close Interaction:**
+```typescript
+const closeButton = await canvas.findByTestId('alert-close');
+await userEvent.click(closeButton);
+expect(onClose).toHaveBeenCalled();
+```
+
+**Test Different Severities:**
+```typescript
+const alert = await canvas.findByTestId('alert');
+expect(alert).toHaveAttribute('role', 'alert');
+expect(alert).toHaveClass('MuiAlert-standardSuccess');
+```
+
+### Common Test Scenarios
+
+1. **Basic Rendering** - Verify alert renders with message
+2. **Severity Variants** - Test all severity types (success, error, warning, info)
+3. **Closable Alert** - Test close button functionality
+4. **With Title** - Verify title renders correctly
+5. **Accessibility** - Verify ARIA attributes and role

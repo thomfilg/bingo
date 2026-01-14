@@ -1,7 +1,7 @@
+import { Alert, Box, Button, Paper, TextField,Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor } from 'storybook/test';
 import { useState } from 'react';
-import { Button, Box, Typography, Paper, Alert, TextField } from '@mui/material';
+import { expect, userEvent, waitFor,within } from 'storybook/test';
 
 import { Portal } from './Portal';
 
@@ -414,15 +414,15 @@ export const KeyboardNavigation: Story = {
 
     // Test Tab navigation within portal
     await userEvent.keyboard('{Tab}');
-    let firstButton = document.querySelector('[data-testid="first-button"]') as HTMLButtonElement;
+    const firstButton = document.querySelector('[data-testid="first-button"]') as HTMLButtonElement;
     expect(firstButton).toHaveFocus();
 
     await userEvent.keyboard('{Tab}');
-    let secondButton = document.querySelector('[data-testid="second-button"]') as HTMLButtonElement;
+    const secondButton = document.querySelector('[data-testid="second-button"]') as HTMLButtonElement;
     expect(secondButton).toHaveFocus();
 
     await userEvent.keyboard('{Tab}');
-    let closeButton = document.querySelector('[data-testid="close-button"]') as HTMLButtonElement;
+    const closeButton = document.querySelector('[data-testid="close-button"]') as HTMLButtonElement;
     expect(closeButton).toHaveFocus();
 
     // Test Escape key to close
@@ -1324,7 +1324,7 @@ export const Performance: Story = {
     const canvas = within(canvasElement);
 
     // Test single portal performance
-    let toggleButton = canvas.getByTestId('toggle-performance-portals');
+    const toggleButton = canvas.getByTestId('toggle-performance-portals');
     await userEvent.click(toggleButton);
 
     await waitFor(() => {

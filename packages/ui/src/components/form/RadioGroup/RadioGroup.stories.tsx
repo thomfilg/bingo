@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Box, Typography } from '@mui/material';
-import { CreditCard, Banknote, Smartphone, Globe, Star, Heart, Zap, Shield } from 'lucide-react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Banknote, CreditCard, Globe, Heart, Shield,Smartphone, Star, Zap } from 'lucide-react';
 import { useState } from 'react';
 
 import { RadioGroup } from './RadioGroup';

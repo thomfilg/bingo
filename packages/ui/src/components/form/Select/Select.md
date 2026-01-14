@@ -9,7 +9,7 @@ The Select component provides a dropdown interface for selecting one option from
 ## Usage
 
 ```tsx
-import { Select } from '@repo/ui';
+import { Select } from '@procurement/ui';
 
 const options = [
   { value: 'option1', label: 'Option 1' },
@@ -128,3 +128,127 @@ Animated gradient border that changes on hover and focus.
 - Supports controlled and uncontrolled usage patterns
 - Integrates with MUI theme system for consistent styling
 - Compatible with all major browsers and screen readers
+
+## Testing
+
+### Test IDs
+
+The Select component includes `data-testid` attributes for reliable testing:
+
+| Test ID | Element | Description |
+|---------|---------|-------------|
+| `{dataTestId}` | FormControl | Root FormControl wrapper element |
+| `{dataTestId}-select` | Select element | The MUI Select component |
+| `{dataTestId}-option-{value}` | Menu items | Individual option elements (one per option) |
+
+**Default Test IDs (when no dataTestId prop provided):**
+- `select` - The Select element
+- `option-{value}` - Each option element
+
+### Testing Best Practices
+
+**Wait for Select to Render:**
+```typescript
+const select = await canvas.findByTestId('country-select-select');
+expect(select).toBeInTheDocument();
+```
+
+**Test Opening Dropdown:**
+```typescript
+const select = await canvas.findByTestId('select-select');
+await userEvent.click(select);
+
+// Wait for dropdown to open
+await waitFor(() => {
+  const dropdown = document.querySelector('[role="listbox"]');
+  expect(dropdown).toBeInTheDocument();
+});
+```
+
+**Test Selecting Option:**
+```typescript
+const select = await canvas.findByTestId('country-select-select');
+await userEvent.click(select);
+
+// Find and click option
+const option = await canvas.findByTestId('country-select-option-us');
+await userEvent.click(option);
+
+expect(onValueChange).toHaveBeenCalledWith('us');
+expect(select).toHaveTextContent('United States');
+```
+
+**Test with Default Value:**
+```typescript
+const select = await canvas.findByTestId('select-select');
+expect(select).toHaveTextContent('United States'); // Default selection
+```
+
+**Test Disabled State:**
+```typescript
+const select = await canvas.findByTestId('disabled-select-select');
+expect(select).toHaveAttribute('aria-disabled', 'true');
+
+// Clicking should not open dropdown
+await userEvent.click(select);
+const dropdown = document.querySelector('[role="listbox"]');
+expect(dropdown).not.toBeInTheDocument();
+```
+
+**Test Error State:**
+```typescript
+const formControl = await canvas.findByTestId('error-select');
+expect(formControl).toHaveClass('Mui-error');
+
+// Helper text should show error
+const helperText = formControl.querySelector('.MuiFormHelperText-root');
+expect(helperText).toHaveTextContent('This field is required');
+expect(helperText).toHaveClass('Mui-error');
+```
+
+**Test All Options Render:**
+```typescript
+const select = await canvas.findByTestId('select-select');
+await userEvent.click(select);
+
+// Check all options exist
+for (const option of options) {
+  const optionElement = await canvas.findByTestId(`select-option-${option.value}`);
+  expect(optionElement).toBeInTheDocument();
+  expect(optionElement).toHaveTextContent(option.label);
+}
+```
+
+**Test Keyboard Navigation:**
+```typescript
+const select = await canvas.findByTestId('select-select');
+select.focus();
+
+// Open with Space or Enter
+await userEvent.keyboard('{Space}');
+await waitFor(() => {
+  expect(document.querySelector('[role="listbox"]')).toBeInTheDocument();
+});
+
+// Navigate with arrow keys
+await userEvent.keyboard('{ArrowDown}');
+await userEvent.keyboard('{Enter}');
+
+expect(onValueChange).toHaveBeenCalled();
+```
+
+### Common Test Scenarios
+
+1. **Basic Rendering** - Verify select renders with label and options
+2. **Option Selection** - Test clicking options and value change
+3. **Default Value** - Test initial selected value
+4. **Placeholder** - Verify placeholder shows when no selection
+5. **Disabled State** - Test disabled select and disabled options
+6. **Error State** - Test error styling and helper text
+7. **Variants** - Test default, glass, and gradient styles
+8. **Visual Effects** - Test glow and pulse animations
+9. **Keyboard Navigation** - Test arrow keys and Enter/Space
+10. **Multiple Options** - Test with many options
+11. **Full Width** - Test fullWidth prop behavior
+12. **Accessibility** - Verify ARIA attributes and screen reader support
+13. **Form Integration** - Test with form libraries like React Hook Form

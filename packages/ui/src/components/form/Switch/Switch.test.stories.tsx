@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import React from 'react';
-import { userEvent, within, expect, waitFor, fn } from 'storybook/test';
 import { Moon, Sun, Volume2, VolumeX } from 'lucide-react';
+import React from 'react';
+import { expect, fn,userEvent, waitFor, within } from 'storybook/test';
 
 import { Switch } from './Switch';
 

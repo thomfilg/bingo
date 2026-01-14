@@ -1,4 +1,5 @@
-import React from 'react';
+import AddIcon from '@mui/icons-material/Add';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import {
   Box,
   Button,
@@ -7,10 +8,11 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
+import React from 'react';
 
-import { EmptyStateProps } from './EmptyState.types';
+import type { EmptyStateProps } from './EmptyState.types';
 
-export const EmptyState: React.FC<EmptyStateProps> = ({
+export const EmptyState: React.FC<EmptyStateProps> = React.memo(({
   variant = 'default',
   title,
   description,
@@ -18,7 +20,12 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   primaryAction,
   secondaryAction,
   helpLink,
+  onRefresh,
+  refreshLabel = 'Refresh',
+  onCreate,
+  createLabel = 'Create New',
   className,
+  dataTestId,
 }) => {
   const theme = useTheme();
   const titleId = React.useId();
@@ -28,6 +35,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       role="region"
       aria-labelledby={titleId}
       className={className}
+      data-testid={dataTestId || 'empty-state'}
       sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -42,6 +50,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       {/* Illustration */}
       {illustration && (
         <Box
+          data-testid={dataTestId ? `${dataTestId}-icon` : 'empty-state-icon'}
           sx={{
             maxWidth: variant === 'illustrated' ? 240 : 120,
             width: '100%',
@@ -60,6 +69,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           id={titleId}
           variant="h6"
           component="h3"
+          data-testid={dataTestId ? `${dataTestId}-title` : 'empty-state-title'}
           sx={{
             fontWeight: theme.typography.fontWeightMedium,
             color: theme.palette.text.primary,
@@ -73,6 +83,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           <Typography
             variant="body2"
             color="text.secondary"
+            data-testid={dataTestId ? `${dataTestId}-description` : 'empty-state-description'}
             sx={{
               maxWidth: 480,
               lineHeight: 1.6,
@@ -83,7 +94,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         )}
 
         {/* Actions */}
-        {(variant === 'action' || primaryAction || secondaryAction) && (
+        {(variant === 'action' || primaryAction || secondaryAction || onCreate || onRefresh) && (
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             spacing={2}
@@ -94,9 +105,22 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
               <Button
                 variant="contained"
                 onClick={primaryAction.onClick}
+                data-testid={dataTestId ? `${dataTestId}-primary-action` : 'empty-state-primary-action'}
                 sx={{ minWidth: 120 }}
               >
                 {primaryAction.label}
+              </Button>
+            )}
+
+            {onCreate && (
+              <Button
+                variant="contained"
+                onClick={onCreate}
+                startIcon={<AddIcon />}
+                data-testid={dataTestId ? `${dataTestId}-create-button` : 'empty-state-create-button'}
+                sx={{ minWidth: 120 }}
+              >
+                {createLabel}
               </Button>
             )}
 
@@ -104,11 +128,25 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
               <Button
                 variant="outlined"
                 onClick={secondaryAction.onClick}
+                data-testid={dataTestId ? `${dataTestId}-secondary-action` : 'empty-state-secondary-action'}
                 sx={{ minWidth: 120 }}
               >
                 {secondaryAction.label}
               </Button>
             )}
+
+            {onRefresh && (
+              <Button
+                variant="outlined"
+                onClick={onRefresh}
+                startIcon={<RefreshIcon />}
+                data-testid={dataTestId ? `${dataTestId}-refresh-button` : 'empty-state-refresh-button'}
+                sx={{ minWidth: 120 }}
+              >
+                {refreshLabel}
+              </Button>
+            )}
+
           </Stack>
         )}
 
@@ -118,6 +156,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             href={helpLink.href}
             target={helpLink.external ? '_blank' : undefined}
             rel={helpLink.external ? 'noopener noreferrer' : undefined}
+            data-testid={dataTestId ? `${dataTestId}-help-link` : 'empty-state-help-link'}
             sx={{
               mt: theme.spacing(1),
               color: theme.palette.primary.main,
@@ -134,6 +173,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       </Stack>
     </Box>
   );
-};
+});
+
+EmptyState.displayName = 'EmptyState';
 
 export default EmptyState;

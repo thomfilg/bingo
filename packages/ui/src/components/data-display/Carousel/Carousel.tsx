@@ -1,26 +1,26 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import {
-  Box,
-  IconButton,
-  Typography,
-  CircularProgress,
-  useTheme,
-  alpha,
-  Fade,
-  Slide,
-  Zoom,
-  Paper,
-} from '@mui/material';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-
 import {
-  CarouselProps,
-  CarouselIndicatorsProps,
+  alpha,
+  Box,
+  CircularProgress,
+  Fade,
+  IconButton,
+  Paper,
+  Slide,
+  Typography,
+  useTheme,
+  Zoom,
+} from '@mui/material';
+import React, { useCallback,useEffect, useRef, useState } from 'react';
+
+import type {
   CarouselArrowsProps,
-  CarouselThumbnailsProps,
+  CarouselIndicatorsProps,
   CarouselItem,
+  CarouselProps,
+  CarouselThumbnailsProps,
 } from './Carousel.types';
 
 export const Carousel: React.FC<CarouselProps> = ({
@@ -346,6 +346,7 @@ export const Carousel: React.FC<CarouselProps> = ({
     <Box
       ref={containerRef}
       className={className}
+      data-testid="carousel-container"
       sx={{
         ...getVariantStyles(),
         ...style,
@@ -356,6 +357,7 @@ export const Carousel: React.FC<CarouselProps> = ({
       onBlur={onBlur}
     >
       <Box
+        data-testid="carousel-track"
         sx={{
           width: '100%',
           height: '100%',
@@ -369,9 +371,11 @@ export const Carousel: React.FC<CarouselProps> = ({
             key={item.id}
             in={index === activeIndex}
             timeout={600}
-            direction={animation === 'flip' ? 'left' : undefined}
+            {...(animation === 'flip' && { direction: 'left' })}
           >
             <Box
+              data-testid={`carousel-slide-${index}`}
+              data-active={index === activeIndex}
               sx={{
                 position: 'absolute',
                 width: '100%',
@@ -465,6 +469,8 @@ export const CarouselIndicators: React.FC<CarouselIndicatorsProps> = ({
             role="button"
             tabIndex={0}
             aria-label={`Go to slide ${index + 1}`}
+            data-testid={`carousel-indicator-${index}`}
+            data-active={isActive}
             sx={{
               width: isActive ? 30 : 20,
               height: 3,
@@ -491,6 +497,8 @@ export const CarouselIndicators: React.FC<CarouselIndicatorsProps> = ({
             role="button"
             tabIndex={0}
             aria-label={`Go to slide ${index + 1}`}
+            data-testid={`carousel-indicator-${index}`}
+            data-active={isActive}
             sx={{
               width: 24,
               height: 24,
@@ -523,6 +531,8 @@ export const CarouselIndicators: React.FC<CarouselIndicatorsProps> = ({
           <IconButton
             size="small"
             aria-label={`Go to slide ${index + 1}`}
+            data-testid={`carousel-indicator-${index}`}
+            data-active={isActive}
             onClick={() => onSelect(index)}
             sx={{
               p: 0.5,
@@ -540,6 +550,7 @@ export const CarouselIndicators: React.FC<CarouselIndicatorsProps> = ({
   return (
     <Box
       className={className}
+      data-testid="carousel-indicators"
       sx={{
         position: 'absolute',
         display: 'flex',
@@ -620,13 +631,14 @@ export const CarouselArrows: React.FC<CarouselArrowsProps> = ({
   const rightPosition = position === 'outside' ? -40 : 8;
 
   return (
-    <>
+    <Box data-testid="carousel-navigation">
       <IconButton
         onClick={onPrev}
         disabled={disabled || disablePrev}
         size={size}
         className={className}
         aria-label="Previous slide"
+        data-testid="carousel-prev-button"
         sx={{
           ...getArrowStyles(),
           left: leftPosition,
@@ -642,6 +654,7 @@ export const CarouselArrows: React.FC<CarouselArrowsProps> = ({
         aria-label="Next slide"
         size={size}
         className={className}
+        data-testid="carousel-next-button"
         sx={{
           ...getArrowStyles(),
           right: rightPosition,
@@ -650,7 +663,7 @@ export const CarouselArrows: React.FC<CarouselArrowsProps> = ({
       >
         <ArrowForwardIosIcon />
       </IconButton>
-    </>
+    </Box>
   );
 };
 
@@ -684,6 +697,7 @@ export const CarouselThumbnails: React.FC<CarouselThumbnailsProps> = ({
   return (
     <Box
       className={className}
+      data-testid="carousel-thumbnails"
       sx={{
         position: 'absolute',
         bottom: -getThumbnailSize() - 16,
@@ -701,6 +715,8 @@ export const CarouselThumbnails: React.FC<CarouselThumbnailsProps> = ({
         <Box
           key={item.id}
           onClick={() => onSelect(index)}
+          data-testid={`carousel-thumbnail-${index}`}
+          data-active={index === activeIndex}
           sx={{
             width: getThumbnailSize(),
             height: getThumbnailSize(),

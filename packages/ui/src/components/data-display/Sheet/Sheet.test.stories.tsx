@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor, fn } from 'storybook/test';
 import {
   Box,
   Button,
-  Typography,
-  TextField,
+  FormControlLabel,
   List,
   ListItem,
   ListItemText,
-  FormControlLabel,
-  Switch,
   Stack,
+  Switch,
+  TextField,
+  Typography,
 } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import React, { useState } from 'react';
+import { expect, fn,userEvent, waitFor, within } from 'storybook/test';
 
 import { Sheet } from './Sheet';
 
@@ -89,7 +89,7 @@ export const BasicInteraction: Story = {
   },
   render: (args) => (
     <TestWrapper {...args}>
-      <Typography data-testid="sheet-content">Sheet content for testing</Typography>
+      <Typography data-testid="basic-interaction-content">Sheet content for testing</Typography>
     </TestWrapper>
   ),
   play: async ({ canvasElement, step, args }) => {
@@ -108,7 +108,7 @@ export const BasicInteraction: Story = {
       // Wait for sheet to open with animation (sheet renders in portal)
       await waitFor(
         () => {
-          const content = body.getByTestId('sheet-content');
+          const content = body.getByTestId('basic-interaction-content');
           expect(content).toBeVisible();
         },
         { timeout: 2000 },
@@ -118,20 +118,15 @@ export const BasicInteraction: Story = {
     });
 
     await step('Click on sheet content', async () => {
-      const content = body.getByTestId('sheet-content');
+      const content = body.getByTestId('basic-interaction-content');
       await userEvent.click(content);
       await expect(args.onClick).toHaveBeenCalled();
     });
 
     await step('Close button interaction', async () => {
-      const closeButtons = body.getAllByRole('button');
-      const closeButton = closeButtons.find((btn) =>
-        btn.querySelector('[data-testid="CloseIcon"]'),
-      );
-      if (closeButton) {
-        await userEvent.click(closeButton);
-        await expect(args.onClose).toHaveBeenCalled();
-      }
+      const closeButton = body.getByTestId('test-sheet-header-close-button');
+      await userEvent.click(closeButton);
+      await expect(args.onClose).toHaveBeenCalled();
     });
   },
 };
@@ -191,8 +186,7 @@ export const FormInteraction: Story = {
     });
 
     await step('Type in input field', async () => {
-      const inputContainer = body.getByTestId('text-input');
-      const input = inputContainer.querySelector('input') as HTMLInputElement;
+      const input = body.getByLabelText('Test Input') as HTMLInputElement;
       await userEvent.type(input, 'Test input value');
       // Just verify the input has the value typed
       await waitFor(() => {
@@ -205,8 +199,7 @@ export const FormInteraction: Story = {
     });
 
     await step('Clear input field', async () => {
-      const inputContainer = body.getByTestId('text-input');
-      const input = inputContainer.querySelector('input') as HTMLInputElement;
+      const input = body.getByLabelText('Test Input') as HTMLInputElement;
       await userEvent.clear(input);
       await expect(input).toHaveValue('');
     });
@@ -336,8 +329,7 @@ export const KeyboardNavigation: Story = {
 
     await step('Tab navigation forward', async () => {
       const firstElement = body.getByTestId('first-focusable');
-      const secondElementContainer = body.getByTestId('second-focusable');
-      const secondElement = secondElementContainer.querySelector('input') || secondElementContainer;
+      const secondElement = body.getByLabelText('Input Field') as HTMLElement;
 
       firstElement.focus();
       await waitFor(() => {
@@ -521,18 +513,13 @@ export const FocusManagement: Story = {
     });
 
     await step('Close and verify focus restoration', async () => {
-      const closeButtons = body.getAllByRole('button');
-      const closeButton = closeButtons.find((btn) =>
-        btn.querySelector('[data-testid="CloseIcon"]'),
-      );
-      if (closeButton) {
-        await userEvent.click(closeButton);
+      const closeButton = body.getByTestId('sheet-header-close-button');
+      await userEvent.click(closeButton);
 
-        await waitFor(() => {
-          const triggerButton = canvas.getByTestId('trigger-button');
-          expect(triggerButton).toHaveFocus();
-        });
-      }
+      await waitFor(() => {
+        const triggerButton = canvas.getByTestId('trigger-button');
+        expect(triggerButton).toHaveFocus();
+      });
     });
   },
 };

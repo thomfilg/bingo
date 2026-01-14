@@ -1,24 +1,24 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
 import {
+  AccountTree,
+  Analytics,
+  Article,
+  Category,
+  CloudUpload,
+  Code,
   Dashboard,
   Folder,
-  Settings,
-  Article,
-  AccountTree,
-  Code,
-  CloudUpload,
-  Analytics,
-  Security,
-  Category,
-  Storage,
   Home,
+  Security,
+  Settings,
+  Storage,
 } from '@mui/icons-material';
-import { Box, Paper, ThemeProvider, createTheme, CssBaseline, Stack } from '@mui/material';
+import { Box, createTheme, CssBaseline, Paper, Stack,ThemeProvider } from '@mui/material';
 import { Button, Typography } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
 
 import { Breadcrumbs } from './Breadcrumbs';
-import { BreadcrumbItem } from './Breadcrumbs.types';
+import type { BreadcrumbItem } from './Breadcrumbs.types';
 
 const meta: Meta<typeof Breadcrumbs> = {
   title: 'Navigation/Breadcrumbs',

@@ -1,29 +1,29 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
 import {
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon,
+  Dashboard as DashboardIcon,
+  Home as HomeIcon,
+  Inbox as InboxIcon,
+  Menu as MenuIcon,
+  Person as PersonIcon,
+  Send as SendIcon,
+  Settings as SettingsIcon,
+  Star as StarIcon,
+} from '@mui/icons-material';
+import {
+  Avatar,
   Box,
-  Typography,
+  IconButton,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  IconButton,
-  Avatar,
+  Typography,
 } from '@mui/material';
-import {
-  Home as HomeIcon,
-  Dashboard as DashboardIcon,
-  Settings as SettingsIcon,
-  Person as PersonIcon,
-  Menu as MenuIcon,
-  ChevronLeft as ChevronLeftIcon,
-  ChevronRight as ChevronRightIcon,
-  Inbox as InboxIcon,
-  Star as StarIcon,
-  Send as SendIcon,
-} from '@mui/icons-material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import React, { useState } from 'react';
 
-import { Sidebar, SidebarHeader, SidebarContent, SidebarFooter } from './Sidebar';
+import { Sidebar, SidebarContent, SidebarFooter,SidebarHeader } from './Sidebar';
 
 const meta: Meta<typeof Sidebar> = {
   title: 'Layout/Sidebar',

@@ -1,17 +1,17 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
 import {
+  Box,
   Card,
   CardContent,
   CardHeader,
-  Typography,
-  Stack,
-  Box,
+  Grid,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
-  Grid,
+  Stack,
+  Typography,
 } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Skeleton } from './Skeleton';
 

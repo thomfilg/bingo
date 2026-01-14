@@ -1,7 +1,7 @@
-import React from 'react';
+import { Box,Button, Stack, TextField } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, userEvent, within, waitFor } from 'storybook/test';
-import { Button, Stack, TextField, Box } from '@mui/material';
+import React from 'react';
+import { expect, userEvent, waitFor,within } from 'storybook/test';
 
 import { SonnerProvider, useSonner } from './Sonner';
 
@@ -636,7 +636,6 @@ export const ThemeVariations: Story = {
         
         if (toastContainer) {
           const styles = window.getComputedStyle(toastContainer);
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const backdropFilter = styles.backdropFilter || (styles as any).webkitBackdropFilter;
           
           // Glass variant should have glass characteristics - check multiple possible indicators

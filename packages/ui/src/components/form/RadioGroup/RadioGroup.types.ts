@@ -1,5 +1,5 @@
-import React from 'react';
-import { RadioGroupProps as MuiRadioGroupProps } from '@mui/material';
+import type { RadioGroupProps as MuiRadioGroupProps } from '@mui/material';
+import type React from 'react';
 
 export interface RadioOption {
   value: string;
@@ -74,4 +74,9 @@ export interface RadioGroupProps extends Omit<MuiRadioGroupProps, 'color'> {
    * Whether to show descriptions for card variant
    */
   showDescriptions?: boolean;
+
+  /**
+   * Test ID for the radio group container element
+   */
+  dataTestId?: string;
 }

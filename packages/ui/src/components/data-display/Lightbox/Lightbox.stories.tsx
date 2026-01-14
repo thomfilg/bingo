@@ -1,9 +1,9 @@
+import { Box, Button, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import React, { useState } from 'react';
-import { Button, Box, Typography } from '@mui/material';
 
 import { Lightbox } from './Lightbox';
-import { LightboxItem } from './Lightbox.types';
+import type { LightboxItem } from './Lightbox.types';
 
 const meta: Meta<typeof Lightbox> = {
   title: 'DataDisplay/Lightbox',

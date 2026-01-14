@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export type ChipVariant = 'filled' | 'outlined';
 export type ChipSize = 'small' | 'medium';
@@ -45,4 +45,7 @@ export interface ChipProps {
   
   /** Additional CSS classes */
   className?: string;
+
+  /** Test ID for component testing */
+  dataTestId?: string;
 }

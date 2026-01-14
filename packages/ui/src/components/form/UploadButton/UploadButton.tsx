@@ -1,8 +1,8 @@
-import React, { useRef, useState, useCallback } from 'react';
-import { Box, Button, Typography, LinearProgress, useTheme } from '@mui/material';
-import { CloudUploadOutlined, AttachFileOutlined } from '@mui/icons-material';
+import { AttachFileOutlined,CloudUploadOutlined } from '@mui/icons-material';
+import { Box, Button, LinearProgress, Typography, useTheme } from '@mui/material';
+import React, { useCallback,useRef, useState } from 'react';
 
-import { UploadButtonProps, UploadButtonState } from './UploadButton.types';
+import type { UploadButtonProps, UploadButtonState } from './UploadButton.types';
 
 const UploadButton = React.forwardRef<HTMLInputElement, UploadButtonProps>(
   (
@@ -180,12 +180,12 @@ const UploadButton = React.forwardRef<HTMLInputElement, UploadButtonProps>(
           padding: 3,
           textAlign: 'center',
           cursor: disabled ? 'not-allowed' : 'pointer',
-          backgroundColor: state.isDragOver ? theme.palette.primary.main + '0A' : 'transparent',
+          backgroundColor: state.isDragOver ? `${theme.palette.primary.main  }0A` : 'transparent',
           transition: 'all 0.2s ease-in-out',
           ...(!disabled && {
             '&:hover': {
               borderColor: theme.palette.primary.main,
-              backgroundColor: theme.palette.primary.main + '05',
+              backgroundColor: `${theme.palette.primary.main  }05`,
             },
           }),
           opacity: disabled ? 0.6 : 1,
@@ -227,7 +227,7 @@ const UploadButton = React.forwardRef<HTMLInputElement, UploadButtonProps>(
         sx={{
           ...(variant === 'ghost' && {
             '&:hover': {
-              backgroundColor: theme.palette.primary.main + '08',
+              backgroundColor: `${theme.palette.primary.main  }08`,
             },
           }),
         }}

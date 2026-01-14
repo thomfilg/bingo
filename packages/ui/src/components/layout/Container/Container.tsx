@@ -1,8 +1,8 @@
-import React from 'react';
 import { Container as MuiContainer, useTheme } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
+import React from 'react';
 
-import { ContainerProps } from './Container.types';
+import type { ContainerProps } from './Container.types';
 
 export const Container: React.FC<ContainerProps> = ({
   children,
@@ -10,6 +10,7 @@ export const Container: React.FC<ContainerProps> = ({
   variant = 'default',
   padding = 'md',
   responsive = true,
+  dataTestId,
   sx,
   ...props
 }) => {
@@ -59,7 +60,12 @@ export const Container: React.FC<ContainerProps> = ({
   };
 
   return (
-    <MuiContainer maxWidth={getMaxWidth()} sx={containerStyles} {...props}>
+    <MuiContainer
+      maxWidth={getMaxWidth()}
+      sx={containerStyles}
+      data-testid={dataTestId || 'container'}
+      {...props}
+    >
       {children}
     </MuiContainer>
   );

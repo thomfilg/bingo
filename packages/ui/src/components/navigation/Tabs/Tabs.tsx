@@ -1,18 +1,18 @@
-import React from 'react';
+import { Close } from '@mui/icons-material';
 import {
-  Tabs as MuiTabs,
-  Tab as MuiTab,
-  Box,
-  Badge,
-  Fade,
-  CircularProgress,
   alpha,
+  Badge,
+  Box,
+  CircularProgress,
   Divider,
+  Fade,
+  Tab as MuiTab,
+  Tabs as MuiTabs,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Close } from '@mui/icons-material';
+import React from 'react';
 
-import { TabsProps, TabPanelProps, TabItem } from './Tabs.types';
+import type { TabItem,TabPanelProps, TabsProps } from './Tabs.types';
 
 const StyledTabs = styled(MuiTabs, {
   shouldForwardProp: (prop) => !['customVariant', 'size', 'showDividers'].includes(prop as string),
@@ -188,7 +188,7 @@ const LoadingContainer = styled(Box)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-const CustomTabPanel: React.FC<TabPanelProps> = ({
+const CustomTabPanel: React.FC<TabPanelProps & { dataTestId?: string; index: number }> = ({
   children,
   id,
   value,
@@ -198,6 +198,8 @@ const CustomTabPanel: React.FC<TabPanelProps> = ({
   loading = false,
   loadingComponent,
   className,
+  dataTestId,
+  index,
   ...props
 }) => {
   const isActive = value === id;
@@ -215,6 +217,8 @@ const CustomTabPanel: React.FC<TabPanelProps> = ({
       )
     : children;
 
+  const testId = dataTestId ? `${dataTestId}-panel-${index}` : `tabs-panel-${index}`;
+
   if (animate) {
     return (
       <Fade in={isActive} timeout={animationDuration}>
@@ -226,6 +230,7 @@ const CustomTabPanel: React.FC<TabPanelProps> = ({
           animate={animate}
           persist={persist}
           className={className}
+          data-testid={testId}
           {...props}
         >
           {content}
@@ -243,6 +248,7 @@ const CustomTabPanel: React.FC<TabPanelProps> = ({
       animate={animate}
       persist={persist}
       className={className}
+      data-testid={testId}
       {...props}
     >
       {content}
@@ -275,6 +281,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
       tabPanelProps,
       loading = false,
       loadingComponent,
+      dataTestId,
       ...props
     },
     ref,
@@ -325,7 +332,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
     };
 
     return (
-      <Box className={className} ref={ref}>
+      <Box className={className} ref={ref} data-testid={dataTestId || 'tabs'}>
         <StyledTabs
           {...props}
           value={value}
@@ -335,6 +342,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
           showDividers={showDividers}
           orientation={orientation}
           centered={centered}
+          data-testid={dataTestId ? `${dataTestId}-list` : 'tabs-list'}
           scrollButtons={
             scrollable
               ? scrollButtons === 'on' || scrollButtons === 'off' || scrollButtons === 'desktop'
@@ -358,7 +366,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
             }),
           }}
         >
-          {items.map((item) => (
+          {items.map((item, index) => (
             <MuiTab
               key={item.id}
               value={item.id}
@@ -368,6 +376,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
               id={`tab-${item.id}`}
               aria-controls={`tabpanel-${item.id}`}
               aria-disabled={item.disabled || disabled}
+              data-testid={dataTestId ? `${dataTestId}-tab-${index}` : `tabs-tab-${index}`}
             />
           ))}
         </StyledTabs>
@@ -375,7 +384,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
         {showDividers && variant !== 'enclosed' && <Divider />}
 
         <Box sx={{ mt: variant === 'enclosed' ? 0 : 2 }}>
-          {items.map((item) => (
+          {items.map((item, index) => (
             <CustomTabPanel
               key={item.id}
               id={item.id}
@@ -386,6 +395,8 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
               loading={loading}
               loadingComponent={loadingComponent}
               className={tabPanelProps?.className}
+              dataTestId={dataTestId}
+              index={index}
             >
               {item.content}
             </CustomTabPanel>

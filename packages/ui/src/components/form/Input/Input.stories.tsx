@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Search, Email, Lock, Visibility, VisibilityOff } from '@mui/icons-material';
+import { Email, Lock, Search, Visibility, VisibilityOff } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
 import { Input } from './Input';

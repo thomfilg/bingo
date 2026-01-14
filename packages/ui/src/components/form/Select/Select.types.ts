@@ -1,4 +1,4 @@
-import { SelectProps as MuiSelectProps } from '@mui/material';
+import type { SelectProps as MuiSelectProps } from '@mui/material';
 
 export type SelectVariant = 'default' | 'glass' | 'gradient';
 

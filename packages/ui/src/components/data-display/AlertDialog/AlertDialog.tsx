@@ -1,22 +1,22 @@
-import React from 'react';
+import { Close, Error, Info } from '@mui/icons-material';
+import type { ButtonProps } from '@mui/material';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  DialogContentText,
-  Button,
-  IconButton,
   alpha,
-  keyframes,
+  Button,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  keyframes,
   Typography,
 } from '@mui/material';
-import type { ButtonProps } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Close, Error, Info } from '@mui/icons-material';
+import React from 'react';
 
-import { AlertDialogProps } from './AlertDialog.types';
+import type { AlertDialogProps } from './AlertDialog.types';
 
 // Define pulse animation
 const pulseAnimation = keyframes`
@@ -158,6 +158,7 @@ export const AlertDialog = React.forwardRef<HTMLDivElement, AlertDialogProps>(
     confirmDisabled = false,
     children,
     onClose,
+    'data-testid': dataTestId = 'alert-dialog',
     ...props
   }, ref) => {
     
@@ -206,41 +207,48 @@ export const AlertDialog = React.forwardRef<HTMLDivElement, AlertDialogProps>(
         glow={glow}
         pulse={pulse}
         onClose={onClose}
+        data-testid={dataTestId}
         {...props}
       >
         <CloseButton
           aria-label="close"
           onClick={handleCancel}
           size="small"
+          data-testid={`${dataTestId}-close-button`}
         >
           <Close />
         </CloseButton>
-        
+
         {title && (
-          <StyledDialogTitle>
-            {(icon !== null) && getVariantIcon()}
+          <StyledDialogTitle data-testid={`${dataTestId}-title`}>
+            {(icon !== null) && (
+              <span data-testid={`${dataTestId}-icon`}>
+                {getVariantIcon()}
+              </span>
+            )}
             <Typography variant="h6" component="span">
               {title}
             </Typography>
           </StyledDialogTitle>
         )}
-        
-        <StyledDialogContent>
+
+        <StyledDialogContent data-testid={`${dataTestId}-content`}>
           {description && (
-            <DialogContentText>
+            <DialogContentText data-testid={`${dataTestId}-description`}>
               {description}
             </DialogContentText>
           )}
           {children}
         </StyledDialogContent>
-        
-        <StyledDialogActions>
+
+        <StyledDialogActions data-testid={`${dataTestId}-actions`}>
           {showCancel && (
             <Button
               onClick={handleCancel}
               variant="outlined"
               color="inherit"
               disabled={loading}
+              data-testid={`${dataTestId}-cancel-button`}
             >
               {cancelText}
             </Button>
@@ -250,8 +258,9 @@ export const AlertDialog = React.forwardRef<HTMLDivElement, AlertDialogProps>(
             variant={getConfirmButtonVariant()}
             color={getConfirmButtonColor()}
             disabled={confirmDisabled || loading}
-            startIcon={loading ? <CircularProgress size={16} color="inherit" /> : undefined}
+            startIcon={loading ? <CircularProgress size={16} color="inherit" data-testid={`${dataTestId}-loading-spinner`} /> : undefined}
             autoFocus
+            data-testid={`${dataTestId}-confirm-button`}
           >
             {confirmText}
           </Button>

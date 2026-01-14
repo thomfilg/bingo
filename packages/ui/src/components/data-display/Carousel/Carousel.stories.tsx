@@ -1,9 +1,9 @@
-import React from 'react';
+import { Box, Button, Card, CardContent, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Box, Typography, Button, Card, CardContent } from '@mui/material';
+import React from 'react';
 
 import { Carousel } from './Carousel';
-import { CarouselItem } from './Carousel.types';
+import type { CarouselItem } from './Carousel.types';
 
 const meta: Meta<typeof Carousel> = {
   title: 'DataDisplay/Carousel',

@@ -5,7 +5,7 @@ A comprehensive data table component with advanced features including sorting, f
 ## Usage
 
 ```tsx
-import { Table } from '@repo/ui';
+import { Table } from '@procurement/ui';
 
 // Basic usage with columns and data
 <Table

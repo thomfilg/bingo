@@ -1,8 +1,9 @@
-import React, { forwardRef } from 'react';
-import { ToggleButton, alpha, keyframes, Theme } from '@mui/material';
+import type { Theme} from '@mui/material';
+import { alpha, keyframes,ToggleButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import React, { forwardRef } from 'react';
 
-import { ToggleProps } from './Toggle.types';
+import type { ToggleProps } from './Toggle.types';
 
 const glowAnimation = keyframes`
   0% { box-shadow: 0 0 5px currentColor; }
@@ -224,11 +225,17 @@ export const Toggle = forwardRef<HTMLButtonElement, ToggleProps>(
       glow = false,
       glass = false,
       gradient = false,
+      dataTestId,
       children,
       ...props
     },
     ref,
   ) => {
+    const testIds = {
+      container: dataTestId,
+      icon: dataTestId ? `${dataTestId}-icon` : undefined,
+    };
+
     return (
       <StyledToggle
         ref={ref}
@@ -238,9 +245,17 @@ export const Toggle = forwardRef<HTMLButtonElement, ToggleProps>(
         glow={glow}
         glass={glass}
         gradient={gradient}
+        data-testid={testIds.container}
         {...props}
       >
-        {icon && <span style={{ marginRight: children ? '8px' : '0' }}>{icon}</span>}
+        {icon && (
+          <span
+            style={{ marginRight: children ? '8px' : '0' }}
+            data-testid={testIds.icon}
+          >
+            {icon}
+          </span>
+        )}
         {children}
       </StyledToggle>
     );

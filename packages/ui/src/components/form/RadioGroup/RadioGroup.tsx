@@ -1,21 +1,22 @@
-import React, { forwardRef } from 'react';
 import {
-  RadioGroup as MuiRadioGroup,
-  FormControlLabel,
-  Radio,
+  alpha,
   Box,
-  Typography,
-  FormLabel,
-  FormHelperText,
+  ButtonBase,
   Card,
   CardContent,
-  alpha,
+  FormControlLabel,
+  FormHelperText,
+  FormLabel,
   keyframes,
-  ButtonBase,
+  Radio,
+  RadioGroup as MuiRadioGroup,
+  Typography,
 } from '@mui/material';
-import { styled, Theme } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
+import React, { forwardRef } from 'react';
 
-import { RadioGroupProps } from './RadioGroup.types';
+import type { RadioGroupProps } from './RadioGroup.types';
 
 const glowAnimation = keyframes`
   0% {
@@ -424,6 +425,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
       showDescriptions = true,
       value,
       onChange,
+      dataTestId,
       ...props
     },
     ref,
@@ -438,12 +440,14 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
           flexDirection: direction,
           gap: 1,
         }}
+        data-testid={dataTestId ? `${dataTestId}-group` : undefined}
       >
-        {options.map((option) => (
+        {options.map((option, index) => (
           <FormControlLabel
             key={option.value}
             value={option.value}
             disabled={option.disabled}
+            data-testid={dataTestId ? `${dataTestId}-option-${index}` : undefined}
             control={
               <Radio
                 color={
@@ -451,10 +455,14 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
                     ? 'error'
                     : (color as 'primary' | 'secondary' | 'success' | 'warning' | 'error')
                 }
+                data-testid={dataTestId ? `${dataTestId}-radio-${index}` : undefined}
               />
             }
             label={
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box
+                sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                data-testid={dataTestId ? `${dataTestId}-label-${index}` : undefined}
+              >
                 {option.icon}
                 <Box>
                   <Typography>{option.label}</Typography>
@@ -478,8 +486,9 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
           flexDirection: direction,
           gap: 2,
         }}
+        data-testid={dataTestId ? `${dataTestId}-container` : undefined}
       >
-        {options.map((option) => (
+        {options.map((option, index) => (
           <StyledRadioCard
             key={option.value}
             selected={value === option.value}
@@ -489,6 +498,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
             glow={glow}
             customSize={size}
             animated
+            data-testid={dataTestId ? `${dataTestId}-card-${index}` : undefined}
             onClick={() => {
               if (!option.disabled && onChange) {
                 const event = {
@@ -515,6 +525,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
                     variant="subtitle1"
                     fontWeight={600}
                     color={value === option.value ? `${color}.main` : 'text.primary'}
+                    data-testid={dataTestId ? `${dataTestId}-label-${index}` : undefined}
                   >
                     {option.label}
                   </Typography>
@@ -539,8 +550,9 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
           gap: 1,
           flexWrap: 'wrap',
         }}
+        data-testid={dataTestId ? `${dataTestId}-container` : undefined}
       >
-        {options.map((option) => (
+        {options.map((option, index) => (
           <StyledButtonRadio
             key={option.value}
             selected={value === option.value}
@@ -550,6 +562,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
             customSize={size}
             animated
             disabled={option.disabled}
+            data-testid={dataTestId ? `${dataTestId}-button-${index}` : undefined}
             onClick={() => {
               if (!option.disabled && onChange) {
                 const event = {
@@ -559,7 +572,10 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
               }
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+              data-testid={dataTestId ? `${dataTestId}-label-${index}` : undefined}
+            >
               {option.icon}
               {option.label}
             </Box>
@@ -569,8 +585,12 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
     );
 
     const renderSegmentRadio = () => (
-      <StyledSegmentContainer glass={glass} customColor={color}>
-        {options.map((option) => (
+      <StyledSegmentContainer
+        glass={glass}
+        customColor={color}
+        data-testid={dataTestId ? `${dataTestId}-container` : undefined}
+      >
+        {options.map((option, index) => (
           <StyledSegmentButton
             key={option.value}
             selected={value === option.value}
@@ -578,6 +598,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
             customSize={size}
             animated
             disabled={option.disabled}
+            data-testid={dataTestId ? `${dataTestId}-segment-${index}` : undefined}
             onClick={() => {
               if (!option.disabled && onChange) {
                 const event = {
@@ -587,7 +608,10 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
               }
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+              data-testid={dataTestId ? `${dataTestId}-label-${index}` : undefined}
+            >
               {option.icon}
               {option.label}
             </Box>
@@ -610,9 +634,13 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
     };
 
     return (
-      <Box>
+      <Box data-testid={dataTestId}>
         {label && (
-          <StyledFormLabel glass={glassLabel} error={error}>
+          <StyledFormLabel
+            glass={glassLabel}
+            error={error}
+            data-testid={dataTestId ? `${dataTestId}-label` : undefined}
+          >
             {label}
           </StyledFormLabel>
         )}
@@ -620,7 +648,11 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
         {renderRadioGroup()}
 
         {helperText && (
-          <FormHelperText error={error} sx={{ mt: 1 }}>
+          <FormHelperText
+            error={error}
+            sx={{ mt: 1 }}
+            data-testid={dataTestId ? `${dataTestId}-helper-text` : undefined}
+          >
             {helperText}
           </FormHelperText>
         )}

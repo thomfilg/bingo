@@ -1,8 +1,8 @@
-import React from 'react';
-import { Tooltip as MuiTooltip, alpha, keyframes } from '@mui/material';
+import { alpha, keyframes,Tooltip as MuiTooltip } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import React from 'react';
 
-import { TooltipProps } from './Tooltip.types';
+import type { TooltipProps } from './Tooltip.types';
 
 // Define pulse animation
 const pulseAnimation = keyframes`
@@ -119,11 +119,18 @@ export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
       glow = false,
       pulse = false,
       maxWidth = 300,
+      dataTestId,
       children,
       ...props
     },
     ref,
   ) => {
+    const childWithTestId = dataTestId
+      ? React.cloneElement(children as React.ReactElement<{ 'data-testid'?: string }>, {
+          'data-testid': `${dataTestId}-trigger`,
+        })
+      : children;
+
     return (
       <StyledTooltip
         ref={ref}
@@ -140,11 +147,12 @@ export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
           tooltip: {
             sx: { maxWidth },
             role: 'tooltip',
+            ...(dataTestId && { 'data-testid': `${dataTestId}-content` }),
           },
         }}
         {...props}
       >
-        {children}
+        {childWithTestId}
       </StyledTooltip>
     );
   },

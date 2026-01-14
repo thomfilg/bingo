@@ -1,26 +1,27 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import CloseIcon from '@mui/icons-material/Close';
 import {
-  Drawer,
-  Box,
-  Typography,
-  IconButton,
-  Divider,
-  CircularProgress,
-  useTheme,
   alpha,
   Backdrop,
-  SwipeableDrawer,
+  Box,
+  CircularProgress,
+  Divider,
+  Drawer,
   Fade,
+  IconButton,
   keyframes,
+  SwipeableDrawer,
+  Typography,
+  useTheme,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+import type { BackdropProps } from '@mui/material';
+import React, { useCallback, useEffect, useMemo,useRef, useState } from 'react';
 
-import {
-  SheetProps,
-  SheetHeaderProps,
+import type {
   SheetContentProps,
   SheetFooterProps,
+  SheetHeaderProps,
   SheetOverlayProps,
+  SheetProps,
 } from './Sheet.types';
 
 // Spring physics configuration for smooth animations
@@ -112,6 +113,8 @@ export const Sheet: React.FC<SheetProps> = ({
   fullHeight = false,
   rounded = true,
   elevation = 16,
+  dataTestId = 'sheet',
+  ...rest
 }) => {
   const theme = useTheme();
   const [isOpen, setIsOpen] = useState(open);
@@ -123,10 +126,13 @@ export const Sheet: React.FC<SheetProps> = ({
 
   const sheetRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | undefined>(undefined);
   const velocityRef = useRef(0);
   const lastYRef = useRef(0);
   const lastTimeRef = useRef(0);
+
+  // Support both dataTestId prop and data-testid HTML attribute
+  const testId = (rest as { 'data-testid'?: string })['data-testid'] || dataTestId;
 
   const isDraggableVariant = variant === 'draggable';
   const isBottomSheet = position === 'bottom';
@@ -597,6 +603,10 @@ export const Sheet: React.FC<SheetProps> = ({
 
   const isSwipeable = swipeable && !isDraggableVariant;
 
+  // Create a proper BackdropComponent that accepts refs and matches BackdropProps
+  const NoBackdrop = React.forwardRef<HTMLDivElement, BackdropProps>((props, ref) => null) as React.ComponentType<BackdropProps>;
+  NoBackdrop.displayName = 'NoBackdrop';
+
   return (
     <>
       {showOverlay && isOpen && (
@@ -632,7 +642,7 @@ export const Sheet: React.FC<SheetProps> = ({
           }}
           ModalProps={{
             keepMounted: true,
-            BackdropComponent: () => null,
+            BackdropComponent: NoBackdrop,
           }}
         >
           <Box
@@ -640,6 +650,7 @@ export const Sheet: React.FC<SheetProps> = ({
             onClick={onClick}
             onFocus={onFocus}
             onBlur={onBlur}
+            data-testid={testId}
             sx={{
               height: '100%',
               display: 'flex',
@@ -657,12 +668,13 @@ export const Sheet: React.FC<SheetProps> = ({
                 showHandle={showHandle && isVerticalSheet}
                 isDraggable={isDraggableVariant && isVerticalSheet}
                 onDragStart={handleDragStart}
+                dataTestId={`${testId}-header`}
               >
                 {header}
               </SheetHeader>
             )}
 
-            <SheetContent padded>
+            <SheetContent padded dataTestId={`${testId}-content`}>
               {loading ? (
                 <Box
                   sx={{
@@ -680,7 +692,7 @@ export const Sheet: React.FC<SheetProps> = ({
             </SheetContent>
 
             {footer && (
-              <SheetFooter sticky divider>
+              <SheetFooter sticky divider dataTestId={`${testId}-footer`}>
                 {footer}
               </SheetFooter>
             )}
@@ -708,7 +720,7 @@ export const Sheet: React.FC<SheetProps> = ({
           }}
           ModalProps={{
             keepMounted: true,
-            BackdropComponent: () => null,
+            BackdropComponent: NoBackdrop,
           }}
         >
           <Box
@@ -716,6 +728,7 @@ export const Sheet: React.FC<SheetProps> = ({
             onClick={onClick}
             onFocus={onFocus}
             onBlur={onBlur}
+            data-testid={testId}
             sx={{
               height: '100%',
               display: 'flex',
@@ -733,12 +746,13 @@ export const Sheet: React.FC<SheetProps> = ({
                 showHandle={showHandle && isVerticalSheet}
                 isDraggable={isDraggableVariant && isVerticalSheet}
                 onDragStart={handleDragStart}
+                dataTestId={`${testId}-header`}
               >
                 {header}
               </SheetHeader>
             )}
 
-            <SheetContent padded>
+            <SheetContent padded dataTestId={`${testId}-content`}>
               {loading ? (
                 <Box
                   sx={{
@@ -756,7 +770,7 @@ export const Sheet: React.FC<SheetProps> = ({
             </SheetContent>
 
             {footer && (
-              <SheetFooter sticky divider>
+              <SheetFooter sticky divider dataTestId={`${testId}-footer`}>
                 {footer}
               </SheetFooter>
             )}
@@ -778,12 +792,14 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
   className,
   style,
   children,
+  dataTestId = 'sheet-header',
 }) => {
   const theme = useTheme();
 
   return (
     <Box
       className={className}
+      data-testid={dataTestId}
       sx={{
         p: 2,
         pb: showHandle ? 1 : 2,
@@ -853,7 +869,7 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
       >
         <Box sx={{ flex: 1 }}>
           {title && (
-            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+            <Typography variant="h6" sx={{ fontWeight: 600 }} data-testid={`${dataTestId}-title`}>
               {title}
             </Typography>
           )}
@@ -866,8 +882,8 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
         </Box>
 
         {showCloseButton && (
-          <IconButton onClick={onClose} size="small" sx={{ ml: 1, mt: -0.5 }}>
-            <CloseIcon />
+          <IconButton onClick={onClose} size="small" sx={{ ml: 1, mt: -0.5 }} data-testid={`${dataTestId}-close-button`}>
+            <CloseIcon data-testid={`${dataTestId}-close-icon`} />
           </IconButton>
         )}
       </Box>
@@ -880,10 +896,11 @@ export const SheetContent: React.FC<SheetContentProps> = ({
   className,
   style,
   padded = true,
-}) => {
-  return (
+  dataTestId = 'sheet-content',
+}) => (
     <Box
       className={className}
+      data-testid={dataTestId}
       sx={{
         flex: 1,
         overflow: 'auto',
@@ -894,7 +911,6 @@ export const SheetContent: React.FC<SheetContentProps> = ({
       {children}
     </Box>
   );
-};
 
 export const SheetFooter: React.FC<SheetFooterProps> = ({
   children,
@@ -902,12 +918,13 @@ export const SheetFooter: React.FC<SheetFooterProps> = ({
   style,
   sticky = false,
   divider = false,
-}) => {
-  return (
+  dataTestId = 'sheet-footer',
+}) => (
     <>
       {divider && <Divider />}
       <Box
         className={className}
+        data-testid={dataTestId}
         sx={{
           p: 2,
           position: sticky ? 'sticky' : 'relative',
@@ -922,7 +939,6 @@ export const SheetFooter: React.FC<SheetFooterProps> = ({
       </Box>
     </>
   );
-};
 
 export const SheetOverlay: React.FC<SheetOverlayProps> = ({
   open = false,

@@ -1,16 +1,16 @@
-import React from 'react';
 import {
-  Modal as MuiModal,
-  Box,
-  Fade,
-  Slide,
-  useTheme,
   alpha,
   Backdrop,
+  Box,
+  Fade,
   keyframes,
+  Modal as MuiModal,
+  Slide,
+  useTheme,
 } from '@mui/material';
+import React from 'react';
 
-import { ModalProps, ModalContentProps } from './Modal.types';
+import type { ModalContentProps,ModalProps } from './Modal.types';
 
 // Define transition component props interface
 interface TransitionProps {
@@ -48,6 +48,7 @@ export const Modal: React.FC<ModalProps> = ({
   borderRadius = 'lg',
   onClose,
   open,
+  dataTestId,
   ...props
 }) => {
   const theme = useTheme();
@@ -257,16 +258,22 @@ export const Modal: React.FC<ModalProps> = ({
               : alpha(theme.palette.common.black, 0.5),
           backdropFilter: glass || variant === 'glass' ? 'blur(8px)' : 'none',
         },
+        // @ts-expect-error - data-testid is not part of BackdropProps type but is valid HTML
+        'data-testid': dataTestId ? `${dataTestId}-backdrop` : 'modal-backdrop',
       }}
       {...props}
     >
       <TransitionComponent in={open} timeout={500}>
-        <Box sx={getVariantStyles()}>{children}</Box>
+        <Box sx={getVariantStyles()} data-testid={dataTestId || 'modal'}>
+          {children}
+        </Box>
       </TransitionComponent>
     </MuiModal>
   );
 };
 
-export const ModalContent: React.FC<ModalContentProps> = ({ children, padding = 3 }) => {
-  return <Box sx={{ p: padding }}>{children}</Box>;
-};
+export const ModalContent: React.FC<ModalContentProps> = ({ children, padding = 3, dataTestId }) => (
+  <Box sx={{ p: padding }} data-testid={dataTestId || 'modal-content'}>
+    {children}
+  </Box>
+);

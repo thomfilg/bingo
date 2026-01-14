@@ -1,12 +1,12 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Stack, Typography } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { Form, FormField } from './Form';
-import { Input } from '../Input';
-import { Checkbox } from '../Checkbox';
-import { Select } from '../Select';
 import { Button } from '../Button';
+import { Checkbox } from '../Checkbox';
+import { Input } from '../Input';
+import { Select } from '../Select';
 import { Textarea } from '../Textarea';
+import { Form, FormField } from './Form';
 
 const meta: Meta<typeof Form> = {
   title: 'Form/Form',

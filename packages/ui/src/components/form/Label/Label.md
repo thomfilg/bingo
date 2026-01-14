@@ -23,6 +23,7 @@ The Label component is essential for:
 - `htmlFor` (string): Associates the label with a form control by ID
 - `className` (string): Additional CSS classes
 - `style` (CSSProperties): Inline styles
+- `dataTestId` (string): Test identifier for automated testing
 
 ### State Props
 
@@ -213,3 +214,213 @@ The Label component uses MUI theme tokens for consistent styling:
 - FormControl: Container for form elements including labels
 - FormHelperText: Alternative for helper text display
 - Tooltip: For additional contextual information
+
+## Testing
+
+### Test Identifiers
+
+The Label component supports the `dataTestId` prop for automated testing:
+
+```jsx
+<Label dataTestId="username-label" htmlFor="username">
+  Username
+</Label>
+```
+
+#### Querying Labels in Tests
+
+```jsx
+// Using dataTestId
+const label = screen.getByTestId('username-label');
+
+// Using text content
+const label = screen.getByText('Username');
+
+// Using label element
+const label = screen.getByLabelText('Username');
+```
+
+### Testing Examples
+
+#### Basic Rendering Test
+
+```jsx
+test('renders label with correct text', () => {
+  render(<Label dataTestId="test-label">My Label</Label>);
+
+  const label = screen.getByTestId('test-label');
+  expect(label).toBeInTheDocument();
+  expect(label).toHaveTextContent('My Label');
+});
+```
+
+#### Testing Required Field Indicator
+
+```jsx
+test('displays asterisk for required field', () => {
+  render(
+    <Label dataTestId="required-label" required>
+      Required Field
+    </Label>
+  );
+
+  const label = screen.getByTestId('required-label');
+  expect(label).toHaveTextContent('*');
+});
+```
+
+#### Testing Label Association
+
+```jsx
+test('associates label with form control', () => {
+  render(
+    <>
+      <Label dataTestId="email-label" htmlFor="email-input">
+        Email
+      </Label>
+      <input id="email-input" type="email" />
+    </>
+  );
+
+  const label = screen.getByTestId('email-label');
+  expect(label).toHaveAttribute('for', 'email-input');
+});
+```
+
+#### Testing States
+
+```jsx
+test('applies error state styling', () => {
+  render(
+    <Label dataTestId="error-label" error>
+      Error Label
+    </Label>
+  );
+
+  const label = screen.getByTestId('error-label');
+  const computedStyle = window.getComputedStyle(label);
+  expect(computedStyle.color).toBeDefined();
+});
+
+test('displays loading spinner', () => {
+  render(
+    <Label dataTestId="loading-label" loading>
+      Loading Label
+    </Label>
+  );
+
+  const spinner = screen.getByRole('progressbar');
+  expect(spinner).toBeInTheDocument();
+});
+```
+
+#### Testing Interactions
+
+```jsx
+test('handles click events', async () => {
+  const handleClick = jest.fn();
+
+  render(
+    <Label dataTestId="clickable-label" onClick={handleClick}>
+      Click Me
+    </Label>
+  );
+
+  const label = screen.getByTestId('clickable-label');
+  await userEvent.click(label);
+
+  expect(handleClick).toHaveBeenCalledTimes(1);
+});
+```
+
+#### Testing Screen Reader Only Labels
+
+```jsx
+test('applies screen reader only styles', () => {
+  render(
+    <Label dataTestId="sr-only-label" srOnly>
+      Screen Reader Only
+    </Label>
+  );
+
+  const label = screen.getByTestId('sr-only-label');
+  const computedStyle = window.getComputedStyle(label);
+
+  expect(computedStyle.position).toBe('absolute');
+  expect(computedStyle.width).toBe('1px');
+  expect(computedStyle.height).toBe('1px');
+});
+```
+
+#### Testing Helper Text
+
+```jsx
+test('displays helper text', () => {
+  render(
+    <Label
+      dataTestId="label-with-helper"
+      helperText="This is helper text"
+    >
+      Field Label
+    </Label>
+  );
+
+  expect(screen.getByText('This is helper text')).toBeInTheDocument();
+});
+```
+
+#### Testing Variants and Sizes
+
+```jsx
+test('applies correct variant styles', () => {
+  render(
+    <Label dataTestId="filled-label" variant="filled">
+      Filled Label
+    </Label>
+  );
+
+  const label = screen.getByTestId('filled-label');
+  const computedStyle = window.getComputedStyle(label);
+  expect(computedStyle.backgroundColor).toBeDefined();
+});
+
+test('applies correct size', () => {
+  render(
+    <Label dataTestId="large-label" size="lg">
+      Large Label
+    </Label>
+  );
+
+  const label = screen.getByTestId('large-label');
+  const computedStyle = window.getComputedStyle(label);
+  expect(parseFloat(computedStyle.fontSize)).toBeGreaterThan(0);
+});
+```
+
+### Accessibility Testing
+
+```jsx
+test('meets accessibility requirements', async () => {
+  const { container } = render(
+    <Label
+      dataTestId="accessible-label"
+      htmlFor="accessible-input"
+      required
+    >
+      Accessible Field
+    </Label>
+  );
+
+  const results = await axe(container);
+  expect(results).toHaveNoViolations();
+});
+```
+
+### Best Practices for Testing
+
+1. **Always use dataTestId**: Prefer `dataTestId` over text-based queries for more stable tests
+2. **Test accessibility**: Verify proper label associations and ARIA attributes
+3. **Test states**: Ensure all states (error, disabled, loading) are properly applied
+4. **Test interactions**: Verify click, focus, and blur handlers work correctly
+5. **Test visual variants**: Ensure different variants and sizes render correctly
+6. **Test edge cases**: Check truncation, empty content, and special characters

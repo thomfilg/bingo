@@ -1,5 +1,5 @@
-import { ReactNode } from 'react';
-import { TransitionProps } from '@mui/material/transitions';
+import type { TransitionProps } from '@mui/material/transitions';
+import type { ReactNode } from 'react';
 
 export type TransitionVariant = 'fade' | 'slide' | 'scale' | 'collapse' | 'grow' | 'zoom';
 export type SlideDirection = 'up' | 'down' | 'left' | 'right';

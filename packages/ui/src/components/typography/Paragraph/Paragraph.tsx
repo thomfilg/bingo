@@ -1,8 +1,9 @@
-import React from 'react';
-import { Typography, Theme } from '@mui/material';
+import type { Theme} from '@mui/material';
+import {Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import React from 'react';
 
-import { ParagraphProps } from './Paragraph.types';
+import type { ParagraphProps } from './Paragraph.types';
 
 const getColorFromTheme = (theme: Theme, color: string) => {
   if (color === 'neutral') {
@@ -82,8 +83,7 @@ const StyledParagraph = styled(Typography, {
 });
 
 export const Paragraph = React.forwardRef<globalThis.HTMLParagraphElement, ParagraphProps>(
-  ({ variant = 'default', color = 'neutral', size = 'md', children, ...props }, ref) => {
-    return (
+  ({ variant = 'default', color = 'neutral', size = 'md', children, ...props }, ref) => (
       <StyledParagraph
         ref={ref}
         customVariant={variant}
@@ -93,8 +93,7 @@ export const Paragraph = React.forwardRef<globalThis.HTMLParagraphElement, Parag
       >
         {children}
       </StyledParagraph>
-    );
-  },
+    ),
 );
 
 Paragraph.displayName = 'Paragraph';

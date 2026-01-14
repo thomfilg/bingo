@@ -1,7 +1,7 @@
+import { Button, createTheme,ThemeProvider } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor, fn } from 'storybook/test';
 import { useState } from 'react';
-import { Button, ThemeProvider, createTheme } from '@mui/material';
+import { expect, fn,userEvent, waitFor, within } from 'storybook/test';
 
 import { AlertDialog } from './AlertDialog';
 import type { AlertDialogProps } from './AlertDialog.types';
@@ -52,7 +52,7 @@ const DialogWrapper = ({
         onClose={handleClose}
         onCancel={handleClose}
         onConfirm={handleConfirm}
-        {...props}
+        {...(props as Partial<AlertDialogProps>)}
       />
     </>
   );

@@ -1,4 +1,4 @@
-import { ReactNode, CSSProperties } from 'react';
+import type { CSSProperties,ReactNode } from 'react';
 
 export interface SheetProps {
   open?: boolean;
@@ -50,6 +50,7 @@ export interface SheetProps {
   fullHeight?: boolean;
   rounded?: boolean;
   elevation?: number;
+  dataTestId?: string;
 }
 
 export interface SheetHeaderProps {
@@ -63,6 +64,7 @@ export interface SheetHeaderProps {
   className?: string;
   style?: CSSProperties;
   children?: ReactNode;
+  dataTestId?: string;
 }
 
 export interface SheetContentProps {
@@ -70,6 +72,7 @@ export interface SheetContentProps {
   className?: string;
   style?: CSSProperties;
   padded?: boolean;
+  dataTestId?: string;
 }
 
 export interface SheetFooterProps {
@@ -78,6 +81,7 @@ export interface SheetFooterProps {
   style?: CSSProperties;
   sticky?: boolean;
   divider?: boolean;
+  dataTestId?: string;
 }
 
 export interface SheetOverlayProps {

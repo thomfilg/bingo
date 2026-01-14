@@ -1,7 +1,7 @@
+import { CloudUploadOutlined,PhotoCameraOutlined } from '@mui/icons-material';
+import { Box } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { action } from 'storybook/actions';
-import { Box } from '@mui/material';
-import { PhotoCameraOutlined, CloudUploadOutlined } from '@mui/icons-material';
 
 import { UploadButton } from './UploadButton';
 

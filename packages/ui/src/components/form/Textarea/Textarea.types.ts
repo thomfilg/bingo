@@ -1,5 +1,5 @@
-import { TextareaAutosizeProps } from '@mui/material';
-import React from 'react';
+import type { TextareaAutosizeProps } from '@mui/material';
+import type React from 'react';
 
 export interface TextareaProps extends Omit<TextareaAutosizeProps, 'variant' | 'color' | 'size'> {
   /**
@@ -71,4 +71,14 @@ export interface TextareaProps extends Omit<TextareaAutosizeProps, 'variant' | '
    * Maximum number of rows for autosize variant
    */
   maxRows?: number;
+
+  /**
+   * Custom test ID for testing
+   */
+  dataTestId?: string;
+
+  /**
+   * Data attribute for testing (HTML standard format)
+   */
+  'data-testid'?: string;
 }

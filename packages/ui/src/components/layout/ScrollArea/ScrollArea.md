@@ -45,7 +45,7 @@ A custom scrollable area component that provides styled scrollbars and smooth sc
 ### Basic Usage
 
 ```tsx
-import { ScrollArea } from '@repo/ui';
+import { ScrollArea } from '@procurement/ui';
 
 function BasicExample() {
   return (

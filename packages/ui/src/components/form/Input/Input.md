@@ -157,3 +157,96 @@ The Input component provides a flexible text input field with comprehensive vali
 - Mobile browsers (iOS Safari, Chrome Mobile)
 - Responsive design for all screen sizes
 - Touch-friendly interaction areas
+
+## Testing
+
+### Test IDs
+
+The Input component includes `data-testid` attributes for reliable testing:
+
+| Test ID | Element | Description |
+|---------|---------|-------------|
+| `{dataTestId}` | Input field | The actual input element (passed via inputProps) |
+
+**Note:** The `data-testid` is applied to the `<input>` element itself, not the TextField wrapper. When querying, use `findByTestId` to target the input element directly.
+
+### Testing Best Practices
+
+**Wait for Input to Render:**
+```typescript
+const input = await canvas.findByTestId('email-input');
+expect(input).toBeInTheDocument();
+```
+
+**Test User Input:**
+```typescript
+const input = await canvas.findByTestId('name-input');
+await userEvent.type(input, 'John Doe');
+expect(input).toHaveValue('John Doe');
+```
+
+**Test Disabled State:**
+```typescript
+const input = await canvas.findByTestId('disabled-input');
+expect(input).toBeDisabled();
+```
+
+**Test Loading State:**
+```typescript
+// Input is disabled when loading
+const loadingInput = await canvas.findByTestId('loading-input');
+expect(loadingInput).toBeDisabled();
+
+// Loading spinner appears
+const spinner = canvasElement.querySelector('.MuiCircularProgress-root');
+expect(spinner).toBeInTheDocument();
+```
+
+**Test Error State:**
+```typescript
+const input = await canvas.findByTestId('error-input');
+const container = input.closest('.MuiFormControl-root');
+
+// Check error styling
+expect(container?.querySelector('.Mui-error')).toBeInTheDocument();
+
+// Verify helper text
+const helperText = container?.querySelector('.MuiFormHelperText-root');
+expect(helperText).toHaveTextContent('Error message');
+```
+
+**Test with Adornments:**
+```typescript
+// Input with start/end adornments
+const input = await canvas.findByTestId('search-input');
+const container = input.closest('.MuiFormControl-root');
+
+const startAdornment = container?.querySelector('.MuiInputAdornment-positionStart');
+const endAdornment = container?.querySelector('.MuiInputAdornment-positionEnd');
+
+expect(startAdornment).toBeInTheDocument();
+expect(endAdornment).toBeInTheDocument();
+```
+
+**Test Form Integration:**
+```typescript
+const input = await canvas.findByTestId('form-input');
+await userEvent.type(input, 'test@example.com');
+await userEvent.keyboard('{Enter}');
+expect(onSubmit).toHaveBeenCalled();
+```
+
+### Common Test Scenarios
+
+1. **Basic Rendering** - Verify input renders with label and placeholder
+2. **User Input** - Test typing and value changes
+3. **Variants** - Test outlined, filled, glass, underline, gradient styles
+4. **Sizes** - Test sm, md, lg sizing
+5. **States** - Test disabled, error, loading, readonly states
+6. **Adornments** - Test start/end icons and buttons
+7. **Validation** - Test error states and helper text
+8. **Floating Labels** - Test label animation on focus/blur
+9. **Visual Effects** - Test glow and pulse animations
+10. **Keyboard Navigation** - Test Tab navigation and Enter key
+11. **Accessibility** - Verify ARIA attributes and screen reader support
+12. **Form Integration** - Test with form libraries like React Hook Form

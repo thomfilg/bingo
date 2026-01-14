@@ -1,4 +1,4 @@
-import { SliderProps as MuiSliderProps } from '@mui/material';
+import type { SliderProps as MuiSliderProps } from '@mui/material';
 
 export interface SliderProps extends Omit<MuiSliderProps, 'color' | 'size'> {
   /**
@@ -98,4 +98,16 @@ export interface SliderProps extends Omit<MuiSliderProps, 'color' | 'size'> {
    * Blur handler
    */
   onBlur?: React.FocusEventHandler<HTMLSpanElement>;
+
+  /**
+   * Test identifier for testing purposes
+   * When provided, generates testIds for all slider elements:
+   * - `${dataTestId}` - Root container
+   * - `${dataTestId}-slider` - Slider component
+   * - `${dataTestId}-track` - Slider track
+   * - `${dataTestId}-thumb` - Slider thumb
+   * - `${dataTestId}-value-label` - Value label (if showValue is enabled)
+   * - `${dataTestId}-label` - Label text (if label is provided)
+   */
+  dataTestId?: string;
 }

@@ -79,7 +79,7 @@ interface MenubarItem {
 ### Basic Menubar
 
 ```tsx
-import { Menubar } from '@repo/ui';
+import { Menubar } from '@procurement/ui';
 
 const menuItems = [
   {
@@ -106,7 +106,7 @@ const menuItems = [
 ### App Bar with Logo and User Controls
 
 ```tsx
-import { Menubar } from '@repo/ui';
+import { Menubar } from '@procurement/ui';
 import { Avatar, IconButton } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 

@@ -1,4 +1,4 @@
-import { CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 
 export interface LightboxItem {
   src: string;
@@ -36,6 +36,8 @@ export interface LightboxProps {
   className?: string;
   /** Inline styles */
   style?: CSSProperties;
+  /** Optional test ID for automated testing */
+  dataTestId?: string;
 }
 
 export interface LightboxRef {

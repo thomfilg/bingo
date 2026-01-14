@@ -1,5 +1,5 @@
+import { Box, Card, CardContent,Stack, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Typography, Stack, Box, Card, CardContent } from '@mui/material';
 
 import { Separator } from './Separator';
 

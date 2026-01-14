@@ -1,12 +1,12 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
-import { Box, Paper, Typography, Divider } from '@mui/material';
 import {
   KeyboardArrowLeft,
   KeyboardArrowRight,
   KeyboardDoubleArrowLeft,
   KeyboardDoubleArrowRight,
 } from '@mui/icons-material';
+import { Box, Divider,Paper, Typography } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
 
 import { Pagination } from './Pagination';
 

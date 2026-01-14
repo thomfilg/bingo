@@ -1,22 +1,23 @@
-import React from 'react';
+import { 
+  CheckCircle, 
+  Close,
+  Error, 
+  Info, 
+  Warning, 
+} from '@mui/icons-material';
 import {
+  alpha,
   Box,
   Button,
   IconButton,
-  Typography,
-  alpha,
   keyframes,
+  Typography,
 } from '@mui/material';
-import { styled, Theme } from '@mui/material/styles';
-import { 
-  Info, 
-  CheckCircle, 
-  Warning, 
-  Error, 
-  Close,
-} from '@mui/icons-material';
+import type { Theme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
+import React from 'react';
 
-import { BannerProps, BannerVariant } from './Banner.types';
+import type { BannerProps, BannerVariant } from './Banner.types';
 
 // Animations
 const fadeInSlide = keyframes`
@@ -221,6 +222,7 @@ export const Banner = React.forwardRef<HTMLDivElement, BannerProps>(
       fullWidth = false,
       className,
       children,
+      'data-testid': dataTestId = 'banner',
       ...props
     },
     ref,
@@ -253,11 +255,12 @@ export const Banner = React.forwardRef<HTMLDivElement, BannerProps>(
         aria-live={ariaLive}
         aria-atomic="true"
         tabIndex={0}
+        data-testid={dataTestId}
         {...props}
       >
         {/* Icon */}
         {displayIcon && (
-          <Box className="banner-icon" aria-hidden="true">
+          <Box className="banner-icon" aria-hidden="true" data-testid={dataTestId ? `${dataTestId}-icon` : 'banner-icon'}>
             {displayIcon}
           </Box>
         )}
@@ -265,12 +268,12 @@ export const Banner = React.forwardRef<HTMLDivElement, BannerProps>(
         {/* Main content */}
         <Box className="banner-content">
           {title && (
-            <Typography className="banner-title" variant="subtitle2" component="div">
+            <Typography className="banner-title" variant="subtitle2" component="div" data-testid={dataTestId ? `${dataTestId}-title` : 'banner-title'}>
               {title}
             </Typography>
           )}
           {description && (
-            <Typography className="banner-description" variant="body2" component="div">
+            <Typography className="banner-description" variant="body2" component="div" data-testid={dataTestId ? `${dataTestId}-message` : 'banner-message'}>
               {description}
             </Typography>
           )}
@@ -288,6 +291,7 @@ export const Banner = React.forwardRef<HTMLDivElement, BannerProps>(
                   size="small"
                   variant={action.variant === 'primary' ? 'contained' : 'outlined'}
                   onClick={action.onClick}
+                  data-testid={dataTestId ? `${dataTestId}-action` : 'banner-action'}
                   sx={(theme) => ({
                     minWidth: 'auto',
                     px: 1.5,
@@ -331,6 +335,7 @@ export const Banner = React.forwardRef<HTMLDivElement, BannerProps>(
               size="small"
               onClick={handleDismiss}
               aria-label="Dismiss banner"
+              data-testid={dataTestId ? `${dataTestId}-close` : 'banner-close'}
               sx={{ transition: 'all 0.2s ease' }}
             >
               <Close fontSize="small" />

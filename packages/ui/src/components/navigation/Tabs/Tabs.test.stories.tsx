@@ -1,16 +1,16 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor, fn } from 'storybook/test';
-import { useState } from 'react';
-import { Box, Typography } from '@mui/material';
 import {
-  Home,
-  Settings,
-  Person,
-  Notifications,
   Dashboard,
-  Security,
   Email,
+  Home,
+  Notifications,
+  Person,
+  Security,
+  Settings,
 } from '@mui/icons-material';
+import { Box, Typography } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
+import { expect, fn,userEvent, waitFor, within } from 'storybook/test';
 
 import { Tabs } from './Tabs';
 import type { TabItem, TabsProps } from './Tabs.types';

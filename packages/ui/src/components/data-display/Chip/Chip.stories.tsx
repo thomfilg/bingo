@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Face, Star } from '@mui/icons-material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Chip } from './Chip';
 

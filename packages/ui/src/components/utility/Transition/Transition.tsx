@@ -1,14 +1,14 @@
-import React from 'react';
 import {
-  Fade,
-  Slide,
-  Grow,
   Collapse,
-  Zoom,
+  Fade,
+  Grow,
+  Slide,
   useTheme,
+  Zoom,
 } from '@mui/material';
+import React from 'react';
 
-import { CustomTransitionProps } from './Transition.types';
+import type { CustomTransitionProps } from './Transition.types';
 
 export const Transition: React.FC<CustomTransitionProps> = ({
   children,
@@ -74,6 +74,7 @@ export const Transition: React.FC<CustomTransitionProps> = ({
     in: inProp,
     timeout: getDuration(),
     easing: getEasing(),
+    unmountOnExit: true,
     style: {
       transitionDelay: `${delay}ms`,
     },
@@ -83,44 +84,56 @@ export const Transition: React.FC<CustomTransitionProps> = ({
   switch (variant) {
     case 'fade':
       return (
-        <Fade {...transitionProps}>
-          <div>{children}</div>
+        <Fade {...transitionProps} data-testid="transition-wrapper">
+          <div data-testid="transition-element">
+            <div data-testid="transition-content">{children}</div>
+          </div>
         </Fade>
       );
 
     case 'slide':
       return (
-        <Slide direction={direction} {...transitionProps}>
-          <div>{children}</div>
+        <Slide direction={direction} {...transitionProps} data-testid="transition-wrapper">
+          <div data-testid="transition-element">
+            <div data-testid="transition-content">{children}</div>
+          </div>
         </Slide>
       );
 
     case 'scale':
     case 'grow':
       return (
-        <Grow {...transitionProps}>
-          <div>{children}</div>
+        <Grow {...transitionProps} data-testid="transition-wrapper">
+          <div data-testid="transition-element">
+            <div data-testid="transition-content">{children}</div>
+          </div>
         </Grow>
       );
 
     case 'collapse':
       return (
-        <Collapse {...transitionProps}>
-          <div>{children}</div>
+        <Collapse {...transitionProps} data-testid="transition-wrapper">
+          <div data-testid="transition-element">
+            <div data-testid="transition-content">{children}</div>
+          </div>
         </Collapse>
       );
 
     case 'zoom':
       return (
-        <Zoom {...transitionProps}>
-          <div>{children}</div>
+        <Zoom {...transitionProps} data-testid="transition-wrapper">
+          <div data-testid="transition-element">
+            <div data-testid="transition-content">{children}</div>
+          </div>
         </Zoom>
       );
 
     default:
       return (
-        <Fade {...transitionProps}>
-          <div>{children}</div>
+        <Fade {...transitionProps} data-testid="transition-wrapper">
+          <div data-testid="transition-element">
+            <div data-testid="transition-content">{children}</div>
+          </div>
         </Fade>
       );
   }

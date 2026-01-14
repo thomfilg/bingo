@@ -1,9 +1,10 @@
-import React from 'react';
-import { Box, Typography, alpha, Theme } from '@mui/material';
-import { styled } from '@mui/material/styles';
 import { FormatQuote } from '@mui/icons-material';
+import type { Theme} from '@mui/material';
+import { alpha, Box,Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import React from 'react';
 
-import { BlockquoteProps } from './Blockquote.types';
+import type { BlockquoteProps } from './Blockquote.types';
 
 const getColorFromTheme = (theme: Theme, color: string) => {
   if (color === 'neutral') {

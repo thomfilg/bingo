@@ -1,5 +1,5 @@
-import { AlertProps as MuiAlertProps } from '@mui/material';
-import React from 'react';
+import type { AlertProps as MuiAlertProps } from '@mui/material';
+import type React from 'react';
 
 export interface AlertProps extends Omit<MuiAlertProps, 'variant' | 'color' | 'role'> {
   /**
@@ -71,4 +71,9 @@ export interface AlertProps extends Omit<MuiAlertProps, 'variant' | 'color' | 'r
    * ARIA atomic setting
    */
   'aria-atomic'?: 'true' | 'false';
+
+  /**
+   * Optional data-testid for testing
+   */
+  'data-testid'?: string;
 }

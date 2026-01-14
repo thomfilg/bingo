@@ -85,6 +85,10 @@ The Sheet component is ideal for:
 - **header** (React.ReactNode): Custom header content (overrides title/description)
 - **footer** (React.ReactNode): Footer content rendered at bottom of sheet
 
+### Testing
+
+- **dataTestId** (string): Base test ID for the component (default: 'sheet'). All child elements derive their test IDs from this base value
+
 ## Usage Examples
 
 ### Basic Sheet
@@ -224,6 +228,243 @@ function BasicExample() {
    - Glass for elegant, semi-transparent panels
    - Elevated for important actions
    - Minimal for subtle, non-intrusive content
+
+## Testing
+
+### Test IDs
+
+The Sheet component provides comprehensive test IDs for automated testing:
+
+#### Main Container
+- `sheet` (default) or custom via `dataTestId` prop - Main sheet container element
+
+#### Header Section
+- `{dataTestId}-header` - Sheet header container
+- `{dataTestId}-header-title` - Title text element
+- `{dataTestId}-header-close-button` - Close button (when `showCloseButton` is true)
+
+#### Content Section
+- `{dataTestId}-content` - Main content area
+
+#### Footer Section
+- `{dataTestId}-footer` - Footer container (when `footer` prop is provided)
+
+### Testing Examples
+
+#### Basic Rendering Test
+```tsx
+import { render, screen } from '@testing-library/react';
+import { Sheet } from '@/components/data-display/Sheet';
+
+test('renders sheet with content', () => {
+  render(
+    <Sheet open title="Test Sheet" dataTestId="test-sheet">
+      <div>Sheet content</div>
+    </Sheet>
+  );
+
+  expect(screen.getByTestId('test-sheet')).toBeInTheDocument();
+  expect(screen.getByTestId('test-sheet-header')).toBeInTheDocument();
+  expect(screen.getByTestId('test-sheet-header-title')).toHaveTextContent('Test Sheet');
+  expect(screen.getByTestId('test-sheet-content')).toBeInTheDocument();
+});
+```
+
+#### Interaction Testing
+```tsx
+import { render, screen, fireEvent } from '@testing-library/react';
+import { Sheet } from '@/components/data-display/Sheet';
+
+test('closes sheet when close button is clicked', () => {
+  const handleClose = vi.fn();
+
+  render(
+    <Sheet
+      open
+      onOpenChange={handleClose}
+      showCloseButton
+      dataTestId="test-sheet"
+    >
+      Content
+    </Sheet>
+  );
+
+  const closeButton = screen.getByTestId('test-sheet-header-close-button');
+  fireEvent.click(closeButton);
+
+  expect(handleClose).toHaveBeenCalledWith(false);
+});
+```
+
+#### Footer Testing
+```tsx
+import { render, screen } from '@testing-library/react';
+import { Sheet } from '@/components/data-display/Sheet';
+
+test('renders footer when provided', () => {
+  render(
+    <Sheet
+      open
+      dataTestId="test-sheet"
+      footer={<button>Save</button>}
+    >
+      Content
+    </Sheet>
+  );
+
+  expect(screen.getByTestId('test-sheet-footer')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
+});
+```
+
+#### Draggable Sheet Testing
+```tsx
+import { render, screen } from '@testing-library/react';
+import { Sheet } from '@/components/data-display/Sheet';
+
+test('renders draggable sheet with snap points', () => {
+  const handleSnapChange = vi.fn();
+
+  render(
+    <Sheet
+      open
+      variant="draggable"
+      position="bottom"
+      snapPoints={[0.25, 0.5, 0.75, 1]}
+      defaultSnapPoint={0.5}
+      onSnapPointChange={handleSnapChange}
+      dataTestId="draggable-sheet"
+    >
+      Draggable content
+    </Sheet>
+  );
+
+  const sheet = screen.getByTestId('draggable-sheet');
+  expect(sheet).toBeInTheDocument();
+
+  // Test drag interactions here using fireEvent or userEvent
+});
+```
+
+#### Loading State Testing
+```tsx
+import { render, screen } from '@testing-library/react';
+import { Sheet } from '@/components/data-display/Sheet';
+
+test('shows loading spinner when loading prop is true', () => {
+  render(
+    <Sheet open loading dataTestId="loading-sheet">
+      Content
+    </Sheet>
+  );
+
+  expect(screen.getByRole('progressbar')).toBeInTheDocument();
+});
+```
+
+#### Accessibility Testing
+```tsx
+import { render } from '@testing-library/react';
+import { axe } from 'jest-axe';
+import { Sheet } from '@/components/data-display/Sheet';
+
+test('has no accessibility violations', async () => {
+  const { container } = render(
+    <Sheet
+      open
+      title="Accessible Sheet"
+      description="This is a description"
+      dataTestId="accessible-sheet"
+    >
+      Content
+    </Sheet>
+  );
+
+  const results = await axe(container);
+  expect(results).toHaveNoViolations();
+});
+```
+
+#### Testing with Custom Test IDs
+```tsx
+import { render, screen } from '@testing-library/react';
+import { Sheet } from '@/components/data-display/Sheet';
+
+test('uses custom dataTestId for all elements', () => {
+  render(
+    <Sheet
+      open
+      title="Custom ID Sheet"
+      showCloseButton
+      dataTestId="custom-sheet"
+      footer={<div>Footer</div>}
+    >
+      Content
+    </Sheet>
+  );
+
+  // All test IDs derive from the custom dataTestId
+  expect(screen.getByTestId('custom-sheet')).toBeInTheDocument();
+  expect(screen.getByTestId('custom-sheet-header')).toBeInTheDocument();
+  expect(screen.getByTestId('custom-sheet-header-title')).toBeInTheDocument();
+  expect(screen.getByTestId('custom-sheet-header-close-button')).toBeInTheDocument();
+  expect(screen.getByTestId('custom-sheet-content')).toBeInTheDocument();
+  expect(screen.getByTestId('custom-sheet-footer')).toBeInTheDocument();
+});
+```
+
+### Playwright E2E Testing
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('sheet opens and closes correctly', async ({ page }) => {
+  await page.goto('/sheet-demo');
+
+  // Open sheet
+  await page.click('button:has-text("Open Sheet")');
+  await expect(page.getByTestId('demo-sheet')).toBeVisible();
+
+  // Verify content
+  await expect(page.getByTestId('demo-sheet-header-title')).toHaveText('Demo Sheet');
+  await expect(page.getByTestId('demo-sheet-content')).toBeVisible();
+
+  // Close sheet
+  await page.getByTestId('demo-sheet-header-close-button').click();
+  await expect(page.getByTestId('demo-sheet')).not.toBeVisible();
+});
+
+test('draggable sheet responds to drag gestures', async ({ page }) => {
+  await page.goto('/draggable-sheet-demo');
+
+  const sheet = page.getByTestId('draggable-sheet');
+  const header = page.getByTestId('draggable-sheet-header');
+
+  // Get initial position
+  const initialBox = await sheet.boundingBox();
+
+  // Drag sheet down
+  await header.hover();
+  await page.mouse.down();
+  await page.mouse.move(initialBox.x, initialBox.y + 200);
+  await page.mouse.up();
+
+  // Verify sheet moved
+  const newBox = await sheet.boundingBox();
+  expect(newBox.y).toBeGreaterThan(initialBox.y);
+});
+```
+
+### Best Practices for Testing
+
+1. **Always Use dataTestId**: Provide unique test IDs for each Sheet instance to avoid collisions in tests
+2. **Test All States**: Verify open, closed, loading, and disabled states
+3. **Test Interactions**: Verify close buttons, overlay clicks, escape key, and drag gestures work correctly
+4. **Test Accessibility**: Ensure keyboard navigation, focus management, and ARIA attributes are correct
+5. **Test Responsive Behavior**: Verify different positions (top, right, bottom, left) and sizes work correctly
+6. **Test Visual Variants**: Verify glass, gradient, elevated, and draggable variants render correctly
+7. **Mock Animations**: Use `vi.useFakeTimers()` or similar to control animation timing in tests
+8. **Test Snap Points**: For draggable variants, verify snap points are respected during drag operations
 
 ## Related Components
 

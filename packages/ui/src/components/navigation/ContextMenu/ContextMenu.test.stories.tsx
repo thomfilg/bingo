@@ -1,20 +1,20 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor, fn } from 'storybook/test';
 import {
+  Archive,
   ContentCopy,
-  ContentPaste,
   ContentCut,
+  ContentPaste,
   Delete,
   Edit,
-  Share,
-  Archive,
   Settings,
+  Share,
   Star,
 } from '@mui/icons-material';
 import { Box, Paper, Typography } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, fn,userEvent, waitFor, within } from 'storybook/test';
 
 import { ContextMenu } from './ContextMenu';
-import { ContextMenuItem } from './ContextMenu.types';
+import type { ContextMenuItem } from './ContextMenu.types';
 
 const meta: Meta<typeof ContextMenu> = {
   title: 'Navigation/ContextMenu/Tests',

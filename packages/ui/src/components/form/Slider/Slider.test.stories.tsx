@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor, fn } from 'storybook/test';
 import { Box, Typography } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import React, { useState } from 'react';
+import { expect, fn,userEvent, waitFor, within } from 'storybook/test';
 
 import { Slider } from './Slider';
 
@@ -797,7 +797,134 @@ export const EdgeCases: Story = {
   },
 };
 
-// 11. Integration Test
+// 11. Test IDs Verification Test
+export const TestIdsVerification: Story = {
+  name: '🏷️ Test IDs Verification',
+  render: () => {
+    const TestIdsComponent = () => {
+      const [value1, setValue1] = React.useState(50);
+      const [value2, setValue2] = React.useState<number[]>([20, 80]);
+      const [value3, setValue3] = React.useState(50);
+
+      return (
+        <Box sx={{ width: 500, p: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Test IDs Verification
+          </Typography>
+
+          <Box sx={{ mb: 4 }}>
+            <Slider
+              dataTestId="test-slider"
+              label="Slider with Test IDs"
+              showValue
+              unit="%"
+              value={value1}
+              onChange={(_event, newValue) => setValue1(newValue as number)}
+              min={0}
+              max={100}
+            />
+          </Box>
+
+          <Box sx={{ mb: 4 }}>
+            <Slider
+              dataTestId="test-range-slider"
+              label="Range Slider with Test IDs"
+              showValue
+              unit="°C"
+              value={value2}
+              onChange={(_event, newValue) => setValue2(newValue as number[])}
+              min={0}
+              max={100}
+            />
+          </Box>
+
+          <Box sx={{ mb: 4 }}>
+            <Slider
+              dataTestId="test-marks-slider"
+              variant="marks"
+              label="Marks Slider with Test IDs"
+              showValue
+              customMarks={[
+                { value: 0, label: 'Min' },
+                { value: 50, label: 'Mid' },
+                { value: 100, label: 'Max' },
+              ]}
+              value={value3}
+              onChange={(_event, newValue) => setValue3(newValue as number)}
+            />
+          </Box>
+        </Box>
+      );
+    };
+
+    return <TestIdsComponent />;
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step('Verify root container testId', async () => {
+      const container = canvas.getByTestId('test-slider');
+      expect(container).toBeInTheDocument();
+    });
+
+    await step('Verify label testId', async () => {
+      const label = canvas.getByTestId('test-slider-label');
+      expect(label).toBeInTheDocument();
+      expect(label).toHaveTextContent('Slider with Test IDs');
+    });
+
+    await step('Verify value label testId', async () => {
+      const valueLabel = canvas.getByTestId('test-slider-value-label');
+      expect(valueLabel).toBeInTheDocument();
+      expect(valueLabel).toHaveTextContent('50%');
+    });
+
+    await step('Verify slider testId', async () => {
+      const slider = canvas.getByTestId('test-slider-slider');
+      expect(slider).toBeInTheDocument();
+    });
+
+    await step('Verify track testId', async () => {
+      const track = canvas.getByTestId('test-slider-track');
+      expect(track).toBeInTheDocument();
+      expect(track).toHaveClass('MuiSlider-track');
+    });
+
+    await step('Verify thumb testId', async () => {
+      const thumb = canvas.getByTestId('test-slider-thumb');
+      expect(thumb).toBeInTheDocument();
+      expect(thumb).toHaveClass('MuiSlider-thumb');
+    });
+
+    await step('Verify range slider testIds', async () => {
+      const rangeContainer = canvas.getByTestId('test-range-slider');
+      expect(rangeContainer).toBeInTheDocument();
+
+      const rangeLabel = canvas.getByTestId('test-range-slider-label');
+      expect(rangeLabel).toHaveTextContent('Range Slider with Test IDs');
+
+      const rangeValueLabel = canvas.getByTestId('test-range-slider-value-label');
+      expect(rangeValueLabel).toHaveTextContent('20°C - 80°C');
+
+      const rangeSlider = canvas.getByTestId('test-range-slider-slider');
+      expect(rangeSlider).toBeInTheDocument();
+    });
+
+    await step('Verify marks slider testIds', async () => {
+      const marksContainer = canvas.getByTestId('test-marks-slider');
+      expect(marksContainer).toBeInTheDocument();
+
+      const marksSlider = canvas.getByTestId('test-marks-slider-slider');
+      expect(marksSlider).toBeInTheDocument();
+
+      // Verify marks are rendered
+      const marksLabels = canvas.getAllByText(/Min|Mid|Max/);
+      expect(marksLabels.length).toBeGreaterThan(0);
+    });
+  },
+};
+
+// 12. Integration Test
 export const Integration: Story = {
   name: '🔗 Integration Test',
   render: () => {

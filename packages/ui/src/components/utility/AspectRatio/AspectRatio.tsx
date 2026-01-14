@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import React from 'react';
 
-import { AspectRatioProps } from './AspectRatio.types';
+import type { AspectRatioProps } from './AspectRatio.types';
 
 export const AspectRatio: React.FC<AspectRatioProps> = ({
   children,
@@ -9,6 +9,7 @@ export const AspectRatio: React.FC<AspectRatioProps> = ({
   ratio,
   maxWidth,
   maxHeight,
+  dataTestId,
   sx,
   ...props
 }) => {
@@ -37,6 +38,7 @@ export const AspectRatio: React.FC<AspectRatioProps> = ({
 
   return (
     <Box
+      data-testid={dataTestId}
       sx={{
         position: 'relative',
         width: '100%',

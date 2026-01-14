@@ -1,16 +1,16 @@
-import React, { useState, cloneElement, isValidElement } from 'react';
 import {
-  Menu,
-  MenuItem,
+  alpha,
+  Divider,
   ListItemIcon,
   ListItemText,
-  Divider,
+  Menu,
+  MenuItem,
   Typography,
-  alpha,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import React, { cloneElement, isValidElement,useState } from 'react';
 
-import { ContextMenuProps, ContextMenuItem } from './ContextMenu.types';
+import type { ContextMenuItem,ContextMenuProps } from './ContextMenu.types';
 
 const StyledMenu = styled(Menu, {
   shouldForwardProp: (prop) => prop !== 'customVariant' && prop !== 'size',
@@ -194,21 +194,28 @@ export const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
     };
 
     const triggerElement = isValidElement(children) ? (
-      cloneElement(children as React.ReactElement, {
-        onContextMenu: handleContextMenu,
-        className: [
-          (children as React.ReactElement).props.className,
-          triggerClassName,
-          !disabled ? 'context-menu-trigger' : '',
-        ]
-          .filter(Boolean)
-          .join(' '),
-        style: {
-          ...(children as React.ReactElement).props.style,
-          ...triggerStyle,
-          cursor: disabled ? 'default' : 'context-menu',
-        },
-      })
+      cloneElement(
+        children as React.ReactElement<{
+          onContextMenu?: (event: React.MouseEvent) => void;
+          className?: string;
+          style?: React.CSSProperties;
+        }>,
+        {
+          onContextMenu: handleContextMenu,
+          className: [
+            (children as React.ReactElement<{ className?: string }>).props.className,
+            triggerClassName,
+            !disabled ? 'context-menu-trigger' : '',
+          ]
+            .filter(Boolean)
+            .join(' '),
+          style: {
+            ...(children as React.ReactElement<{ style?: React.CSSProperties }>).props.style,
+            ...triggerStyle,
+            cursor: disabled ? 'default' : 'context-menu',
+          },
+        }
+      )
     ) : (
       <div
         onContextMenu={handleContextMenu}

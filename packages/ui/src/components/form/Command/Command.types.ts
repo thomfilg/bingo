@@ -1,4 +1,4 @@
-import { ReactNode, CSSProperties } from 'react';
+import type { CSSProperties,ReactNode } from 'react';
 
 export interface CommandItem {
   id: string;
@@ -42,6 +42,7 @@ export interface CommandProps {
   onBlur?: () => void;
   onClick?: () => void;
   children?: ReactNode;
+  dataTestId?: string;
 }
 
 export interface CommandInputProps {
@@ -55,6 +56,7 @@ export interface CommandInputProps {
   autoFocus?: boolean;
   className?: string;
   style?: CSSProperties;
+  dataTestId?: string;
 }
 
 export interface CommandListProps {
@@ -68,6 +70,7 @@ export interface CommandListProps {
   loading?: boolean;
   className?: string;
   style?: CSSProperties;
+  dataTestId?: string;
 }
 
 export interface CommandGroupProps {
@@ -78,6 +81,7 @@ export interface CommandGroupProps {
   showDescriptions?: boolean;
   className?: string;
   style?: CSSProperties;
+  dataTestId?: string;
 }
 
 export interface CommandItemProps extends CommandItem {
@@ -87,18 +91,21 @@ export interface CommandItemProps extends CommandItem {
   showDescription?: boolean;
   className?: string;
   style?: CSSProperties;
+  dataTestId?: string;
 }
 
 export interface CommandEmptyProps {
   message?: string;
   className?: string;
   style?: CSSProperties;
+  dataTestId?: string;
 }
 
 export interface CommandLoadingProps {
   message?: string;
   className?: string;
   style?: CSSProperties;
+  dataTestId?: string;
 }
 
 export interface CommandSeparatorProps {

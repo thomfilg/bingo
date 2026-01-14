@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useRef } from 'react';
 import { Box, useTheme } from '@mui/material';
+import React, { useCallback, useRef,useState } from 'react';
 
-import { ResizableProps, ResizeHandle } from './Resizable.types';
+import type { ResizableProps, ResizeHandle } from './Resizable.types';
 
 export const Resizable: React.FC<ResizableProps> = ({
   children,
@@ -16,6 +16,7 @@ export const Resizable: React.FC<ResizableProps> = ({
   disabled = false,
   handles,
   className,
+  'data-testid': dataTestId,
   ...rest
 }) => {
   const theme = useTheme();
@@ -159,6 +160,7 @@ export const Resizable: React.FC<ResizableProps> = ({
       {...rest}
       ref={containerRef}
       className={className}
+      data-testid={dataTestId}
       sx={{
         position: 'relative',
         width: size.width,
@@ -178,6 +180,7 @@ export const Resizable: React.FC<ResizableProps> = ({
           <Box
             key={handle}
             className="resize-handle"
+            data-testid={dataTestId ? `${dataTestId}-handle-${handle}` : undefined}
             sx={getHandleStyle(handle)}
             onMouseDown={(e) => handleMouseDown(e, handle)}
           />

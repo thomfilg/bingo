@@ -1,6 +1,6 @@
+import { Box, Button, Card, CardContent,Paper, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, fn } from 'storybook/test';
-import { Box, Typography, Paper, Button, Card, CardContent } from '@mui/material';
+import { expect, fn,userEvent, within } from 'storybook/test';
 
 import { Container } from './Container';
 
@@ -551,10 +551,8 @@ export const PerformanceTest: Story = {
     const canvas = within(canvasElement);
     
     await step('Measure render time', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const startTime = (window as any).performance.now();
       const elements = canvas.getAllByTestId(/item-/);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const endTime = (window as any).performance.now();
       
       const renderTime = endTime - startTime;
@@ -638,7 +636,7 @@ export const EdgeCases: Story = {
     });
     
     await step('Input limits testing', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const input = canvas.getByTestId('limited-input') as any;
       const testText = 'a'.repeat(100); // 100 characters
       

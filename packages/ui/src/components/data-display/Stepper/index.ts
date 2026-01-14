@@ -1,2 +1,2 @@
 export { Stepper } from './Stepper';
-export type { StepperProps, Step, ConnectorState, StepItemProps } from './Stepper.types';
+export type { ConnectorState, Step, StepItemProps,StepperProps } from './Stepper.types';

@@ -1,5 +1,5 @@
-import { MenuProps } from '@mui/material';
-import { ReactNode } from 'react';
+import type { MenuProps } from '@mui/material';
+import type { ReactNode } from 'react';
 
 export interface DropdownMenuItem {
   /**

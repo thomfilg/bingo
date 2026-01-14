@@ -1,7 +1,7 @@
-import { CardProps as MuiCardProps } from '@mui/material';
-import { ReactNode } from 'react';
+import type { CardProps as MuiCardProps } from '@mui/material';
+import type { ReactNode } from 'react';
 
-export type CardVariant = 'elevated' | 'outlined' | 'glass' | 'gradient' | 'neumorphic';
+export type CardVariant = 'elevated' | 'outlined' | 'glass' | 'gradient' | 'neumorphic' | 'section';
 export type CardEntranceAnimation = 'fade' | 'slide-up' | 'slide-down' | 'slide-left' | 'slide-right' | 'zoom' | 'grow' | 'none';
 
 export interface CardProps extends Omit<MuiCardProps, 'variant'> {
@@ -22,6 +22,7 @@ export interface CardProps extends Omit<MuiCardProps, 'variant'> {
   onClick?: React.MouseEventHandler<HTMLDivElement>;
   onFocus?: React.FocusEventHandler<HTMLDivElement>;
   onBlur?: React.FocusEventHandler<HTMLDivElement>;
+  dataTestId?: string;
 }
 
 export interface CardHeaderProps {
@@ -30,17 +31,20 @@ export interface CardHeaderProps {
   action?: ReactNode;
   avatar?: ReactNode;
   children?: ReactNode;
+  dataTestId?: string;
 }
 
 export interface CardContentProps {
   children: ReactNode;
   dense?: boolean;
+  dataTestId?: string;
 }
 
 export interface CardActionsProps {
   children: ReactNode;
   disableSpacing?: boolean;
   alignment?: 'left' | 'center' | 'right' | 'space-between';
+  dataTestId?: string;
 }
 
 export interface CardMediaProps {
@@ -49,4 +53,5 @@ export interface CardMediaProps {
   title?: string;
   height?: number | string;
   children?: ReactNode;
+  dataTestId?: string;
 }

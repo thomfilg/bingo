@@ -1,5 +1,5 @@
-import { AvatarProps as MuiAvatarProps } from '@mui/material';
-import React from 'react';
+import type { AvatarProps as MuiAvatarProps } from '@mui/material';
+import type React from 'react';
 
 export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
 export type AvatarVariant = 'circle' | 'square' | 'rounded' | 'status';
@@ -80,4 +80,9 @@ export interface AvatarProps extends Omit<MuiAvatarProps, 'variant'> {
    * Click handler
    */
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+
+  /**
+   * Test ID for automated testing
+   */
+  dataTestId?: string;
 }

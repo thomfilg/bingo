@@ -1,23 +1,23 @@
-import React from 'react';
 import {
-  Card as MuiCard,
-  CardHeader as MuiCardHeader,
-  CardContent as MuiCardContent,
-  CardActions as MuiCardActions,
-  CardMedia as MuiCardMedia,
-  useTheme,
   alpha,
   Box,
-  keyframes,
+  Card as MuiCard,
+  CardActions as MuiCardActions,
+  CardContent as MuiCardContent,
+  CardHeader as MuiCardHeader,
+  CardMedia as MuiCardMedia,
   CircularProgress,
+  keyframes,
+  useTheme,
 } from '@mui/material';
+import React from 'react';
 
-import {
-  CardProps,
-  CardHeaderProps,
-  CardContentProps,
+import type {
   CardActionsProps,
+  CardContentProps,
+  CardHeaderProps,
   CardMediaProps,
+  CardProps,
 } from './Card.types';
 
 // Define pulse animation
@@ -49,6 +49,7 @@ export const Card: React.FC<CardProps> = (props) => {
     onFocus,
     onBlur,
     sx,
+    dataTestId,
     // These props are reserved for future implementation but need to be extracted
     // to prevent them from being passed to the underlying MuiCard
     expandable,
@@ -240,6 +241,29 @@ export const Card: React.FC<CardProps> = (props) => {
         };
       }
 
+      case 'section':
+        return {
+          ...baseStyles,
+          ...interactiveStyles,
+          ...glowStyles,
+          ...pulseStyles,
+          backgroundColor:
+            theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.02)',
+          border: 'none',
+          boxShadow: 'none',
+          '&:hover': {
+            ...interactiveStyles['&:hover'],
+            ...glowStyles['&:hover'],
+            backgroundColor: interactive
+              ? theme.palette.mode === 'dark'
+                ? 'rgba(0, 0, 0, 0.25)'
+                : 'rgba(0, 0, 0, 0.04)'
+              : theme.palette.mode === 'dark'
+                ? 'rgba(0, 0, 0, 0.2)'
+                : 'rgba(0, 0, 0, 0.02)',
+          },
+        };
+
       default:
         return baseStyles;
     }
@@ -247,6 +271,7 @@ export const Card: React.FC<CardProps> = (props) => {
 
   return (
     <MuiCard
+      data-testid={dataTestId || 'card'}
       onClick={!loading ? onClick : undefined}
       onFocus={!loading ? onFocus : undefined}
       onBlur={!loading ? onBlur : undefined}
@@ -283,20 +308,34 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
   action,
   avatar,
   children,
+  dataTestId,
   ...props
 }) => {
   if (children) {
-    return <Box sx={{ p: 2 }}>{children}</Box>;
+    return <Box sx={{ p: 2 }} data-testid={dataTestId || 'card-header'}>{children}</Box>;
   }
 
   return (
-    <MuiCardHeader avatar={avatar} action={action} title={title} subheader={subtitle} {...props} />
+    <MuiCardHeader
+      data-testid={dataTestId || 'card-header'}
+      avatar={avatar}
+      action={action}
+      title={title}
+      subheader={subtitle}
+      titleTypographyProps={{
+        'data-testid': dataTestId ? `${dataTestId}-title` : 'card-title',
+      } as any}
+      subheaderTypographyProps={{
+        'data-testid': dataTestId ? `${dataTestId}-subtitle` : 'card-subtitle',
+      } as any}
+      {...props}
+    />
   );
 };
 
-export const CardContent: React.FC<CardContentProps> = ({ children, dense = false, ...props }) => {
-  return (
+export const CardContent: React.FC<CardContentProps> = ({ children, dense = false, dataTestId, ...props }) => (
     <MuiCardContent
+      data-testid={dataTestId || 'card-content'}
       sx={{
         padding: dense ? 1 : 2,
         '&:last-child': {
@@ -308,12 +347,12 @@ export const CardContent: React.FC<CardContentProps> = ({ children, dense = fals
       {children}
     </MuiCardContent>
   );
-};
 
 export const CardActions: React.FC<CardActionsProps> = ({
   children,
   disableSpacing = false,
   alignment = 'left',
+  dataTestId,
   ...props
 }) => {
   const getJustifyContent = () => {
@@ -331,6 +370,7 @@ export const CardActions: React.FC<CardActionsProps> = ({
 
   return (
     <MuiCardActions
+      data-testid={dataTestId || 'card-actions'}
       disableSpacing={disableSpacing}
       sx={{
         justifyContent: getJustifyContent(),
@@ -348,11 +388,17 @@ export const CardMedia: React.FC<CardMediaProps> = ({
   title,
   height = 200,
   children,
+  dataTestId,
   ...props
-}) => {
-  return (
-    <MuiCardMedia component={component} height={height} image={image} title={title} {...props}>
+}) => (
+    <MuiCardMedia
+      data-testid={dataTestId || 'card-media'}
+      component={component}
+      height={height}
+      image={image}
+      title={title}
+      {...props}
+    >
       {children}
     </MuiCardMedia>
   );
-};

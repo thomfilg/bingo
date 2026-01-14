@@ -1,9 +1,9 @@
+import { Favorite, MoreVert, Share } from '@mui/icons-material';
+import { Avatar, Box,Button, Chip, IconButton, Stack, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor, fn } from 'storybook/test';
-import { Button, Typography, Avatar, IconButton, Chip, Stack, Box } from '@mui/material';
-import { MoreVert, Favorite, Share } from '@mui/icons-material';
+import { expect, fn,userEvent, waitFor, within } from 'storybook/test';
 
-import { Card, CardHeader, CardContent, CardActions, CardMedia } from './Card';
+import { Card, CardActions, CardContent, CardHeader, CardMedia } from './Card';
 
 const meta: Meta<typeof Card> = {
   title: 'Layout/Card/Tests',

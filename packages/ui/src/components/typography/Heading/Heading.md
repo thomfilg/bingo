@@ -17,7 +17,7 @@ A flexible heading component supporting semantic HTML heading levels (h1-h6) and
 ### Basic Usage
 
 ```tsx
-import { Heading } from '@repo/ui';
+import { Heading } from '@procurement/ui';
 
 // Basic heading
 <Heading level="h1">Main Title</Heading>

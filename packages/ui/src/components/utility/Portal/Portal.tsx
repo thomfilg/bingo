@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
-import { PortalProps } from './Portal.types';
+import type { PortalProps } from './Portal.types';
 
 export const Portal: React.FC<PortalProps> = ({
   children,

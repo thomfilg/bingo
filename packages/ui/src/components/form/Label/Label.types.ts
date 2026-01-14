@@ -1,4 +1,4 @@
-import { ReactNode, CSSProperties, HTMLAttributes } from 'react';
+import type { CSSProperties, HTMLAttributes,ReactNode } from 'react';
 
 export interface LabelProps extends HTMLAttributes<globalThis.HTMLLabelElement> {
   children?: ReactNode;
@@ -31,4 +31,5 @@ export interface LabelProps extends HTMLAttributes<globalThis.HTMLLabelElement> 
   align?: 'left' | 'center' | 'right';
   nowrap?: boolean;
   truncate?: boolean;
+  dataTestId?: string;
 }

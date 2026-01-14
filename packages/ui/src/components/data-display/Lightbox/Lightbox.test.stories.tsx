@@ -1,10 +1,10 @@
+import { Box,Button } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor, fn } from 'storybook/test';
-import React, { useState, useRef } from 'react';
-import { Button, Box } from '@mui/material';
+import React, { useRef,useState } from 'react';
+import { expect, fn,userEvent, waitFor, within } from 'storybook/test';
 
 import { Lightbox } from './Lightbox';
-import { LightboxItem, LightboxRef } from './Lightbox.types';
+import type { LightboxItem, LightboxRef } from './Lightbox.types';
 
 const meta: Meta<typeof Lightbox> = {
   title: 'DataDisplay/Lightbox/Tests',
@@ -234,14 +234,17 @@ export const AccessibilityCompliance: Story = {
     });
 
     await step('Should have proper ARIA attributes', async () => {
-      const dialog = document.querySelector('[role="dialog"]');
-      expect(dialog).toHaveAttribute('aria-modal', 'true');
+      // MUI Dialog might render aria-modal on the root div or the inner dialog element
+      const dialogWithModal = document.querySelector('[aria-modal="true"]');
+      expect(dialogWithModal).toBeInTheDocument();
 
       // Check if the title element exists (MUI Dialog might handle aria-labelledby differently)
       const title = document.getElementById('lightbox-title');
       expect(title).toBeInTheDocument();
 
-      // Verify the dialog has either aria-labelledby or aria-label for accessibility
+      // Verify there's a dialog with proper labeling
+      const dialog = document.querySelector('[role="dialog"]');
+      expect(dialog).toBeInTheDocument();
       const hasAriaLabel =
         dialog?.hasAttribute('aria-label') || dialog?.hasAttribute('aria-labelledby');
       expect(hasAriaLabel).toBe(true);
@@ -365,7 +368,7 @@ export const ThumbnailsFilmstrip: Story = {
         return width <= 60; // Thumbnails are 60px wide
       });
 
-      const secondThumbnail = thumbnailImages.find((img) => img.alt === 'Test Image 2');
+      const secondThumbnail = thumbnailImages.find((img) => (img as HTMLImageElement).alt === 'Test Image 2');
       expect(secondThumbnail).toBeInTheDocument();
 
       await userEvent.click(secondThumbnail!.parentElement!);

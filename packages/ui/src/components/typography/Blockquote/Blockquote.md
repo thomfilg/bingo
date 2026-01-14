@@ -16,7 +16,7 @@ A versatile blockquote component that displays quoted content with multiple visu
 ### Basic Usage
 
 ```tsx
-import { Blockquote } from '@repo/ui';
+import { Blockquote } from '@procurement/ui';
 
 export function BasicQuote() {
   return <Blockquote>The best way to predict the future is to invent it.</Blockquote>;

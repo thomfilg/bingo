@@ -1,19 +1,19 @@
-import React from 'react';
+import { ArrowForwardIos, ChevronRight, Home, MoreHoriz,NavigateNext } from '@mui/icons-material';
 import {
-  Breadcrumbs as MuiBreadcrumbs,
-  Link,
-  Typography,
-  Box,
   alpha,
-  useTheme,
-  useMediaQuery,
-  Tooltip,
+  Box,
+  Breadcrumbs as MuiBreadcrumbs,
   Fade,
+  Link,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
-import { styled, keyframes } from '@mui/material/styles';
-import { NavigateNext, ChevronRight, ArrowForwardIos, Home, MoreHoriz } from '@mui/icons-material';
+import { keyframes,styled } from '@mui/material/styles';
+import React from 'react';
 
-import { BreadcrumbsProps, BreadcrumbItem } from './Breadcrumbs.types';
+import type { BreadcrumbItem,BreadcrumbsProps } from './Breadcrumbs.types';
 
 // Animation keyframes
 const slideIn = keyframes`
@@ -271,10 +271,12 @@ const CollapsedMenu = ({
   items,
   size,
   visualStyle,
+  dataTestId,
 }: {
   items: BreadcrumbItem[];
   size: string;
   visualStyle?: string;
+  dataTestId?: string;
 }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -295,6 +297,7 @@ const CollapsedMenu = ({
           size={size}
           visualStyle={visualStyle}
           sx={{ cursor: 'pointer' }}
+          data-testid={dataTestId ? `${dataTestId}-collapsed-menu` : 'breadcrumbs-collapsed-menu'}
         >
           <MoreHoriz className="breadcrumb-icon" />
         </BreadcrumbLink>
@@ -308,6 +311,7 @@ const CollapsedMenu = ({
           display: open ? 'block' : 'none',
           zIndex: 1000,
         }}
+        data-testid={dataTestId ? `${dataTestId}-collapsed-menu-items` : 'breadcrumbs-collapsed-menu-items'}
       >
         <Fade in={open}>
           <Box
@@ -345,6 +349,7 @@ const CollapsedMenu = ({
                     color: 'primary.main',
                   },
                 }}
+                data-testid={dataTestId ? `${dataTestId}-collapsed-item-${index}` : `breadcrumbs-collapsed-item-${index}`}
               >
                 {item.label}
               </Box>
@@ -371,6 +376,7 @@ export const Breadcrumbs = React.forwardRef<HTMLElement, BreadcrumbsProps>(
       collapseBehavior = 'menu',
       mobileMaxItems = 3,
       ariaLabel,
+      dataTestId,
       ...props
     },
     ref,
@@ -411,6 +417,7 @@ export const Breadcrumbs = React.forwardRef<HTMLElement, BreadcrumbsProps>(
         elevation={elevation}
         aria-label={ariaLabel || 'breadcrumb navigation'}
         role="navigation"
+        data-testid={dataTestId || 'breadcrumbs'}
         {...props}
       >
         {displayItems.map((item, index) => {
@@ -423,7 +430,7 @@ export const Breadcrumbs = React.forwardRef<HTMLElement, BreadcrumbsProps>(
           if (index === 1 && collapsedItems.length > 0 && collapseBehavior === 'menu') {
             return (
               <React.Fragment key="collapsed">
-                <CollapsedMenu items={collapsedItems} size={size} visualStyle={variant} />
+                <CollapsedMenu items={collapsedItems} size={size} visualStyle={variant} dataTestId={dataTestId} />
                 {finalSeparator}
               </React.Fragment>
             );
@@ -440,6 +447,7 @@ export const Breadcrumbs = React.forwardRef<HTMLElement, BreadcrumbsProps>(
                     cursor: 'default',
                     userSelect: 'none',
                   }}
+                  data-testid={dataTestId ? `${dataTestId}-ellipsis` : 'breadcrumbs-ellipsis'}
                 >
                   {item.label}
                 </Box>
@@ -463,7 +471,13 @@ export const Breadcrumbs = React.forwardRef<HTMLElement, BreadcrumbsProps>(
           // Render active/last item
           if (isActive) {
             return (
-              <BreadcrumbText key={index} size={size} visualStyle={variant} aria-current="page">
+              <BreadcrumbText
+                key={index}
+                size={size}
+                visualStyle={variant}
+                aria-current="page"
+                data-testid={dataTestId ? `${dataTestId}-item-${index}` : `breadcrumbs-item-${index}`}
+              >
                 {icon}
                 <span>{item.label}</span>
               </BreadcrumbText>
@@ -486,6 +500,7 @@ export const Breadcrumbs = React.forwardRef<HTMLElement, BreadcrumbsProps>(
                 active={isActive}
                 underline="none"
                 aria-label={item.ariaLabel || item.label}
+                data-testid={dataTestId ? `${dataTestId}-link-${index}` : `breadcrumbs-link-${index}`}
               >
                 {icon}
                 <span>{item.label}</span>

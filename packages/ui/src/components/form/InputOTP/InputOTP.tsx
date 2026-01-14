@@ -1,8 +1,9 @@
-import React, { forwardRef, useState, useRef, useEffect } from 'react';
-import { Box, TextField, alpha, Theme } from '@mui/material';
+import type { Theme } from '@mui/material';
+import { alpha, Box, TextField } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import React, { forwardRef, useEffect,useRef, useState } from 'react';
 
-import { InputOTPProps } from './InputOTP.types';
+import type { InputOTPProps } from './InputOTP.types';
 
 const getColorFromTheme = (theme: Theme, color: string) => {
   if (color === 'neutral') {
@@ -117,6 +118,7 @@ export const InputOTP = forwardRef<HTMLDivElement, InputOTPProps>(
       autoFocus = false,
       error = false,
       disabled = false,
+      dataTestId,
       ...props
     },
     ref,
@@ -188,6 +190,7 @@ export const InputOTP = forwardRef<HTMLDivElement, InputOTPProps>(
     return (
       <Box
         ref={ref}
+        data-testid={dataTestId}
         sx={{
           display: 'flex',
           gap: 1,
@@ -199,7 +202,9 @@ export const InputOTP = forwardRef<HTMLDivElement, InputOTPProps>(
         {digits.map((digit, index) => (
           <StyledOTPInput
             key={index}
-            ref={(el) => (inputRefs.current[index] = el?.querySelector('input') || null)}
+            ref={(el: HTMLDivElement | null) => {
+              inputRefs.current[index] = el?.querySelector('input') || null;
+            }}
             customColor={color}
             customSize={size}
             glass={glass}
@@ -214,6 +219,7 @@ export const InputOTP = forwardRef<HTMLDivElement, InputOTPProps>(
             inputProps={{
               maxLength: 1,
               style: { textAlign: 'center' },
+              'data-testid': dataTestId ? `${dataTestId}-slot-${index}` : undefined,
             }}
           />
         ))}

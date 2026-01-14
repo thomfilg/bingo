@@ -1,6 +1,6 @@
+import { Box, Card, CardContent, Stack,Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { within, expect } from 'storybook/test';
-import { Box, Card, CardContent, Typography, Stack } from '@mui/material';
+import { expect,within } from 'storybook/test';
 
 import { Skeleton } from './Skeleton';
 

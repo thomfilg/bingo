@@ -2,7 +2,7 @@ import { Box, Button, Paper, Stack, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import React from 'react';
 
-import { Toaster, toast } from './Sonner';
+import { toast,Toaster } from './Sonner';
 
 const meta: Meta<typeof Toaster> = {
   title: 'Feedback/Sonner',
@@ -485,7 +485,7 @@ const ThemedToastsComponent = () => {
         <Stack direction="row" spacing={2}>
           <Button
             variant="contained"
-            onClick={() => toast.success('Success in ' + theme + ' theme')}
+            onClick={() => toast.success(`Success in ${  theme  } theme`)}
           >
             Success
           </Button>
@@ -493,7 +493,7 @@ const ThemedToastsComponent = () => {
           <Button
             variant="contained"
             color="error"
-            onClick={() => toast.error('Error in ' + theme + ' theme')}
+            onClick={() => toast.error(`Error in ${  theme  } theme`)}
           >
             Error
           </Button>
@@ -501,7 +501,7 @@ const ThemedToastsComponent = () => {
           <Button
             variant="contained"
             color="info"
-            onClick={() => toast.info('Info in ' + theme + ' theme')}
+            onClick={() => toast.info(`Info in ${  theme  } theme`)}
           >
             Info
           </Button>

@@ -1,7 +1,7 @@
+import { Alert,Box, CircularProgress, Typography } from '@mui/material';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Box, CircularProgress, Typography, Alert } from '@mui/material';
 
-import { InfiniteScrollProps } from './InfiniteScroll.types';
+import type { InfiniteScrollProps } from './InfiniteScroll.types';
 
 export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
   children,
@@ -19,6 +19,8 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
   style,
   width,
   scrollableTarget,
+  testMode = false,
+  testTriggerRef,
 }) => {
   const [isIntersecting, setIsIntersecting] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -78,8 +80,21 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
     }
   }, [hasMore, error, loadMore, onError]);
 
+  // Expose test trigger for test mode
   useEffect(() => {
-    if (!sentinelRef.current) return;
+    if (testMode && testTriggerRef) {
+      testTriggerRef.current = handleLoadMore;
+    }
+
+    return () => {
+      if (testMode && testTriggerRef) {
+        testTriggerRef.current = undefined;
+      }
+    };
+  }, [testMode, testTriggerRef, handleLoadMore]);
+
+  useEffect(() => {
+    if (testMode || !sentinelRef.current) return;
 
     const getScrollableElement = () => {
       if (!scrollableTarget) return null;
@@ -156,6 +171,7 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
     return (
       <div
         ref={sentinelRef}
+        data-testid="infinite-scroll-sentinel"
         style={{
           height: variant === 'horizontal' ? '100%' : '1px',
           width: variant === 'horizontal' ? '1px' : '100%',

@@ -36,7 +36,7 @@ All MUI TooltipProps are supported except `variant` (which is replaced by our cu
 ### Basic Tooltip
 
 ```tsx
-import { Tooltip, Button } from '@repo/ui';
+import { Tooltip, Button } from '@procurement/ui';
 
 <Tooltip title="This is a basic tooltip">
   <Button>Hover me</Button>
@@ -151,3 +151,247 @@ The Tooltip component integrates with the MUI theme system:
 - Efficient re-rendering with proper memoization
 - Lightweight animations that don't impact performance
 - Portal-based rendering for optimal z-index management
+
+## Testing
+
+The Tooltip component provides comprehensive testIds for automated testing.
+
+### Test IDs
+
+When you provide a `dataTestId` prop, the following test IDs are automatically generated:
+
+| Element          | Test ID Pattern          | Description                           |
+| ---------------- | ------------------------ | ------------------------------------- |
+| Trigger Element  | `{dataTestId}-trigger`   | The element that triggers the tooltip |
+| Tooltip Content  | `{dataTestId}-content`   | The tooltip popup content             |
+
+### Testing Examples
+
+#### Basic Tooltip Testing
+
+```tsx
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Tooltip, Button } from '@procurement/ui';
+
+test('shows tooltip on hover', async () => {
+  const user = userEvent.setup();
+
+  render(
+    <Tooltip title="Helpful information" dataTestId="help-tooltip">
+      <Button>Help</Button>
+    </Tooltip>
+  );
+
+  const trigger = screen.getByTestId('help-tooltip-trigger');
+
+  // Hover over trigger
+  await user.hover(trigger);
+
+  // Tooltip should appear
+  await waitFor(() => {
+    expect(screen.getByTestId('help-tooltip-content')).toBeInTheDocument();
+  });
+
+  // Check tooltip content
+  expect(screen.getByText('Helpful information')).toBeInTheDocument();
+});
+```
+
+#### Testing Tooltip Variants
+
+```tsx
+test('renders different variants correctly', async () => {
+  const user = userEvent.setup();
+
+  const { rerender } = render(
+    <Tooltip title="Dark tooltip" variant="dark" dataTestId="variant-tooltip">
+      <Button>Hover</Button>
+    </Tooltip>
+  );
+
+  const trigger = screen.getByTestId('variant-tooltip-trigger');
+  await user.hover(trigger);
+
+  const tooltip = await screen.findByTestId('variant-tooltip-content');
+  expect(tooltip).toBeInTheDocument();
+
+  // Test different variants
+  rerender(
+    <Tooltip title="Light tooltip" variant="light" dataTestId="variant-tooltip">
+      <Button>Hover</Button>
+    </Tooltip>
+  );
+
+  await user.hover(trigger);
+  expect(await screen.findByTestId('variant-tooltip-content')).toBeInTheDocument();
+});
+```
+
+#### Testing Visual Effects
+
+```tsx
+test('applies glow effect', async () => {
+  const user = userEvent.setup();
+
+  render(
+    <Tooltip title="Glowing tooltip" glow dataTestId="glow-tooltip">
+      <Button>Glow</Button>
+    </Tooltip>
+  );
+
+  const trigger = screen.getByTestId('glow-tooltip-trigger');
+  await user.hover(trigger);
+
+  const tooltip = await screen.findByTestId('glow-tooltip-content');
+  expect(tooltip).toBeInTheDocument();
+});
+
+test('applies pulse animation', async () => {
+  const user = userEvent.setup();
+
+  render(
+    <Tooltip title="Pulsing tooltip" pulse dataTestId="pulse-tooltip">
+      <Button>Pulse</Button>
+    </Tooltip>
+  );
+
+  const trigger = screen.getByTestId('pulse-tooltip-trigger');
+  await user.hover(trigger);
+
+  const tooltip = await screen.findByTestId('pulse-tooltip-content');
+  expect(tooltip).toBeInTheDocument();
+});
+```
+
+#### Testing Accessibility
+
+```tsx
+test('has proper ARIA attributes', async () => {
+  const user = userEvent.setup();
+
+  render(
+    <Tooltip title="Accessible tooltip" dataTestId="a11y-tooltip">
+      <Button>Accessible</Button>
+    </Tooltip>
+  );
+
+  const trigger = screen.getByTestId('a11y-tooltip-trigger');
+  await user.hover(trigger);
+
+  const tooltip = await screen.findByRole('tooltip');
+  expect(tooltip).toBeInTheDocument();
+  expect(tooltip).toHaveTextContent('Accessible tooltip');
+});
+
+test('supports keyboard navigation', async () => {
+  const user = userEvent.setup();
+
+  render(
+    <Tooltip title="Keyboard accessible" dataTestId="keyboard-tooltip">
+      <Button>Focus me</Button>
+    </Tooltip>
+  );
+
+  const trigger = screen.getByTestId('keyboard-tooltip-trigger');
+
+  // Focus trigger with keyboard
+  await user.tab();
+  expect(trigger).toHaveFocus();
+
+  // Tooltip should appear on focus
+  await waitFor(() => {
+    expect(screen.getByTestId('keyboard-tooltip-content')).toBeInTheDocument();
+  });
+});
+```
+
+#### Testing Placement
+
+```tsx
+test('renders tooltip at specified placement', async () => {
+  const user = userEvent.setup();
+
+  render(
+    <Tooltip
+      title="Top placement"
+      placement="top"
+      dataTestId="placement-tooltip"
+    >
+      <Button>Positioned</Button>
+    </Tooltip>
+  );
+
+  const trigger = screen.getByTestId('placement-tooltip-trigger');
+  await user.hover(trigger);
+
+  const tooltip = await screen.findByTestId('placement-tooltip-content');
+  expect(tooltip).toBeInTheDocument();
+});
+```
+
+#### Testing Controlled Behavior
+
+```tsx
+test('shows and hides tooltip programmatically', async () => {
+  const { rerender } = render(
+    <Tooltip title="Controlled tooltip" open={false} dataTestId="controlled-tooltip">
+      <Button>Controlled</Button>
+    </Tooltip>
+  );
+
+  // Should not be visible
+  expect(screen.queryByTestId('controlled-tooltip-content')).not.toBeInTheDocument();
+
+  // Show tooltip
+  rerender(
+    <Tooltip title="Controlled tooltip" open={true} dataTestId="controlled-tooltip">
+      <Button>Controlled</Button>
+    </Tooltip>
+  );
+
+  // Should be visible
+  await waitFor(() => {
+    expect(screen.getByTestId('controlled-tooltip-content')).toBeInTheDocument();
+  });
+});
+```
+
+#### Testing Size Variations
+
+```tsx
+test('renders different sizes correctly', async () => {
+  const user = userEvent.setup();
+
+  const sizes: Array<'sm' | 'md' | 'lg'> = ['sm', 'md', 'lg'];
+
+  for (const size of sizes) {
+    const { unmount } = render(
+      <Tooltip
+        title={`${size} tooltip`}
+        size={size}
+        dataTestId={`${size}-tooltip`}
+      >
+        <Button>Size {size}</Button>
+      </Tooltip>
+    );
+
+    const trigger = screen.getByTestId(`${size}-tooltip-trigger`);
+    await user.hover(trigger);
+
+    const tooltip = await screen.findByTestId(`${size}-tooltip-content`);
+    expect(tooltip).toBeInTheDocument();
+
+    unmount();
+  }
+});
+```
+
+### Best Practices for Testing
+
+1. **Always use dataTestId** - Provides reliable selectors for both trigger and content
+2. **Test user interactions** - Verify hover, focus, and click behaviors
+3. **Wait for async updates** - Use `waitFor` and `findBy` queries for tooltip appearance
+4. **Test accessibility** - Check ARIA attributes and keyboard navigation
+5. **Test all variants** - Ensure different visual styles render correctly
+6. **Clean up properly** - Unmount components to prevent memory leaks in test suites

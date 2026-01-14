@@ -1,5 +1,6 @@
+import { Box, Chip, List, ListItem, ListItemText, Paper, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Box, Typography, Paper, List, ListItem, ListItemText, Chip } from '@mui/material';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import { ScrollArea } from './ScrollArea';
 
@@ -500,7 +501,7 @@ export const Responsive: Story = {
   render: () => (
     <Box sx={{ width: '100%', p: 2 }}>
       <Typography variant="h6" gutterBottom>Responsive ScrollArea</Typography>
-      
+
       <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
         <Box sx={{ flex: 1 }}>
           <Typography variant="caption" color="text.secondary">100% width, max 500px</Typography>
@@ -508,11 +509,11 @@ export const Responsive: Story = {
             <ScrollableContent lines={25} />
           </ScrollArea>
         </Box>
-        
+
         <Box sx={{ flex: 1 }}>
           <Typography variant="caption" color="text.secondary">Responsive height</Typography>
-          <ScrollArea 
-            width="100%" 
+          <ScrollArea
+            width="100%"
             height={{ xs: 200, sm: 300, md: 400 }}
             sx={{ bgcolor: 'background.paper' }}
           >
@@ -523,3 +524,128 @@ export const Responsive: Story = {
     </Box>
   ),
 };
+
+// Virtualized grid component that uses ScrollArea
+interface VirtualizedGridInScrollAreaProps {
+  totalItems: number;
+  squareSize: number;
+  gap: number;
+  columnCount: number;
+  visibleRows: number;
+}
+
+const VirtualizedGridInScrollArea: React.FC<VirtualizedGridInScrollAreaProps> = ({
+  totalItems,
+  squareSize,
+  gap,
+  columnCount,
+  visibleRows,
+}) => {
+  const [scrollTop, setScrollTop] = useState(0);
+
+  const rowHeight = squareSize + gap;
+  const totalRows = Math.ceil(totalItems / columnCount);
+  const totalHeight = totalRows * squareSize + Math.max(0, totalRows - 1) * gap;
+  const visibleHeight = visibleRows * squareSize + Math.max(0, visibleRows - 1) * gap;
+  const containerWidth = columnCount * squareSize + (columnCount - 1) * gap;
+
+  // Calculate visible rows with buffer
+  const bufferRows = 2;
+  const startRow = Math.max(0, Math.floor(scrollTop / rowHeight) - bufferRows);
+  const endRow = Math.min(totalRows, Math.ceil((scrollTop + visibleHeight) / rowHeight) + bufferRows);
+
+  const visibleSquares = useMemo(() => {
+    const squares = [];
+    for (let row = startRow; row < endRow; row++) {
+      for (let col = 0; col < columnCount; col++) {
+        const index = row * columnCount + col;
+        if (index >= totalItems) break;
+        squares.push({ index, row, col, number: index + 1 });
+      }
+    }
+    return squares;
+  }, [startRow, endRow, columnCount, totalItems]);
+
+  const handleScroll = useCallback((event: React.UIEvent<HTMLDivElement>) => {
+    setScrollTop(event.currentTarget.scrollTop);
+  }, []);
+
+  return (
+    <ScrollArea
+      width={containerWidth + 20}
+      height={visibleHeight}
+      autoHide
+      autoHideDelay={800}
+      onScroll={handleScroll}
+    >
+      <Box sx={{ position: 'relative', width: containerWidth, height: totalHeight }}>
+        {visibleSquares.map(({ index, row, col, number }) => (
+          <Box
+            key={index}
+            sx={{
+              position: 'absolute',
+              top: row * rowHeight,
+              left: col * (squareSize + gap),
+              width: squareSize,
+              height: squareSize,
+              bgcolor: 'primary.main',
+              color: 'primary.contrastText',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '12px',
+              fontWeight: 'bold',
+              borderRadius: 1,
+              boxShadow: 1,
+            }}
+          >
+            {number}
+          </Box>
+        ))}
+      </Box>
+    </ScrollArea>
+  );
+};
+
+export const NumberedSquaresGrid: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'A virtualized grid of 100,000 numbered squares (50x50px each with 5px gap) ' +
+          'inside ScrollArea. Demonstrates autoHide scrollbar with large datasets.',
+      },
+    },
+  },
+  render: () => {
+    const GAP = 5;
+    const SQUARE_SIZE = 50;
+    const TOTAL_SQUARES = 100000;
+    const COLUMN_COUNT = 9;
+    const VISIBLE_ROWS = 3;
+
+    return (
+      <Box sx={{ p: 2 }}>
+        <Typography variant="h6" gutterBottom>
+          Numbered Squares Grid (100,000 items)
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          50x50px squares with 5px gap. Scroll to see the autoHide scrollbar in action.
+        </Typography>
+        <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1, p: 1 }}>
+          <VirtualizedGridInScrollArea
+            totalItems={TOTAL_SQUARES}
+            squareSize={SQUARE_SIZE}
+            gap={GAP}
+            columnCount={COLUMN_COUNT}
+            visibleRows={VISIBLE_ROWS}
+          />
+        </Box>
+        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+          Total items: {TOTAL_SQUARES.toLocaleString()} | Columns: {COLUMN_COUNT} | Gap: {GAP}px
+        </Typography>
+      </Box>
+    );
+  },
+};
+

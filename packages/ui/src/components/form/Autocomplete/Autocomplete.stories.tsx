@@ -1,10 +1,10 @@
+import { CssBaseline } from '@mui/material';
+import { createTheme,ThemeProvider } from '@mui/material/styles';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { CssBaseline } from '@mui/material';
 
 import { Autocomplete } from './Autocomplete';
-import { AutocompleteProps } from './Autocomplete.types';
+import type { AutocompleteProps } from './Autocomplete.types';
 
 interface Person {
   id: string;

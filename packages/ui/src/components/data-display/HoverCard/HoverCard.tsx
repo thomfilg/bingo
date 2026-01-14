@@ -1,18 +1,18 @@
-import React from 'react';
 import {
-  Popover,
-  Card,
-  CardContent,
-  Typography,
+  alpha,
   Avatar,
   Box,
-  alpha,
-  keyframes,
+  Card,
+  CardContent,
   CircularProgress,
+  keyframes,
+  Popover,
+  Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import React from 'react';
 
-import { HoverCardProps, HoverCardPlacement, HoverCardAnimation } from './HoverCard.types';
+import type { HoverCardAnimation, HoverCardPlacement, HoverCardProps } from './HoverCard.types';
 
 // Animation definitions
 const pulseAnimation = keyframes`
@@ -344,6 +344,7 @@ export const HoverCard = React.forwardRef<HTMLDivElement, HoverCardProps>(
       onOpen,
       onClose,
       children,
+      dataTestId,
       ...props
     },
     ref,
@@ -352,8 +353,8 @@ export const HoverCard = React.forwardRef<HTMLDivElement, HoverCardProps>(
     const [isOpen, setIsOpen] = React.useState(false);
     const [isTouchDevice, setIsTouchDevice] = React.useState(false);
     const [touchTimeout, setTouchTimeout] = React.useState<number>();
-    const enterTimeoutRef = React.useRef<number>();
-    const exitTimeoutRef = React.useRef<number>();
+    const enterTimeoutRef = React.useRef<number | undefined>(undefined);
+    const exitTimeoutRef = React.useRef<number | undefined>(undefined);
 
     // Detect touch device
     React.useEffect(() => {
@@ -460,8 +461,7 @@ export const HoverCard = React.forwardRef<HTMLDivElement, HoverCardProps>(
       };
     }, [isOpen, handleClose]);
 
-    React.useEffect(() => {
-      return () => {
+    React.useEffect(() => () => {
         if (enterTimeoutRef.current) {
           window.clearTimeout(enterTimeoutRef.current);
         }
@@ -471,8 +471,7 @@ export const HoverCard = React.forwardRef<HTMLDivElement, HoverCardProps>(
         if (touchTimeout) {
           window.clearTimeout(touchTimeout);
         }
-      };
-    }, [touchTimeout]);
+      }, [touchTimeout]);
 
     const triggerProps = {
       onMouseEnter: handleMouseEnter,
@@ -481,6 +480,7 @@ export const HoverCard = React.forwardRef<HTMLDivElement, HoverCardProps>(
       onTouchEnd: handleTouchEnd,
       onTouchCancel: handleTouchCancel,
       style: { cursor: disabled ? 'default' : 'pointer' },
+      'data-testid': dataTestId ? `${dataTestId}-trigger` : 'hover-card-trigger',
     };
 
     const triggerElement = trigger ? (
@@ -498,8 +498,9 @@ export const HoverCard = React.forwardRef<HTMLDivElement, HoverCardProps>(
         return <Avatar src={avatar} sx={{ width: 48, height: 48, mr: 2 }} />;
       }
 
-      return React.cloneElement(avatar as React.ReactElement, {
-        sx: { width: 48, height: 48, mr: 2, ...(avatar as React.ReactElement)?.props?.sx },
+      const avatarElement = avatar as React.ReactElement<{ sx?: object }>;
+      return React.cloneElement(avatarElement, {
+        sx: { width: 48, height: 48, mr: 2, ...avatarElement.props.sx },
       });
     };
 
@@ -525,12 +526,20 @@ export const HoverCard = React.forwardRef<HTMLDivElement, HoverCardProps>(
                 {renderAvatar()}
                 <Box>
                   {title && (
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
+                    <Typography
+                      variant="h6"
+                      sx={{ fontWeight: 600, mb: 0.5 }}
+                      data-testid={dataTestId ? `${dataTestId}-title` : 'hover-card-title'}
+                    >
                       {title}
                     </Typography>
                   )}
                   {description && (
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      data-testid={dataTestId ? `${dataTestId}-description` : 'hover-card-description'}
+                    >
                       {description}
                     </Typography>
                   )}
@@ -538,12 +547,21 @@ export const HoverCard = React.forwardRef<HTMLDivElement, HoverCardProps>(
               </Box>
             )}
             {!avatar && title && (
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 600, mb: 1 }}
+                data-testid={dataTestId ? `${dataTestId}-title` : 'hover-card-title'}
+              >
                 {title}
               </Typography>
             )}
             {!avatar && description && (
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 1 }}
+                data-testid={dataTestId ? `${dataTestId}-description` : 'hover-card-description'}
+              >
                 {description}
               </Typography>
             )}
@@ -558,12 +576,17 @@ export const HoverCard = React.forwardRef<HTMLDivElement, HoverCardProps>(
             <Typography
               variant={variant === 'minimal' ? 'body2' : 'subtitle1'}
               sx={{ fontWeight: 600, mb: 0.5 }}
+              data-testid={dataTestId ? `${dataTestId}-title` : 'hover-card-title'}
             >
               {title}
             </Typography>
           )}
           {description && (
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              data-testid={dataTestId ? `${dataTestId}-description` : 'hover-card-description'}
+            >
               {description}
             </Typography>
           )}
@@ -604,6 +627,7 @@ export const HoverCard = React.forwardRef<HTMLDivElement, HoverCardProps>(
               glow={glow}
               pulse={pulse}
               animation={animation}
+              data-testid={dataTestId || 'hover-card-content'}
               sx={{
                 maxWidth,
                 mt: placement.startsWith('top') ? `${offset}px` : 0,

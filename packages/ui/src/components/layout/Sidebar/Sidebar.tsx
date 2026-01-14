@@ -1,11 +1,11 @@
+import { alpha,Box, useTheme } from '@mui/material';
 import React from 'react';
-import { Box, useTheme, alpha } from '@mui/material';
 
-import {
-  SidebarProps,
-  SidebarHeaderProps,
+import type {
   SidebarContentProps,
   SidebarFooterProps,
+  SidebarHeaderProps,
+  SidebarProps,
 } from './Sidebar.types';
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -17,6 +17,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   collapsedWidth = 64,
   position = 'left',
   className,
+  dataTestId = 'sidebar',
   ...rest
 }) => {
   // Prevent unused variable warning for onToggle
@@ -63,6 +64,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <Box
       className={className}
+      data-testid={dataTestId}
       {...rest}
       sx={{
         width: currentWidth,
@@ -78,11 +80,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   );
 };
 
-export const SidebarHeader: React.FC<SidebarHeaderProps> = ({ children, ...rest }) => {
+export const SidebarHeader: React.FC<SidebarHeaderProps> = ({ children, dataTestId = 'sidebar-header', ...rest }) => {
   const theme = useTheme();
 
   return (
     <Box
+      data-testid={dataTestId}
       {...rest}
       sx={{
         padding: theme.spacing(2),
@@ -96,9 +99,9 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({ children, ...rest 
   );
 };
 
-export const SidebarContent: React.FC<SidebarContentProps> = ({ children, ...rest }) => {
-  return (
+export const SidebarContent: React.FC<SidebarContentProps> = ({ children, dataTestId = 'sidebar-content', ...rest }) => (
     <Box
+      data-testid={dataTestId}
       {...rest}
       sx={{
         flex: 1,
@@ -108,13 +111,13 @@ export const SidebarContent: React.FC<SidebarContentProps> = ({ children, ...res
       {children}
     </Box>
   );
-};
 
-export const SidebarFooter: React.FC<SidebarFooterProps> = ({ children, ...rest }) => {
+export const SidebarFooter: React.FC<SidebarFooterProps> = ({ children, dataTestId = 'sidebar-footer', ...rest }) => {
   const theme = useTheme();
 
   return (
     <Box
+      data-testid={dataTestId}
       {...rest}
       sx={{
         padding: theme.spacing(2),

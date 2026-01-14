@@ -1,6 +1,6 @@
+import { Button, TextField,Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, fn, waitFor } from 'storybook/test';
-import { Typography, Button, TextField } from '@mui/material';
+import { expect, fn, userEvent, waitFor,within } from 'storybook/test';
 
 import { Form, FormField } from './Form';
 
@@ -30,9 +30,10 @@ export const BasicInteraction: Story = {
     maxWidth: 'sm',
     spacing: 'md',
     onSubmit: fn(),
+    dataTestId: 'login-form',
     children: (
       <>
-        <FormField name="email" label="Email" required>
+        <FormField name="email" label="Email" required dataTestId="email-field">
           <TextField
             type="email"
             placeholder="Enter your email"
@@ -41,7 +42,7 @@ export const BasicInteraction: Story = {
             inputProps={{ 'data-testid': 'email-input' }}
           />
         </FormField>
-        <FormField name="password" label="Password" required>
+        <FormField name="password" label="Password" required dataTestId="password-field">
           <TextField
             type="password"
             placeholder="Enter your password"
@@ -59,9 +60,27 @@ export const BasicInteraction: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // Find the form
-    const form = canvas.getByRole('form');
+    // Verify form testId
+    const form = canvas.getByTestId('login-form');
     expect(form).toBeInTheDocument();
+    expect(form).toHaveAttribute('role', 'form');
+
+    // Verify FormField testIds
+    const emailField = canvas.getByTestId('email-field');
+    const passwordField = canvas.getByTestId('password-field');
+    expect(emailField).toBeInTheDocument();
+    expect(passwordField).toBeInTheDocument();
+
+    // Verify nested testIds (label, control)
+    const emailLabel = canvas.getByTestId('email-field-label');
+    const emailControl = canvas.getByTestId('email-field-control');
+    const passwordLabel = canvas.getByTestId('password-field-label');
+    const passwordControl = canvas.getByTestId('password-field-control');
+
+    expect(emailLabel).toBeInTheDocument();
+    expect(emailControl).toBeInTheDocument();
+    expect(passwordLabel).toBeInTheDocument();
+    expect(passwordControl).toBeInTheDocument();
 
     // Find form elements - use the input elements directly
     const emailInput = canvas.getByTestId('email-input') as HTMLInputElement;
@@ -458,7 +477,63 @@ export const Performance: Story = {
   },
 };
 
-// Test 10: Integration Test
+// Test 10: TestId Verification for Error Messages
+export const ErrorMessageTestIds: Story = {
+  args: {
+    variant: 'vertical',
+    maxWidth: 'sm',
+    spacing: 'md',
+    dataTestId: 'error-form',
+    children: (
+      <>
+        <Typography variant="h6" mb={2}>
+          Error Message TestIds
+        </Typography>
+        <FormField name="email" label="Email" required error="Invalid email address" dataTestId="email-field-with-error">
+          <TextField
+            type="email"
+            placeholder="Enter email"
+            fullWidth
+            error
+            inputProps={{ 'data-testid': 'email-input-error' }}
+          />
+        </FormField>
+        <FormField name="username" label="Username" helperText="Choose a unique username" dataTestId="username-field-with-helper">
+          <TextField
+            placeholder="Enter username"
+            fullWidth
+            inputProps={{ 'data-testid': 'username-input-helper' }}
+          />
+        </FormField>
+      </>
+    ),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Verify form testId
+    const form = canvas.getByTestId('error-form');
+    expect(form).toBeInTheDocument();
+
+    // Verify error message testId
+    const errorField = canvas.getByTestId('email-field-with-error');
+    expect(errorField).toBeInTheDocument();
+
+    const errorMessage = canvas.getByTestId('email-field-with-error-message');
+    expect(errorMessage).toBeInTheDocument();
+    expect(errorMessage).toHaveTextContent('Invalid email address');
+
+    // Verify helper text testId
+    const helperField = canvas.getByTestId('username-field-with-helper');
+    expect(helperField).toBeInTheDocument();
+
+    const helperMessage = canvas.getByTestId('username-field-with-helper-message');
+    expect(helperMessage).toBeInTheDocument();
+    expect(helperMessage).toHaveTextContent('Choose a unique username');
+  },
+};
+
+// Test 11: Integration Test
 export const Integration: Story = {
   args: {
     variant: 'vertical',

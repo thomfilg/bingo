@@ -1,5 +1,5 @@
-import { DialogProps as MuiDialogProps } from '@mui/material';
-import { ReactNode } from 'react';
+import type { DialogProps as MuiDialogProps } from '@mui/material';
+import type { ReactNode } from 'react';
 
 export type DialogVariant = 'default' | 'glass' | 'fullscreen' | 'drawer';
 export type DialogSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -19,6 +19,7 @@ export interface DialogProps extends Omit<MuiDialogProps, 'variant' | 'title'> {
   pulse?: boolean;
   borderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
   onClose?: () => void;
+  dataTestId?: string;
 }
 
 export interface DialogHeaderProps {
@@ -27,16 +28,19 @@ export interface DialogHeaderProps {
   subtitle?: ReactNode;
   showCloseButton?: boolean;
   onClose?: () => void;
+  dataTestId?: string;
 }
 
 export interface DialogContentProps {
   children: ReactNode;
   dividers?: boolean;
   dense?: boolean;
+  dataTestId?: string;
 }
 
 export interface DialogActionsProps {
   children: ReactNode;
   alignment?: 'left' | 'center' | 'right' | 'space-between';
   spacing?: number;
+  dataTestId?: string;
 }

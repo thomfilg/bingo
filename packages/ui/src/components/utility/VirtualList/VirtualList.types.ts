@@ -1,4 +1,4 @@
-import { ReactNode, CSSProperties } from 'react';
+import type { CSSProperties, ReactNode, RefObject } from 'react';
 
 export type VirtualListVariant = 'fixed' | 'variable' | 'grid';
 
@@ -22,6 +22,10 @@ export interface VirtualListProps {
   style?: CSSProperties;
   'data-testid'?: string;
   'aria-label'?: string;
+  /** External scroll container ref - when provided, uses this element for scroll events */
+  scrollContainerRef?: RefObject<HTMLElement | null>;
+  /** Disable internal scroll container - use when composing with external ScrollArea */
+  disableInternalScroll?: boolean;
 }
 
 export interface VirtualGridProps {
@@ -45,4 +49,8 @@ export interface VirtualGridProps {
   style?: CSSProperties;
   'data-testid'?: string;
   'aria-label'?: string;
+  /** External scroll container ref - when provided, uses this element for scroll events */
+  scrollContainerRef?: RefObject<HTMLElement | null>;
+  /** Disable internal scroll container - use when composing with external ScrollArea */
+  disableInternalScroll?: boolean;
 }

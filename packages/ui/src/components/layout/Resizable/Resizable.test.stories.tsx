@@ -1,7 +1,7 @@
+import { Box, Paper,Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor, fn } from 'storybook/test';
-import { Box, Typography, Paper } from '@mui/material';
 import React, { useState } from 'react';
+import { expect, fn,userEvent, waitFor, within } from 'storybook/test';
 
 import { Resizable } from './Resizable';
 
@@ -415,19 +415,19 @@ const PerformanceTestComponent: React.FC = () => {
   React.useEffect(() => {
     const startTime = window.performance.now();
 
-    // Simulate component mount timing
-    const timer = window.setTimeout(() => {
+    // Use requestAnimationFrame for reliable timing after render
+    const frameId = window.requestAnimationFrame(() => {
       const endTime = window.performance.now();
       setRenderTime(endTime - startTime);
-    }, 0);
+    });
 
-    return () => window.clearTimeout(timer);
+    return () => window.cancelAnimationFrame(frameId);
   }, []);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center' }}>
       <Typography variant="body2" data-testid="performance-info">
-        Render time: {renderTime ? `${renderTime.toFixed(2)}ms` : 'Measuring...'}
+        Render time: {renderTime !== null ? `${renderTime.toFixed(2)}ms` : 'Measuring...'}
       </Typography>
 
       <Resizable variant="both" width={400} height={300} data-testid="performance-resizable">
@@ -468,9 +468,14 @@ export const PerformanceTest: Story = {
       await waitFor(
         async () => {
           const performanceInfo = canvas.getByTestId('performance-info');
-          await expect(performanceInfo).not.toHaveTextContent('Measuring...');
+          const text = performanceInfo.textContent || '';
+          // Verify we have actual render time (contains 'ms' and not 'Measuring...')
+          expect(text).toMatch(/Render time: \d+\.\d{2}ms/);
         },
-        { timeout: 3000 },
+        {
+          timeout: 5000,
+          interval: 100,
+        },
       );
     });
 

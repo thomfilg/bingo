@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Save, Delete, Add, ArrowForward } from '@mui/icons-material';
+import { Add, ArrowForward,Delete, Save } from '@mui/icons-material';
 import { Stack } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Button } from './Button';
 
@@ -14,7 +14,7 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['solid', 'outline', 'ghost', 'glass', 'gradient'],
+      options: ['solid', 'outline', 'ghost', 'text', 'glass', 'gradient'],
     },
     color: {
       control: { type: 'select' },
@@ -48,12 +48,75 @@ export const Default: Story = {
 
 export const AllVariants: Story = {
   render: () => (
-    <Stack spacing={2} direction="row">
-      <Button variant="solid">Solid</Button>
-      <Button variant="outline">Outline</Button>
-      <Button variant="ghost">Ghost</Button>
-      <Button variant="glass">Glass</Button>
-      <Button variant="gradient">Gradient</Button>
+    <Stack spacing={2} direction="column">
+        <h1>All Variants</h1>
+        <Stack spacing={2} direction="column" alignItems="flex-start">
+          <h1>Regular</h1>
+          <Stack spacing={2} direction="row">
+          <Button variant="solid">Solid</Button>
+          <Button variant="outline">Outline</Button>
+          <Button variant="ghost">Ghost</Button>
+          <Button variant="text">Text</Button>
+          <Button variant="glass">Glass</Button>
+          <Button variant="gradient">Gradient</Button>
+        </Stack>
+      </Stack>
+      <Stack spacing={2} direction="column" alignItems="flex-start">
+        <h1>Active</h1>
+        <Stack spacing={2} direction="row">
+          <Button variant="solid" active>Solid</Button>
+          <Button variant="outline" active>Outline</Button>
+          <Button variant="ghost" active>Ghost</Button>
+          <Button variant="text" active>Text</Button>
+          <Button variant="glass" active>Glass</Button>
+          <Button variant="gradient" active>Gradient</Button>
+        </Stack>
+      </Stack>
+      <Stack spacing={2} direction="column" alignItems="flex-start">
+        <h1>Disabled</h1>
+        <Stack spacing={2} direction="row">
+          <Button variant="solid" disabled>Solid</Button>
+          <Button variant="outline" disabled>Outline</Button>
+          <Button variant="ghost" disabled>Ghost</Button>
+          <Button variant="text" disabled>Text</Button>
+          <Button variant="glass" disabled>Glass</Button>
+          <Button variant="gradient" disabled>Gradient</Button>
+        </Stack>
+      </Stack>
+      <Stack spacing={2} direction="column" alignItems="flex-start">
+        <h1>Glow</h1>
+        <Stack spacing={2} direction="row">
+          <Button variant="solid" glow>Solid</Button>
+          <Button variant="outline" glow>Outline</Button>
+          <Button variant="ghost" glow>Ghost</Button>
+          <Button variant="text" glow>Text</Button>
+          <Button variant="glass" glow>Glass</Button>
+          <Button variant="gradient" glow>Gradient</Button>
+        </Stack>
+      </Stack>
+      <Stack spacing={2} direction="column" alignItems="flex-start">
+        <h1>Pulse</h1>
+        <Stack spacing={2} direction="row">
+          <Button variant="solid" pulse>Solid</Button>
+          <Button variant="outline" pulse>Outline</Button>
+          <Button variant="ghost" pulse>Ghost</Button>
+          <Button variant="text" pulse>Text</Button>
+          <Button variant="glass" pulse>Glass</Button>
+          <Button variant="gradient" pulse>Gradient</Button>
+        </Stack>
+      </Stack>
+      
+      <Stack spacing={2} direction="column" alignItems="flex-start">
+        <h1>Glow and Pulse</h1>
+        <Stack spacing={2} direction="row">
+          <Button variant="solid" glow pulse>Solid</Button>
+          <Button variant="outline" glow pulse>Outline</Button>
+          <Button variant="ghost" glow pulse>Ghost</Button>
+          <Button variant="text" glow pulse>Text</Button>
+          <Button variant="glass" glow pulse>Glass</Button>
+          <Button variant="gradient" glow pulse>Gradient</Button>
+        </Stack>
+      </Stack>
     </Stack>
   ),
 };
@@ -107,17 +170,33 @@ export const AllColors: Story = {
 
 export const WithIcons: Story = {
   render: () => (
-    <Stack spacing={2} direction="row">
-      <Button icon={<Save />}>Save</Button>
-      <Button variant="outline" icon={<Add />} color="success">
-        Add Item
-      </Button>
-      <Button variant="ghost" icon={<Delete />} color="danger">
-        Delete
-      </Button>
-      <Button variant="gradient" icon={<ArrowForward />}>
-        Continue
-      </Button>
+    <Stack spacing={2} direction="column">
+      <Stack spacing={2} direction="row">
+        <Button icon={<Save />}>Save</Button>
+        <Button variant="outline" icon={<Add />} color="success">
+          Add Item
+        </Button>
+        <Button variant="ghost" icon={<Delete />} color="danger">
+          Delete
+        </Button>
+        <Button variant="gradient" icon={<ArrowForward />}>
+          Continue
+        </Button>
+      </Stack>
+      <Stack spacing={2} direction="row">
+        <Button icon={<ArrowForward />} iconPosition="right">
+          Next
+        </Button>
+        <Button variant="outline" icon={<ArrowForward />} iconPosition="right" color="success">
+          Proceed
+        </Button>
+        <Button variant="ghost" icon={<ArrowForward />} iconPosition="right" color="danger">
+          Go Forward
+        </Button>
+        <Button variant="gradient" icon={<ArrowForward />} iconPosition="right">
+          Continue
+        </Button>
+      </Stack>
     </Stack>
   ),
 };

@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Box, SvgIcon } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 
 import { EmptyState } from './EmptyState';
@@ -28,7 +28,7 @@ const ErrorIcon = () => (
 );
 
 const meta: Meta<typeof EmptyState> = {
-  title: 'DataDisplay/EmptyState',
+  title: 'DataDisplay/AsyncStates/EmptyState',
   component: EmptyState,
   parameters: {
     layout: 'centered',
@@ -52,6 +52,9 @@ const meta: Meta<typeof EmptyState> = {
     secondaryAction: { control: false },
     helpLink: { control: false },
     className: { control: 'text' },
+    // Disable auto-action generation to prevent them from being truthy when not explicitly passed
+    onCreate: { action: false },
+    onRefresh: { action: false },
   },
 };
 

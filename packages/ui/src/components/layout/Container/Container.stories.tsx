@@ -1,6 +1,6 @@
-import React from 'react';
+import { Box, Button, Card, CardContent,Paper, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Box, Typography, Paper, Button, Card, CardContent } from '@mui/material';
+import React from 'react';
 
 import { Container } from './Container';
 

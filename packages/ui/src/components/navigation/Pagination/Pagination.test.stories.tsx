@@ -1,7 +1,7 @@
+import { Box, createTheme,ThemeProvider } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor, fn } from 'storybook/test';
-import { Box, ThemeProvider, createTheme } from '@mui/material';
 import React from 'react';
+import { expect, fn,userEvent, waitFor, within } from 'storybook/test';
 
 import { Pagination } from './Pagination';
 
@@ -51,7 +51,7 @@ export const BasicInteraction: Story = {
 
     // Verify current page is highlighted
     const currentPage = canvas.getByRole('button', { name: /page 5/i });
-    await expect(currentPage).toHaveAttribute('aria-current', 'true');
+    await expect(currentPage).toHaveAttribute('aria-current', 'page');
   },
 };
 
@@ -150,7 +150,7 @@ export const ScreenReader: Story = {
 
     // Check current page has aria-current
     const currentPage = canvas.getByRole('button', { name: /page 5/i });
-    await expect(currentPage).toHaveAttribute('aria-current', 'true');
+    await expect(currentPage).toHaveAttribute('aria-current', 'page');
 
     // Check for descriptive labels on navigation buttons
     const prevButton = canvas.getByRole('button', { name: /go to previous page/i });
@@ -288,7 +288,7 @@ export const ThemeVariations: Story = {
     await expect(currentPages).toHaveLength(2);
 
     for (const page of currentPages) {
-      await expect(page).toHaveAttribute('aria-current', 'true');
+      await expect(page).toHaveAttribute('aria-current', 'page');
       const styles = window.getComputedStyle(page);
       // Should have background color (primary color)
       await expect(styles.backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
@@ -391,7 +391,7 @@ export const EdgeCases: Story = {
     // Only page 1 should be visible
     const page1Button = canvas.getByRole('button', { name: /page 1/i });
     await expect(page1Button).toBeInTheDocument();
-    await expect(page1Button).toHaveAttribute('aria-current', 'true');
+    await expect(page1Button).toHaveAttribute('aria-current', 'page');
 
     // Navigation buttons should be disabled
     const prevButton = canvas.getByRole('button', { name: /go to previous page/i });

@@ -1,30 +1,31 @@
-import React, { useState, useRef, useEffect } from 'react';
 import {
-  TextareaAutosize,
-  Box,
-  FormHelperText,
-  InputLabel,
-  alpha,
-  keyframes,
-  IconButton,
-  Divider,
-  Tooltip,
-} from '@mui/material';
-import {
+  Code,
   FormatBold,
+  FormatColorFill,
+  FormatColorText,
   FormatItalic,
-  FormatUnderlined,
   FormatListBulleted,
   FormatListNumbered,
   FormatQuote,
-  Code,
+  FormatUnderlined,
   Link,
-  FormatColorText,
-  FormatColorFill,
 } from '@mui/icons-material';
-import { styled, Theme } from '@mui/material/styles';
+import {
+  alpha,
+  Box,
+  Divider,
+  FormHelperText,
+  IconButton,
+  InputLabel,
+  keyframes,
+  TextareaAutosize,
+  Tooltip,
+} from '@mui/material';
+import type { Theme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
+import React, { useEffect,useRef, useState } from 'react';
 
-import { TextareaProps } from './Textarea.types';
+import type { TextareaProps } from './Textarea.types';
 
 // Interface for styled component props
 interface StyledTextareaProps {
@@ -579,11 +580,14 @@ export const Textarea: React.FC<TextareaProps> = ({
   minRows = 3,
   maxRows,
   style,
+  'data-testid': dataTestId,
+  dataTestId: dataTestIdCamelCase,
   ...props
 }) => {
   const [richTextValue, setRichTextValue] = useState('');
   const hasIcon = Boolean(icon);
   const iconPadding = hasIcon ? (iconPosition === 'start' ? '40px' : '40px') : '0px';
+  const testId = dataTestId || dataTestIdCamelCase;
 
   const textareaStyle = {
     ...style,
@@ -595,7 +599,7 @@ export const Textarea: React.FC<TextareaProps> = ({
   // If rich text variant, use the rich text editor
   if (variant === 'rich') {
     return (
-      <Box sx={{ position: 'relative', width: '100%' }}>
+      <Box sx={{ position: 'relative', width: '100%' }} data-testid={testId ? `${testId}-wrapper` : undefined}>
         {label && (
           <StyledLabel glass={glassLabel} error={error}>
             {label}
@@ -622,7 +626,7 @@ export const Textarea: React.FC<TextareaProps> = ({
   }
 
   return (
-    <Box sx={{ position: 'relative', width: '100%' }}>
+    <Box sx={{ position: 'relative', width: '100%' }} data-testid={testId ? `${testId}-wrapper` : undefined}>
       {label && (
         <StyledLabel glass={glassLabel} error={error}>
           {label}
@@ -657,6 +661,7 @@ export const Textarea: React.FC<TextareaProps> = ({
           maxRows={variant === 'autosize' ? maxRows : undefined}
           style={textareaStyle}
           aria-label={label || props['aria-label']}
+          data-testid={testId}
           {...props}
         />
       </Box>

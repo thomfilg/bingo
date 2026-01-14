@@ -1,5 +1,5 @@
+import { createTheme, CssBaseline,ThemeProvider } from '@mui/material';
 import type { Preview } from '@storybook/react-vite';
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import React from 'react';
 
 const lightTheme = createTheme({

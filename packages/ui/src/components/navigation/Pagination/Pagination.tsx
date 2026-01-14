@@ -1,19 +1,19 @@
-import React from 'react';
+import { FirstPage, LastPage, NavigateBefore, NavigateNext } from '@mui/icons-material';
+import type { PaginationRenderItemParams } from '@mui/material';
 import {
+  alpha,
+  Box,
+  FormControl,
+  MenuItem,
   Pagination as MuiPagination,
   PaginationItem,
-  Box,
-  Typography,
   Select,
-  MenuItem,
-  FormControl,
-  alpha,
+  Typography,
 } from '@mui/material';
-import type { PaginationRenderItemParams } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { FirstPage, LastPage, NavigateBefore, NavigateNext } from '@mui/icons-material';
+import React from 'react';
 
-import { PaginationProps } from './Pagination.types';
+import type { PaginationProps } from './Pagination.types';
 
 const StyledPagination = styled(MuiPagination, {
   shouldForwardProp: (prop) => !['customVariant', 'customSize'].includes(prop as string),
@@ -193,6 +193,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
       itemsPerPage = 10,
       onItemsPerPageChange,
       className,
+      dataTestId,
       ...props
     },
     ref,
@@ -202,12 +203,53 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
     const adjustedSiblingCount = variant === 'dots' ? 0 : siblingCount;
 
     const renderItem = (item: PaginationRenderItemParams) => {
+      // Determine test ID based on item type
+      let itemTestId: string | undefined;
+      if (dataTestId) {
+        switch (item.type) {
+          case 'first':
+            itemTestId = `${dataTestId}-first`;
+            break;
+          case 'last':
+            itemTestId = `${dataTestId}-last`;
+            break;
+          case 'previous':
+            itemTestId = `${dataTestId}-prev`;
+            break;
+          case 'next':
+            itemTestId = `${dataTestId}-next`;
+            break;
+          case 'page':
+            itemTestId = `${dataTestId}-page-${item.page}`;
+            break;
+        }
+      } else {
+        switch (item.type) {
+          case 'first':
+            itemTestId = 'pagination-first';
+            break;
+          case 'last':
+            itemTestId = 'pagination-last';
+            break;
+          case 'previous':
+            itemTestId = 'pagination-prev';
+            break;
+          case 'next':
+            itemTestId = 'pagination-next';
+            break;
+          case 'page':
+            itemTestId = `pagination-page-${item.page}`;
+            break;
+        }
+      }
+
       // Custom rendering for different variants
       if (variant === 'dots') {
         if (item.type === 'page') {
           return (
             <PaginationItem
               {...item}
+              data-testid={itemTestId}
               sx={{
                 '&.MuiPaginationItem-page': {
                   fontSize: 0,
@@ -232,6 +274,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
       return (
         <PaginationItem
           {...item}
+          data-testid={itemTestId}
           components={{
             first: () => iconMap.first || <FirstPage />,
             last: () => iconMap.last || <LastPage />,
@@ -243,7 +286,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
     };
 
     return (
-      <PaginationContainer className={className}>
+      <PaginationContainer className={className} data-testid={dataTestId || 'pagination'}>
         {showItemsPerPage && onItemsPerPageChange && (
           <ItemsPerPageContainer>
             <Typography variant="body2" color="text.secondary">
@@ -254,6 +297,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
                 value={itemsPerPage}
                 onChange={(e) => onItemsPerPageChange(e.target.value as number)}
                 disabled={disabled}
+                data-testid={dataTestId ? `${dataTestId}-items-per-page` : 'pagination-items-per-page'}
                 sx={{
                   '& .MuiSelect-select': {
                     fontSize: size === 'sm' ? '0.875rem' : size === 'lg' ? '1.125rem' : '1rem',
@@ -298,6 +342,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
               variant="body2"
               color="text.secondary"
               fontSize={size === 'sm' ? '0.75rem' : size === 'lg' ? '1rem' : '0.875rem'}
+              data-testid={dataTestId ? `${dataTestId}-info` : 'pagination-info'}
             >
               {pageInfoFormat(page, count)}
             </Typography>

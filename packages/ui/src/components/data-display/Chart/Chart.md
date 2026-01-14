@@ -5,7 +5,7 @@ A comprehensive charting component built on Recharts, providing multiple chart t
 ## Usage
 
 ```tsx
-import { Chart } from '@repo/ui';
+import { Chart } from '@procurement/ui';
 
 // Basic line chart
 <Chart
@@ -178,3 +178,175 @@ Combines multiple chart types in a single visualization.
   glow
 />
 ```
+
+## Testing
+
+### Test IDs
+
+The Chart component includes `data-testid` attributes for reliable testing:
+
+| Test ID | Element | Description |
+|---------|---------|-------------|
+| `chart` or `{dataTestId}` | Main container | Root Paper element wrapping the entire chart |
+| `{dataTestId}-loading` | Loading container | Paper element shown during loading state |
+| `{dataTestId}-loading-spinner` | Loading spinner | CircularProgress component shown during loading |
+| `{dataTestId}-container` | Chart container | ResponsiveContainer or Box wrapping the chart visualization |
+| `{dataTestId}-header` | Header section | Box containing title and subtitle (when provided) |
+| `{dataTestId}-title` | Chart title | Typography element for chart title |
+| `{dataTestId}-subtitle` | Chart subtitle | Typography element for chart subtitle |
+
+### Recharts Internal Elements
+
+Recharts components render their own DOM elements with specific class names. Use these selectors for testing:
+
+| Element | Class Selector | Description |
+|---------|---------------|-------------|
+| Legend | `.recharts-legend-wrapper` | Chart legend container |
+| Tooltip | `.recharts-tooltip-wrapper` | Chart tooltip container (visible on hover) |
+| Cartesian Grid | `.recharts-cartesian-grid` | Grid lines (when showCartesianGrid=true) |
+| X-Axis | `.recharts-xAxis` | X-axis component |
+| Y-Axis | `.recharts-yAxis` | Y-axis component |
+| Line | `.recharts-line` | Line chart elements |
+| Bar | `.recharts-bar` | Bar chart elements |
+| Area | `.recharts-area` | Area chart elements |
+| Pie | `.recharts-pie` | Pie chart elements |
+
+### Testing Best Practices
+
+**Wait for Chart to Render:**
+```typescript
+// Use async queries to wait for elements
+const chart = await canvas.findByTestId('chart');
+expect(chart).toBeInTheDocument();
+
+// Wait for chart container
+await waitFor(async () => {
+  const container = await canvas.findByTestId('chart-container');
+  expect(container).toBeInTheDocument();
+}, { timeout: 3000 });
+```
+
+**Test Loading State:**
+```typescript
+// Verify loading spinner is displayed
+const loading = await canvas.findByTestId('chart-loading');
+expect(loading).toBeInTheDocument();
+
+const spinner = await canvas.findByTestId('chart-loading-spinner');
+expect(spinner).toBeInTheDocument();
+
+// Wait for chart to load
+await waitFor(async () => {
+  expect(canvas.queryByTestId('chart-loading')).not.toBeInTheDocument();
+  const chart = await canvas.findByTestId('chart');
+  expect(chart).toBeInTheDocument();
+}, { timeout: 5000 });
+```
+
+**Test Chart Title and Subtitle:**
+```typescript
+// Verify header elements
+const header = await canvas.findByTestId('chart-header');
+expect(header).toBeInTheDocument();
+
+const title = await canvas.findByTestId('chart-title');
+expect(title).toHaveTextContent('Expected Title');
+
+const subtitle = await canvas.findByTestId('chart-subtitle');
+expect(subtitle).toHaveTextContent('Expected Subtitle');
+```
+
+**Test Chart Interactions:**
+```typescript
+// Click on chart
+const chart = await canvas.findByTestId('chart');
+await userEvent.click(chart);
+expect(onClick).toHaveBeenCalled();
+
+// Focus and blur events
+await userEvent.tab(); // Focus on chart
+expect(onFocus).toHaveBeenCalled();
+
+await userEvent.tab(); // Focus away
+expect(onBlur).toHaveBeenCalled();
+```
+
+**Test Chart Variants:**
+```typescript
+// Test different variants
+const chart = await canvas.findByTestId('chart');
+const style = window.getComputedStyle(chart);
+
+// Glass variant
+expect(style.backdropFilter).toBe('blur(20px)');
+
+// Neon variant
+expect(style.backgroundColor).toBe('rgb(0, 0, 0)');
+
+// Gradient variant
+expect(style.background).toContain('linear-gradient');
+```
+
+**Test Custom Test IDs:**
+```typescript
+// Using custom data-testid
+<Chart data={data} series={series} data-testid="sales-chart" />
+
+const salesChart = await canvas.findByTestId('sales-chart');
+const container = await canvas.findByTestId('sales-chart-container');
+const title = await canvas.findByTestId('sales-chart-title');
+```
+
+**Test Recharts Internal Elements:**
+```typescript
+// Test legend rendering
+const chart = await canvas.findByTestId('chart');
+const legend = chart.querySelector('.recharts-legend-wrapper');
+expect(legend).toBeInTheDocument();
+
+// Test tooltip on hover (requires user interaction)
+const chartContainer = await canvas.findByTestId('chart-container');
+await userEvent.hover(chartContainer);
+
+await waitFor(() => {
+  const tooltip = chart.querySelector('.recharts-tooltip-wrapper');
+  expect(tooltip).toBeInTheDocument();
+});
+
+// Test grid lines
+const grid = chart.querySelector('.recharts-cartesian-grid');
+expect(grid).toBeInTheDocument();
+
+// Test axes
+const xAxis = chart.querySelector('.recharts-xAxis');
+const yAxis = chart.querySelector('.recharts-yAxis');
+expect(xAxis).toBeInTheDocument();
+expect(yAxis).toBeInTheDocument();
+
+// Test specific chart type elements
+const lines = chart.querySelectorAll('.recharts-line');
+expect(lines).toHaveLength(expectedSeriesCount);
+```
+
+### Common Test Scenarios
+
+1. **Basic Rendering** - Verify chart and container render correctly
+2. **Loading State** - Test loading spinner and transition to loaded state
+3. **Chart Types** - Test different chart types (line, bar, area, pie, radar, scatter, composed)
+4. **Variants** - Test visual variants (default, glass, gradient, elevated, minimal, neon)
+5. **Responsive Behavior** - Test responsive vs fixed-width charts
+6. **Interactions** - Test click, focus, and blur handlers
+7. **Visual Effects** - Test glow, pulse, glass, and gradient effects
+8. **Data Visualization** - Verify correct rendering of series, legends, tooltips, and grids
+9. **Disabled State** - Test disabled chart interactions
+10. **Title/Subtitle** - Test header elements display correctly
+11. **Accessibility** - Verify focus states and keyboard navigation
+12. **Legend Display** - Verify legend renders with showLegend prop using `.recharts-legend-wrapper`
+13. **Tooltip Display** - Test tooltip appears on hover using `.recharts-tooltip-wrapper`
+14. **Grid Lines** - Verify cartesian grid renders with showCartesianGrid prop
+15. **Axes Rendering** - Test X and Y axes render with correct labels
+16. **Multiple Series** - Test multiple data series render correctly
+17. **Custom Colors** - Verify custom color palette is applied to chart elements
+18. **Animation** - Test animation behavior with animate and animationDuration props
+19. **Stacked Charts** - Verify stacked bar/area charts with stacked prop
+20. **Curved vs Linear** - Test curved vs linear line rendering with curved prop

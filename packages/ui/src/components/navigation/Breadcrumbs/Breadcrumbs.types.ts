@@ -1,5 +1,5 @@
-import { BreadcrumbsProps as MuiBreadcrumbsProps } from '@mui/material';
-import { ReactNode } from 'react';
+import type { BreadcrumbsProps as MuiBreadcrumbsProps } from '@mui/material';
+import type { ReactNode } from 'react';
 
 export interface BreadcrumbItem {
   /**
@@ -123,4 +123,10 @@ export interface BreadcrumbsProps extends Omit<MuiBreadcrumbsProps, 'separator'>
    * Custom aria-label for the breadcrumb navigation
    */
   ariaLabel?: string;
+
+  /**
+   * Test ID for the breadcrumbs container and elements
+   * @default 'breadcrumbs'
+   */
+  dataTestId?: string;
 }

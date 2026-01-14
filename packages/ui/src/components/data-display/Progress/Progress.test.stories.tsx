@@ -1,7 +1,7 @@
+import { Box, Button, Stack,Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor } from 'storybook/test';
-import { Box, Typography, Button, Stack } from '@mui/material';
 import React from 'react';
+import { expect, userEvent, waitFor,within } from 'storybook/test';
 
 import { Progress } from './Progress';
 

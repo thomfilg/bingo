@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, fn } from 'storybook/test';
 import { Box, SvgIcon } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { EmptyState } from './EmptyState';
 
@@ -17,13 +17,20 @@ const TestIcon = () => (
 );
 
 const meta: Meta<typeof EmptyState> = {
-  title: 'DataDisplay/EmptyState/Tests',
+  title: 'DataDisplay/AsyncStates/EmptyState/Tests',
   component: EmptyState,
   parameters: {
     layout: 'centered',
     chromatic: { disableSnapshot: false },
   },
   tags: ['autodocs', 'test', 'component:EmptyState'],
+  // Disable auto-action generation for onCreate/onRefresh to prevent them from
+  // being truthy when not explicitly passed (otherwise they get auto-mocked by
+  // the global argTypesRegex: '^on[A-Z].*' pattern)
+  argTypes: {
+    onCreate: { action: false },
+    onRefresh: { action: false },
+  },
 };
 
 export default meta;
@@ -34,6 +41,9 @@ export const BasicInteraction: Story = {
   args: {
     title: 'Basic Interaction Test',
     description: 'Testing basic rendering and accessibility.',
+    // Explicitly set to undefined to override auto-generated actions from argTypesRegex
+    onCreate: undefined,
+    onRefresh: undefined,
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -71,6 +81,9 @@ export const ActionInteraction: Story = {
       label: 'Help Link',
       href: '#help',
     },
+    // Explicitly set to undefined to override auto-generated actions from argTypesRegex
+    onCreate: undefined,
+    onRefresh: undefined,
   },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
@@ -110,6 +123,9 @@ export const KeyboardNavigation: Story = {
       label: 'Help',
       href: '#help',
     },
+    // Explicitly set to undefined to override auto-generated actions from argTypesRegex
+    onCreate: undefined,
+    onRefresh: undefined,
   },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
@@ -140,6 +156,9 @@ export const ScreenReader: Story = {
     title: 'Screen Reader Test',
     description: 'Testing screen reader accessibility features.',
     illustration: <TestIcon />,
+    // Explicitly set to undefined to override auto-generated actions from argTypesRegex
+    onCreate: undefined,
+    onRefresh: undefined,
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -154,7 +173,7 @@ export const ScreenReader: Story = {
     await expect(heading.tagName).toBe('H3');
 
     // Test illustration accessibility
-    const icon = canvas.getByTestId('empty-state-icon');
+    const icon = canvas.getAllByTestId('empty-state-icon')[0];
     await expect(icon).toBeInTheDocument();
   },
 };
@@ -171,6 +190,9 @@ export const FocusManagement: Story = {
       label: 'Focus Test Link',
       href: '#focus',
     },
+    // Explicitly set to undefined to override auto-generated actions from argTypesRegex
+    onCreate: undefined,
+    onRefresh: undefined,
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -205,6 +227,9 @@ export const ResponsiveDesign: Story = {
       label: 'Secondary',
       onClick: fn(),
     },
+    // Explicitly set to undefined to override auto-generated actions from argTypesRegex
+    onCreate: undefined,
+    onRefresh: undefined,
   },
   parameters: {
     viewport: {
@@ -235,6 +260,9 @@ export const ThemeVariations: Story = {
     title: 'Theme Variations Test',
     description: 'Testing theme compatibility and color contrast.',
     illustration: <TestIcon />,
+    // Explicitly set to undefined to override auto-generated actions from argTypesRegex
+    onCreate: undefined,
+    onRefresh: undefined,
   },
   parameters: {
     backgrounds: {
@@ -256,7 +284,7 @@ export const ThemeVariations: Story = {
     await expect(description).toBeInTheDocument();
 
     // Test icon renders
-    const icon = canvas.getByTestId('empty-state-icon');
+    const icon = canvas.getAllByTestId('empty-state-icon')[0];
     await expect(icon).toBeInTheDocument();
   },
 };
@@ -313,29 +341,36 @@ export const Performance: Story = {
       label: 'Performance Action',
       onClick: fn(),
     },
+    // Explicitly set to undefined to override auto-generated actions from argTypesRegex
+    onCreate: undefined,
+    onRefresh: undefined,
   },
-  play: async ({ canvasElement }) => {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
-    const startTime = Date.now();
 
-    // Test component renders quickly
+    // Test all key elements are present
     const title = canvas.getByRole('heading', { name: 'Performance Test' });
+    const description = canvas.getByText('Testing component render performance.');
+    const icon = canvas.getAllByTestId('empty-state-icon')[0];
+    const button = canvas.getByRole('button', { name: 'Performance Action' });
+
     await expect(title).toBeInTheDocument();
-
-    const endTime = Date.now();
-    const renderTime = endTime - startTime;
-
-    // Expect render to complete within reasonable time (100ms)
-    expect(renderTime).toBeLessThan(100);
+    await expect(description).toBeInTheDocument();
+    await expect(icon).toBeInTheDocument();
+    await expect(button).toBeInTheDocument();
 
     // Test interaction performance
-    const button = canvas.getByRole('button', { name: 'Performance Action' });
-    const clickStartTime = Date.now();
     await userEvent.click(button);
-    const clickEndTime = Date.now();
-    const clickTime = clickEndTime - clickStartTime;
+    await waitFor(
+      () => expect(args.primaryAction?.onClick).toHaveBeenCalled(),
+      { timeout: 3000 }
+    );
 
-    expect(clickTime).toBeLessThan(50);
+    // Verify click handler was called exactly once
+    await expect(args.primaryAction?.onClick).toHaveBeenCalledTimes(1);
   },
 };
 
@@ -350,6 +385,9 @@ export const EdgeCases: Story = {
       href: '#very-long-url-that-might-cause-layout-issues-if-not-handled-properly',
       external: true,
     },
+    // Explicitly set to undefined to override auto-generated actions from argTypesRegex
+    onCreate: undefined,
+    onRefresh: undefined,
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

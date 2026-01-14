@@ -1,20 +1,18 @@
-import React from 'react';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { 
   Accordion as MuiAccordion,
-  AccordionSummary as MuiAccordionSummary,
-  AccordionDetails as MuiAccordionDetails,
   AccordionActions as MuiAccordionActions,
-  useTheme,
-  alpha
-} from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+  AccordionDetails as MuiAccordionDetails,
+  AccordionSummary as MuiAccordionSummary,
+  alpha,
+  useTheme} from '@mui/material';
+import React from 'react';
 
-import { 
-  AccordionProps, 
-  AccordionSummaryProps, 
+import type { 
+  AccordionActionsProps, 
   AccordionDetailsProps, 
-  AccordionActionsProps 
-} from './Accordion.types';
+  AccordionProps, 
+  AccordionSummaryProps} from './Accordion.types';
 
 export const Accordion: React.FC<AccordionProps> = ({
   children,
@@ -129,10 +127,17 @@ export const AccordionSummary: React.FC<AccordionSummaryProps> = ({
   ...props
 }) => {
   const theme = useTheme();
-  
+
+  // Clone expandIcon to add data-testid if it's a valid React element
+  const iconWithTestId = React.isValidElement(expandIcon)
+    ? React.cloneElement(expandIcon as React.ReactElement<{ 'data-testid'?: string }>, {
+        'data-testid': 'accordion-icon',
+      })
+    : expandIcon;
+
   return (
     <MuiAccordionSummary
-      expandIcon={expandIcon}
+      expandIcon={iconWithTestId}
       disabled={disabled}
       data-testid={testId}
       sx={{

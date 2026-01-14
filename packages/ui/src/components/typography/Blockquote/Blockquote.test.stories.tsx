@@ -1,6 +1,6 @@
+import { Box, Stack } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor } from 'storybook/test';
-import { Stack, Box } from '@mui/material';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import React from 'react';
 
 import { Blockquote } from './Blockquote';

@@ -1,5 +1,5 @@
+import { Box, Paper,Stack } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Box, Stack, Paper } from '@mui/material';
 import React from 'react';
 
 import { Text } from './Text';

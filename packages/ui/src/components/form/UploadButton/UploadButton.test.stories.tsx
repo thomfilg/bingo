@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor, fn } from 'storybook/test';
 import { Box, FormControl, FormLabel } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, fn,userEvent, waitFor, within } from 'storybook/test';
 
 import { UploadButton } from './UploadButton';
 
@@ -385,7 +385,7 @@ export const EdgeCases: Story = {
       Object.defineProperty(fileInput, 'files', { value: [], configurable: true });
 
       // Test custom validation
-      const longNameFile = createTestFile('a'.repeat(60) + '.jpg', 'image/jpeg', 500 * 1024);
+      const longNameFile = createTestFile(`${'a'.repeat(60)  }.jpg`, 'image/jpeg', 500 * 1024);
       await userEvent.upload(fileInput, longNameFile);
 
       await waitFor(() => {

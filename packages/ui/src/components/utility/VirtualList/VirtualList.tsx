@@ -1,7 +1,7 @@
-import React, { useState, useRef, useMemo, useCallback } from 'react';
 import { Box } from '@mui/material';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { VirtualListProps, VirtualGridProps } from './VirtualList.types';
+import type { VirtualGridProps, VirtualListProps } from './VirtualList.types';
 
 export const VirtualList: React.FC<VirtualListProps> = ({
   items,
@@ -17,9 +17,12 @@ export const VirtualList: React.FC<VirtualListProps> = ({
   style,
   'data-testid': dataTestId,
   'aria-label': ariaLabel,
+  scrollContainerRef,
+  disableInternalScroll = false,
 }) => {
   const [scrollTop, setScrollTop] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const internalContainerRef = useRef<HTMLDivElement>(null);
+  const containerRef = scrollContainerRef || internalContainerRef;
   const itemHeights = useRef<Map<number, number>>(new Map());
 
   const getItemHeight = useCallback(
@@ -116,13 +119,28 @@ export const VirtualList: React.FC<VirtualListProps> = ({
   );
 
   const handleScroll = useCallback(
-    (event: React.UIEvent<HTMLDivElement>) => {
-      const newScrollTop = event.currentTarget.scrollTop;
+    (event: React.UIEvent<HTMLDivElement> | Event) => {
+      // Handle both React synthetic events and native DOM events
+      const target =
+        (event as React.UIEvent<HTMLDivElement>).currentTarget ||
+        (event as Event).target;
+      const newScrollTop = (target as HTMLElement).scrollTop;
       setScrollTop(newScrollTop);
       onScroll?.(newScrollTop);
     },
     [onScroll],
   );
+
+  // Listen to external scroll container if provided
+  useEffect(() => {
+    if (!scrollContainerRef?.current) return;
+
+    const element = scrollContainerRef.current;
+    const scrollHandler = (e: Event) => handleScroll(e);
+
+    element.addEventListener('scroll', scrollHandler);
+    return () => element.removeEventListener('scroll', scrollHandler);
+  }, [scrollContainerRef, handleScroll]);
 
   const visibleItems = useMemo(() => {
     const { startIndex, endIndex } = getVisibleRange;
@@ -151,9 +169,29 @@ export const VirtualList: React.FC<VirtualListProps> = ({
     return result;
   }, [getVisibleRange, items, getItemOffset, getItemHeight]);
 
+  // When using external scroll container, render just the content
+  if (disableInternalScroll) {
+    return (
+      <Box
+        className={className}
+        data-testid={dataTestId}
+        role="list"
+        aria-label={ariaLabel}
+        sx={{
+          height: getTotalHeight,
+          width,
+          position: 'relative',
+          ...style,
+        }}
+      >
+        {visibleItems.map(({ item, index, style }) => renderItem({ item, index, style }))}
+      </Box>
+    );
+  }
+
   return (
     <Box
-      ref={containerRef}
+      ref={internalContainerRef}
       className={className}
       data-testid={dataTestId}
       role="list"
@@ -194,9 +232,11 @@ export const VirtualGrid: React.FC<VirtualGridProps> = ({
   style,
   'data-testid': dataTestId,
   'aria-label': ariaLabel,
+  scrollContainerRef,
+  disableInternalScroll = false,
 }) => {
   const [scrollTop, setScrollTop] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const internalContainerRef = useRef<HTMLDivElement>(null);
 
   const rowCount = Math.ceil(items.length / columnCount);
   const totalHeight = rowCount * (rowHeight + gap) - gap;
@@ -219,15 +259,30 @@ export const VirtualGrid: React.FC<VirtualGridProps> = ({
   }, [scrollTop, height, rowHeight, gap, overscan, rowCount]);
 
   const handleScroll = useCallback(
-    (event: React.UIEvent<HTMLDivElement>) => {
-      const newScrollTop = event.currentTarget.scrollTop;
-      const newScrollLeft = event.currentTarget.scrollLeft;
+    (event: React.UIEvent<HTMLDivElement> | Event) => {
+      // Handle both React synthetic events and native DOM events
+      const target =
+        (event as React.UIEvent<HTMLDivElement>).currentTarget ||
+        (event as Event).target;
+      const newScrollTop = (target as HTMLElement).scrollTop;
+      const newScrollLeft = (target as HTMLElement).scrollLeft;
 
       setScrollTop(newScrollTop);
       onScroll?.(newScrollTop, newScrollLeft);
     },
     [onScroll],
   );
+
+  // Listen to external scroll container if provided
+  useEffect(() => {
+    if (!scrollContainerRef?.current) return;
+
+    const element = scrollContainerRef.current;
+    const scrollHandler = (e: Event) => handleScroll(e);
+
+    element.addEventListener('scroll', scrollHandler);
+    return () => element.removeEventListener('scroll', scrollHandler);
+  }, [scrollContainerRef, handleScroll]);
 
   const visibleItems = useMemo(() => {
     const { startRow, endRow } = getVisibleRange;
@@ -261,9 +316,31 @@ export const VirtualGrid: React.FC<VirtualGridProps> = ({
     return result;
   }, [getVisibleRange, items, columnCount, rowHeight, gap, computedColumnWidth]);
 
+  // When using external scroll container, render just the content
+  if (disableInternalScroll) {
+    return (
+      <Box
+        className={className}
+        data-testid={dataTestId}
+        role="grid"
+        aria-label={ariaLabel}
+        sx={{
+          height: totalHeight,
+          width,
+          position: 'relative',
+          ...style,
+        }}
+      >
+        {visibleItems.map(({ item, index, columnIndex, rowIndex, style }) =>
+          renderItem({ item, index, columnIndex, rowIndex, style }),
+        )}
+      </Box>
+    );
+  }
+
   return (
     <Box
-      ref={containerRef}
+      ref={internalContainerRef}
       className={className}
       data-testid={dataTestId}
       role="grid"

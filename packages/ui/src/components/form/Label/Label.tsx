@@ -1,14 +1,14 @@
-import React, { forwardRef } from 'react';
 import {
-  Tooltip,
+  alpha,
   Box,
   CircularProgress,
-  useTheme,
-  alpha,
+  Tooltip,
   Typography,
+  useTheme,
 } from '@mui/material';
+import React, { forwardRef } from 'react';
 
-import { LabelProps } from './Label.types';
+import type { LabelProps } from './Label.types';
 
 export const Label = forwardRef<globalThis.HTMLLabelElement, LabelProps>(({
   children,
@@ -39,6 +39,7 @@ export const Label = forwardRef<globalThis.HTMLLabelElement, LabelProps>(({
   align = 'left',
   nowrap = false,
   truncate = false,
+  dataTestId,
   ...props
 }, ref) => {
   const theme = useTheme();
@@ -301,6 +302,7 @@ export const Label = forwardRef<globalThis.HTMLLabelElement, LabelProps>(({
       onFocus={onFocus}
       onBlur={onBlur}
       className={className}
+      data-testid={dataTestId}
       sx={{
         ...getVariantStyles(),
         ...style,
@@ -328,12 +330,13 @@ export const Label = forwardRef<globalThis.HTMLLabelElement, LabelProps>(({
         <Box
           component="label"
           htmlFor={htmlFor}
+          data-testid={dataTestId}
           sx={{
             position: 'absolute',
-            width: 1,
-            height: 1,
+            width: '1px',
+            height: '1px',
             padding: 0,
-            margin: -1,
+            margin: '-1px',
             overflow: 'hidden',
             clip: 'rect(0, 0, 0, 0)',
             whiteSpace: 'nowrap',

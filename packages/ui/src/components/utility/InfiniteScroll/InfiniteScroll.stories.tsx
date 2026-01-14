@@ -1,17 +1,17 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState, useCallback } from 'react';
 import {
+  Avatar,
   Box,
-  Typography,
   Card,
   CardContent,
-  Avatar,
+  CircularProgress,
   ListItem,
   ListItemAvatar,
   ListItemText,
-  CircularProgress,
   Paper,
+  Typography,
 } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useCallback,useState } from 'react';
 
 import { InfiniteScroll } from './InfiniteScroll';
 
@@ -40,14 +40,12 @@ interface Item {
   avatar: string;
 }
 
-const generateItems = (startIndex: number, count: number): Item[] => {
-  return Array.from({ length: count }, (_, i) => ({
+const generateItems = (startIndex: number, count: number): Item[] => Array.from({ length: count }, (_, i) => ({
     id: startIndex + i,
     name: `User ${startIndex + i + 1}`,
     description: `This is a description for user ${startIndex + i + 1}. They have been using our platform for a while.`,
     avatar: `https://i.pravatar.cc/40?img=${((startIndex + i) % 70) + 1}`,
   }));
-};
 
 const VerticalScrollComponent = () => {
   const [items, setItems] = useState<Item[]>(generateItems(0, 20));

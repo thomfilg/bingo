@@ -5,7 +5,7 @@ The Form component provides a flexible container for building forms with consist
 ## Usage
 
 ```tsx
-import { Form, FormField, FormLabel, FormControl, FormMessage } from '@repo/ui';
+import { Form, FormField, FormLabel, FormControl, FormMessage } from '@procurement/ui';
 
 function MyForm() {
   return (
@@ -126,6 +126,152 @@ Display validation errors and helper text:
 - Keyboard navigation support
 - Focus management for form interactions
 
+## Testing
+
+The Form component and its sub-components support testing through the `dataTestId` prop. This enables reliable test automation and component verification.
+
+### TestId Prop
+
+All Form components accept a `dataTestId` prop:
+
+```tsx
+<Form dataTestId="login-form" variant="vertical">
+  <FormField
+    name="email"
+    label="Email"
+    required
+    dataTestId="email-field"
+  >
+    <Input type="email" />
+  </FormField>
+</Form>
+```
+
+### Auto-generated TestIds
+
+When you provide a `dataTestId` to `FormField`, it automatically generates testIds for its child elements:
+
+- `{dataTestId}-label` - The field label element
+- `{dataTestId}-control` - The field control wrapper
+- `{dataTestId}-message` - Error or helper text element (when present)
+
+Example:
+```tsx
+<FormField name="email" label="Email" dataTestId="email-field">
+  <Input type="email" />
+</FormField>
+
+// Generates:
+// - data-testid="email-field" (field wrapper)
+// - data-testid="email-field-label" (label)
+// - data-testid="email-field-control" (control wrapper)
+// - data-testid="email-field-message" (if error or helperText provided)
+```
+
+### Testing Examples
+
+**Basic Form Testing:**
+```tsx
+import { render, screen } from '@testing-library/react';
+import { Form, FormField } from '@procurement/ui';
+
+test('renders form with testIds', () => {
+  render(
+    <Form dataTestId="test-form">
+      <FormField name="email" label="Email" dataTestId="email-field">
+        <input type="email" />
+      </FormField>
+    </Form>
+  );
+
+  expect(screen.getByTestId('test-form')).toBeInTheDocument();
+  expect(screen.getByTestId('email-field')).toBeInTheDocument();
+  expect(screen.getByTestId('email-field-label')).toBeInTheDocument();
+  expect(screen.getByTestId('email-field-control')).toBeInTheDocument();
+});
+```
+
+**Testing Error Messages:**
+```tsx
+test('renders error message with testId', () => {
+  render(
+    <FormField
+      name="email"
+      label="Email"
+      error="Invalid email"
+      dataTestId="email-field"
+    >
+      <input type="email" />
+    </FormField>
+  );
+
+  const errorMessage = screen.getByTestId('email-field-message');
+  expect(errorMessage).toHaveTextContent('Invalid email');
+});
+```
+
+**Testing Helper Text:**
+```tsx
+test('renders helper text with testId', () => {
+  render(
+    <FormField
+      name="username"
+      label="Username"
+      helperText="Choose a unique username"
+      dataTestId="username-field"
+    >
+      <input type="text" />
+    </FormField>
+  );
+
+  const helperText = screen.getByTestId('username-field-message');
+  expect(helperText).toHaveTextContent('Choose a unique username');
+});
+```
+
+**Testing Individual Components:**
+```tsx
+import { FormLabel, FormControl, FormMessage } from '@procurement/ui';
+
+test('FormLabel renders with testId', () => {
+  render(<FormLabel dataTestId="custom-label">Label Text</FormLabel>);
+  expect(screen.getByTestId('custom-label')).toBeInTheDocument();
+});
+
+test('FormControl renders with testId', () => {
+  render(
+    <FormControl dataTestId="custom-control">
+      <input type="text" />
+    </FormControl>
+  );
+  expect(screen.getByTestId('custom-control')).toBeInTheDocument();
+});
+
+test('FormMessage renders with testId', () => {
+  render(<FormMessage dataTestId="custom-message">Message</FormMessage>);
+  expect(screen.getByTestId('custom-message')).toBeInTheDocument();
+});
+```
+
+### Accessibility Testing
+
+Form components include proper ARIA attributes and roles:
+
+```tsx
+test('form has proper accessibility attributes', () => {
+  render(
+    <Form dataTestId="accessible-form">
+      <FormField name="email" label="Email" required>
+        <input type="email" aria-label="Email" aria-required="true" />
+      </FormField>
+    </Form>
+  );
+
+  const form = screen.getByTestId('accessible-form');
+  expect(form).toHaveAttribute('role', 'form');
+});
+```
+
 ## Best Practices
 
 1. Always provide labels for form fields
@@ -136,6 +282,8 @@ Display validation errors and helper text:
 6. Make forms responsive for mobile devices
 7. Implement proper validation feedback
 8. Consider progressive disclosure for complex forms
+9. Use `dataTestId` props for all form elements in automated tests
+10. Leverage auto-generated testIds for comprehensive form testing
 
 ## Examples
 

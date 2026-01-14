@@ -1,6 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Delete, Logout,Warning } from '@mui/icons-material';
 import { Button, Stack } from '@mui/material';
-import { Delete, Warning, Logout } from '@mui/icons-material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import React from 'react';
 
 import { AlertDialog } from './AlertDialog';
@@ -42,7 +43,7 @@ type Story = StoryObj<typeof meta>;
 const DialogWrapper = ({
   children,
   ...props
-}: { children: React.ReactNode } & Record<string, unknown>) => {
+}: { children?: React.ReactNode } & Record<string, unknown>) => {
   const [open, setOpen] = React.useState(false);
 
   return (

@@ -1,16 +1,16 @@
-import React from 'react';
 import {
-  Select as MuiSelect,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  FormHelperText,
-  styled,
   alpha,
+  FormControl,
+  FormHelperText,
+  InputLabel,
   keyframes,
+  MenuItem,
+  Select as MuiSelect,
+  styled,
 } from '@mui/material';
+import React from 'react';
 
-import { SelectProps } from './Select.types';
+import type { SelectProps } from './Select.types';
 
 // Define pulse animation
 const pulseAnimation = keyframes`

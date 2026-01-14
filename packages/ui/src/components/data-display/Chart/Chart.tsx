@@ -1,32 +1,32 @@
+import { alpha, Box, CircularProgress, Paper, Typography, useTheme } from '@mui/material';
 import React from 'react';
 import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  AreaChart,
   Area,
-  PieChart,
-  Pie,
-  RadarChart,
-  Radar,
-  ScatterChart,
-  Scatter,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
   ComposedChart,
+  Legend,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  PolarAngleAxis,
+  PolarGrid,
+  PolarRadiusAxis,
+  Radar,
+  RadarChart,
+  ResponsiveContainer,
+  Scatter,
+  ScatterChart,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Cell,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
 } from 'recharts';
-import { Box, Typography, CircularProgress, Paper, useTheme, alpha } from '@mui/material';
 
-import { ChartProps, ChartSeries, ChartDataPoint } from './Chart.types';
+import type { ChartDataPoint, ChartProps, ChartSeries } from './Chart.types';
 
 export const Chart: React.FC<ChartProps> = ({
   data,
@@ -64,6 +64,9 @@ export const Chart: React.FC<ChartProps> = ({
   stacked = false,
   showValues = false,
   responsive = true,
+  innerRadius = 0,
+  centerLabel,
+  'data-testid': dataTestId = 'chart',
 }) => {
   const theme = useTheme();
 
@@ -218,7 +221,7 @@ export const Chart: React.FC<ChartProps> = ({
 
     const commonProps = {
       data,
-      margin,
+      margin: { top: 20, right: 30, left: 20, bottom: 20, ...margin },
       onClick: handleChartClick,
     };
 
@@ -314,6 +317,7 @@ export const Chart: React.FC<ChartProps> = ({
               cx="50%"
               cy="50%"
               outerRadius={getSizeStyles().height / 3}
+              innerRadius={innerRadius}
               fill={chartColors[0]}
               label={showValues}
               animationDuration={animate ? animationDuration : 0}
@@ -322,6 +326,32 @@ export const Chart: React.FC<ChartProps> = ({
                 <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
               ))}
             </Pie>
+            {centerLabel && innerRadius > 0 && (
+              <text
+                x="50%"
+                y="50%"
+                textAnchor="middle"
+                dominantBaseline="middle"
+                style={{
+                  fontSize: getSizeStyles().fontSize,
+                  fill: variant === 'neon' ? '#00ffff' : theme.palette.text.primary,
+                  fontWeight: 600,
+                }}
+              >
+                {typeof centerLabel === 'string' ? (
+                  centerLabel
+                ) : (
+                  <>
+                    <tspan x="50%" dy="-0.6em" style={{ fontSize: '0.875em', fontWeight: 500, fill: theme.palette.text.secondary }}>
+                      {centerLabel.label}
+                    </tspan>
+                    <tspan x="50%" dy="1.4em" style={{ fontSize: '1.5em', fontWeight: 700 }}>
+                      {centerLabel.value}
+                    </tspan>
+                  </>
+                )}
+              </text>
+            )}
           </PieChart>
         );
 
@@ -422,6 +452,7 @@ export const Chart: React.FC<ChartProps> = ({
   if (loading) {
     return (
       <Paper
+        data-testid={`${dataTestId}-loading`}
         sx={{
           ...getVariantStyles(),
           ...getSizeStyles(),
@@ -430,21 +461,22 @@ export const Chart: React.FC<ChartProps> = ({
           alignItems: 'center',
         }}
       >
-        <CircularProgress color={color} />
+        <CircularProgress color={color} data-testid={`${dataTestId}-loading-spinner`} />
       </Paper>
     );
   }
 
   const chartContent = responsive ? (
-    <ResponsiveContainer width="100%" height={getSizeStyles().height}>
+    <ResponsiveContainer width="100%" height={getSizeStyles().height} data-testid={`${dataTestId}-container`}>
       {renderChart() as React.ReactElement}
     </ResponsiveContainer>
   ) : (
-    <Box sx={{ width, height: getSizeStyles().height }}>{renderChart()}</Box>
+    <Box sx={{ width, height: getSizeStyles().height }} data-testid={`${dataTestId}-container`}>{renderChart()}</Box>
   );
 
   return (
     <Paper
+      data-testid={dataTestId}
       className={className}
       sx={{
         p: 2,
@@ -455,10 +487,11 @@ export const Chart: React.FC<ChartProps> = ({
       onBlur={onBlur}
     >
       {(title || subtitle) && (
-        <Box sx={{ mb: 2 }}>
+        <Box sx={{ mb: 2 }} data-testid={`${dataTestId}-header`}>
           {title && (
             <Typography
               variant="h6"
+              data-testid={`${dataTestId}-title`}
               sx={{
                 color: variant === 'neon' ? '#00ffff' : 'text.primary',
                 fontWeight: 600,
@@ -470,6 +503,7 @@ export const Chart: React.FC<ChartProps> = ({
           {subtitle && (
             <Typography
               variant="body2"
+              data-testid={`${dataTestId}-subtitle`}
               sx={{
                 color: variant === 'neon' ? alpha('#00ffff', 0.7) : 'text.secondary',
               }}

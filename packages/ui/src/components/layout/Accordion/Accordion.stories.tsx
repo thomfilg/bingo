@@ -1,9 +1,9 @@
+import { ExpandMore, Help,Info, Security, Settings } from '@mui/icons-material';
+import { Box, Button, Stack,Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { Button, Typography, Box, Stack } from '@mui/material';
-import { ExpandMore, Settings, Info, Security, Help } from '@mui/icons-material';
 
-import { Accordion, AccordionSummary, AccordionDetails, AccordionActions } from './Accordion';
+import { Accordion, AccordionActions,AccordionDetails, AccordionSummary } from './Accordion';
 
 const meta: Meta<typeof Accordion> = {
   title: 'Layout/Accordion',

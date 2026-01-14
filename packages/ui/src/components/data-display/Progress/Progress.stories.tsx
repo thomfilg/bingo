@@ -1,5 +1,5 @@
+import { Box, Button,Stack, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Stack, Box, Typography, Button } from '@mui/material';
 import React from 'react';
 
 import { Progress } from './Progress';

@@ -1,6 +1,6 @@
+import { Box, Button, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { Box, Button, Typography } from '@mui/material';
 
 import { Calendar } from './Calendar';
 import type { DateRange } from './Calendar.types';

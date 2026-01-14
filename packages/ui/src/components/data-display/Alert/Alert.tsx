@@ -1,17 +1,18 @@
-import React from 'react';
+import { CheckCircle, Close,Error, Info, Warning } from '@mui/icons-material';
 import {
   Alert as MuiAlert,
   AlertTitle,
+  alpha,
+  Box,
   Collapse,
   IconButton,
-  alpha,
   keyframes,
-  Box,
 } from '@mui/material';
-import { styled, Theme } from '@mui/material/styles';
-import { CheckCircle, Info, Warning, Error, Close } from '@mui/icons-material';
+import type { Theme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
+import React from 'react';
 
-import { AlertProps } from './Alert.types';
+import type { AlertProps } from './Alert.types';
 
 // Define animations
 const pulseAnimation = keyframes`
@@ -326,6 +327,7 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
       role = 'alert',
       'aria-live': ariaLive = variant === 'danger' ? 'assertive' : 'polite',
       'aria-atomic': ariaAtomic = 'true',
+      'data-testid': dataTestId = 'alert',
       ...props
     },
     ref,
@@ -350,12 +352,17 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
             ? 'info'
             : variant;
 
-    const displayIcon = showIcon ? icon || getVariantIcon(variant) : false;
+    const displayIcon = showIcon ? (
+      <Box component="span" data-testid={dataTestId ? `${dataTestId}-icon` : 'alert-icon'}>
+        {icon || getVariantIcon(variant)}
+      </Box>
+    ) : false;
 
     const content = (
       <>
         {title && (
           <AlertTitle
+            data-testid={dataTestId ? `${dataTestId}-title` : 'alert-title'}
             sx={{
               fontWeight: 600,
               fontSize: '1.05rem',
@@ -371,6 +378,7 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
         {description && (
           <Box
             component="div"
+            data-testid={dataTestId ? `${dataTestId}-message` : 'alert-message'}
             sx={{
               opacity: 0.9,
               fontSize: '0.925rem',
@@ -390,6 +398,7 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
       <Collapse in={open && !isClosing} timeout={300}>
         <StyledAlert
           ref={ref}
+          data-testid={dataTestId || 'alert'}
           severity={severity}
           customVariant={variant}
           customColor={color}
@@ -404,6 +413,7 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
           action={
             closable && (
               <IconButton
+                data-testid={dataTestId ? `${dataTestId}-close` : 'alert-close'}
                 aria-label="close alert"
                 color="inherit"
                 size="small"

@@ -1,9 +1,9 @@
-import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Box, Typography } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import React from 'react';
 
 import { Chart } from './Chart';
-import { ChartDataPoint } from './Chart.types';
+import type { ChartDataPoint } from './Chart.types';
 
 const meta: Meta<typeof Chart> = {
   title: 'DataDisplay/Chart',

@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export type ToastVariant = 'default' | 'success' | 'error' | 'warning' | 'info' | 'promise';
 export type ToastPosition =
@@ -27,6 +27,7 @@ export interface ToastProps {
   };
   glass?: boolean;
   onClose?: (id: string) => void;
+  dataTestId?: string;
 }
 
 export interface ToastContainerProps {
@@ -34,6 +35,7 @@ export interface ToastContainerProps {
   maxToasts?: number;
   gap?: number;
   className?: string;
+  dataTestId?: string;
 }
 
 export interface ToastItem extends ToastProps {

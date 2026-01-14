@@ -1,7 +1,7 @@
-import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor, fn } from 'storybook/test';
 import { Stack } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import React from 'react';
+import { expect, fn,userEvent, waitFor, within } from 'storybook/test';
 
 import { Select } from './Select';
 

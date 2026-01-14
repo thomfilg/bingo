@@ -1,20 +1,20 @@
-import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import {
-  TextField,
-  Paper,
+  Box,
+  Chip,
+  CircularProgress,
+  ClickAwayListener,
   List,
   ListItem,
   ListItemText,
-  Chip,
-  Box,
-  CircularProgress,
-  Typography,
+  Paper,
   Popper,
-  ClickAwayListener,
+  TextField,
+  Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 
-import { AutocompleteProps, AutocompleteOption, SuggestionItemState } from './Autocomplete.types';
+import type { AutocompleteOption, AutocompleteProps, SuggestionItemState } from './Autocomplete.types';
 
 const StyledPopper = styled(Popper)(({ theme }) => ({
   zIndex: theme.zIndex.tooltip,
@@ -72,7 +72,7 @@ const defaultGetLabel = <T,>(item: T): string => {
   return String(item);
 };
 
-export const Autocomplete = <T = AutocompleteOption,>({
+export const Autocomplete = <T = AutocompleteOption>({
   value,
   onChange,
   suggestions = [],
@@ -123,7 +123,7 @@ export const Autocomplete = <T = AutocompleteOption,>({
   // Refs
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement | null>(null);
-  const debounceRef = useRef<number>();
+  const debounceRef = useRef<number | undefined>(undefined);
 
   // Debounced onChange
   const debouncedOnChange = useCallback(
@@ -147,14 +147,15 @@ export const Autocomplete = <T = AutocompleteOption,>({
       return;
     }
 
-    if (!value.trim()) {
+    // For edge cases like spaces, we still filter
+    if (!inputValue) {
       setFilteredSuggestions(suggestions);
       return;
     }
 
     const filtered = suggestions.filter((item) => {
       const label = getLabel(item).toLowerCase();
-      const query = value.toLowerCase();
+      const query = inputValue.toLowerCase();
 
       switch (matchMode) {
         case 'startsWith':
@@ -181,24 +182,24 @@ export const Autocomplete = <T = AutocompleteOption,>({
 
     setFilteredSuggestions(filtered);
 
-    // Open dropdown immediately when we have filtered results and input is focused
+    // Open dropdown when we have input and are focused (even for no results case)
     // but not if we just completed a ghost text completion or user explicitly closed it
     if (
-      filtered.length > 0 &&
-      value.trim() &&
+      inputValue.trim() &&
       isInputFocused &&
       !composition &&
       !justCompletedGhost &&
       !userClosedDropdown
     ) {
       setOpen(true);
-      if (activeIndex === -1) {
+      // Only set active index if we have results
+      if (filtered.length > 0 && activeIndex === -1) {
         setActiveIndex(0);
       }
     }
   }, [
     suggestions,
-    value,
+    inputValue,
     async,
     getLabel,
     matchMode,
@@ -211,28 +212,28 @@ export const Autocomplete = <T = AutocompleteOption,>({
 
   // Ghost text computation using Filter.tsx proven pattern
   useEffect(() => {
-    if (value && isInputFocused && !composition && showGhostText) {
+    if (inputValue && isInputFocused && !composition && showGhostText) {
       const firstSuggestion = filteredSuggestions.find((s) => {
         const label = getLabel(s);
         return (
-          label.toLowerCase().startsWith(value.toLowerCase()) &&
-          label.toLowerCase() !== value.toLowerCase()
+          label.toLowerCase().startsWith(inputValue.toLowerCase()) &&
+          label.toLowerCase() !== inputValue.toLowerCase()
         );
       });
 
       if (firstSuggestion) {
-        setGhost(getLabel(firstSuggestion).slice(value.length));
+        setGhost(getLabel(firstSuggestion).slice(inputValue.length));
       } else {
         setGhost('');
       }
     } else {
       setGhost('');
     }
-  }, [value, filteredSuggestions, isInputFocused, composition, showGhostText, getLabel]);
+  }, [inputValue, filteredSuggestions, isInputFocused, composition, showGhostText, getLabel]);
 
   // Additional open/close logic for loading states
   useEffect(() => {
-    if (isLoading && value.trim().length > 0 && !disabled) {
+    if (isLoading && inputValue.trim().length > 0 && !disabled) {
       setOpen(true);
     }
 
@@ -240,7 +241,7 @@ export const Autocomplete = <T = AutocompleteOption,>({
       setOpen(false);
       setActiveIndex(-1);
     }
-  }, [isLoading, value, disabled]);
+  }, [isLoading, inputValue, disabled]);
 
   // Reset ghost completion flag after a short delay
   useEffect(() => {
@@ -270,6 +271,7 @@ export const Autocomplete = <T = AutocompleteOption,>({
         debouncedOnChange('');
         setOpen(false);
         setActiveIndex(-1);
+        setUserClosedDropdown(false); // Reset so dropdown can open for next selection
       } else {
         // Single select mode: set value and close
         const newValue = getLabel(item);
@@ -315,17 +317,17 @@ export const Autocomplete = <T = AutocompleteOption,>({
             if (selectedItem) {
               selectItem(selectedItem);
             }
-          } else if (allowFreeText && value.trim()) {
+          } else if (allowFreeText && inputValue.trim()) {
             // Allow free text submission
             setOpen(false);
           }
           break;
 
         case 'Tab':
-          // Tab completion: preserve user's case (concatenate value + ghost)
+          // Tab completion: preserve user's case (concatenate inputValue + ghost)
           if (ghost && isInputFocused && filteredSuggestions.length > 0) {
             event.preventDefault();
-            const newValue = value + ghost;
+            const newValue = inputValue + ghost;
             setJustCompletedGhost(true);
             setInputValue(newValue);
             debouncedOnChange(newValue);
@@ -344,8 +346,8 @@ export const Autocomplete = <T = AutocompleteOption,>({
             const firstSuggestion = filteredSuggestions.find((s) => {
               const label = getLabel(s);
               return (
-                label.toLowerCase().startsWith(value.toLowerCase()) &&
-                label.toLowerCase() !== value.toLowerCase()
+                label.toLowerCase().startsWith(inputValue.toLowerCase()) &&
+                label.toLowerCase() !== inputValue.toLowerCase()
               );
             });
             if (firstSuggestion) {
@@ -374,7 +376,7 @@ export const Autocomplete = <T = AutocompleteOption,>({
           break;
 
         case 'Backspace':
-          if (multiple && value === '' && selectedItems.length > 0) {
+          if (multiple && inputValue === '' && selectedItems.length > 0) {
             // Remove last chip when input is empty
             const newItems = selectedItems.slice(0, -1);
             onSelectedItemsChange?.(newItems);
@@ -389,7 +391,7 @@ export const Autocomplete = <T = AutocompleteOption,>({
       activeIndex,
       maxVisibleItems,
       allowFreeText,
-      value,
+      inputValue,
       ghost,
       isInputFocused,
       multiple,
@@ -417,19 +419,24 @@ export const Autocomplete = <T = AutocompleteOption,>({
       const newValue = event.target.value;
       setInputValue(newValue);
       debouncedOnChange(newValue);
-      setActiveIndex(-1);
+      // Don't reset activeIndex to -1 if dropdown is already open and we have filtered results
+      // This prevents losing the active selection while typing
+      if (!open || filteredSuggestions.length === 0) {
+        setActiveIndex(-1);
+      }
       setUserClosedDropdown(false); // Reset when user starts typing
     },
-    [debouncedOnChange],
+    [debouncedOnChange, open, filteredSuggestions.length],
   );
 
   // Handle input focus
   const handleInputFocus = useCallback(() => {
     setIsInputFocused(true);
-    // Open dropdown if there's content and suggestions
-    if (inputValue.trim() && filteredSuggestions.length > 0) {
+    setUserClosedDropdown(false); // Reset when focusing input
+    // Open dropdown if there's content (show no results if needed)
+    if (inputValue.trim()) {
       setOpen(true);
-      if (activeIndex === -1) {
+      if (filteredSuggestions.length > 0 && activeIndex === -1) {
         setActiveIndex(0);
       }
     }
@@ -453,8 +460,8 @@ export const Autocomplete = <T = AutocompleteOption,>({
   useEffect(() => {
     if (activeIndex >= 0 && listRef.current) {
       const elementId = `${optionIdPrefix}-${activeIndex}`;
-      // Use attribute selector to avoid CSS.escape dependency
-      const activeElement = listRef.current.querySelector(`[id="${elementId}"]`);
+      // Use getElementById for direct element access
+      const activeElement = document.getElementById(elementId);
       activeElement?.scrollIntoView({ block: 'nearest' });
     }
   }, [activeIndex, optionIdPrefix]);
@@ -465,17 +472,13 @@ export const Autocomplete = <T = AutocompleteOption,>({
   }, [value]);
 
   // Clean up debounce on unmount
-  useEffect(() => {
-    return () => {
+  useEffect(() => () => {
       if (debounceRef.current) {
         window.clearTimeout(debounceRef.current);
       }
-    };
-  }, []);
+    }, []);
 
-  const getActiveId = () => {
-    return activeIndex >= 0 ? `${optionIdPrefix}-${activeIndex}` : undefined;
-  };
+  const getActiveId = () => activeIndex >= 0 ? `${optionIdPrefix}-${activeIndex}` : undefined;
 
   const renderDefaultSuggestion = (item: T, state: SuggestionItemState) => {
     const label = getLabel(item);
@@ -502,10 +505,10 @@ export const Autocomplete = <T = AutocompleteOption,>({
 
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
-      <Box className={className}>
+      <Box className={className} data-testid="autocomplete-container">
         {/* Selected items (chips) for multiple mode */}
         {multiple && selectedItems.length > 0 && (
-          <ChipContainer>
+          <ChipContainer data-testid="selected-items-container">
             {selectedItems.map((item, index) => (
               <Chip
                 key={`${getKey(item)}-${index}`}
@@ -513,6 +516,7 @@ export const Autocomplete = <T = AutocompleteOption,>({
                 onDelete={() => removeSelectedItem(item)}
                 size="small"
                 className={chipClassName}
+                data-testid={`selected-chip-${index}`}
               />
             ))}
           </ChipContainer>
@@ -553,7 +557,7 @@ export const Autocomplete = <T = AutocompleteOption,>({
               'aria-activedescendant': getActiveId(),
               'aria-autocomplete': 'list',
               'aria-label': inputAriaLabel,
-              id: id,
+              id,
             }}
           />
         </Box>
@@ -579,13 +583,14 @@ export const Autocomplete = <T = AutocompleteOption,>({
               },
             ]}
           >
-            <Paper elevation={8} className={listClassName}>
+            <Paper elevation={8} className={listClassName} data-testid="suggestions-dropdown">
               <List
                 ref={listRef}
                 role="listbox"
                 id={listId}
                 dense
                 sx={{ maxHeight: 300, overflow: 'auto' }}
+                data-testid="suggestions-list"
               >
                 {visibleSuggestions.map((item, index) => (
                   <ListItem
@@ -607,12 +612,13 @@ export const Autocomplete = <T = AutocompleteOption,>({
                     className={`${itemClassName} ${
                       index === activeIndex ? activeItemClassName : ''
                     }`}
+                    data-testid={`suggestion-item-${index}`}
                   >
                     {renderSuggestion
-                      ? renderSuggestion(item, { active: index === activeIndex, query: value })
+                      ? renderSuggestion(item, { active: index === activeIndex, query: inputValue })
                       : renderDefaultSuggestion(item, {
                           active: index === activeIndex,
-                          query: value,
+                          query: inputValue,
                         })}
                   </ListItem>
                 ))}
@@ -630,7 +636,7 @@ export const Autocomplete = <T = AutocompleteOption,>({
                 )}
 
                 {/* No results state */}
-                {!isLoading && visibleSuggestions.length === 0 && value.trim() && (
+                {!isLoading && visibleSuggestions.length === 0 && inputValue.trim() && (
                   <ListItem>
                     <Typography variant="body2" color="text.secondary">
                       No results found

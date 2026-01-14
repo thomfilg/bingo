@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Avatar as MuiAvatar, Badge, alpha, keyframes, Fade, useTheme } from '@mui/material';
-import { Person, BrokenImage } from '@mui/icons-material';
-import { styled, Theme } from '@mui/material/styles';
+import { BrokenImage, Person } from '@mui/icons-material';
+import { alpha, Avatar as MuiAvatar, Badge, Fade, keyframes, useTheme } from '@mui/material';
+import type { Theme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
+import React, { useCallback, useEffect, useState } from 'react';
 
-import { AvatarProps, AvatarSize, AvatarStatus } from './Avatar.types';
+import type { AvatarProps, AvatarSize, AvatarStatus } from './Avatar.types';
 
 // Define animations
 const pulseAnimation = keyframes`
@@ -343,6 +344,7 @@ export const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
       showFallbackOnError = true,
       animationDelay = 0,
       className,
+      dataTestId,
       ...props
     },
     ref,
@@ -386,10 +388,30 @@ export const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
 
     // Determine what content to show
     let avatarContent = children || fallback || icon || <Person />;
+    let contentType: 'children' | 'fallback' | 'icon' | 'default' = 'default';
+
+    if (children) {
+      contentType = 'children';
+    } else if (fallback) {
+      contentType = 'fallback';
+    } else if (icon) {
+      contentType = 'icon';
+    }
 
     if (imageError && showFallbackOnError) {
-      avatarContent = fallback || icon || <BrokenImage />;
+      if (fallback) {
+        avatarContent = fallback;
+        contentType = 'fallback';
+      } else if (icon) {
+        avatarContent = icon;
+        contentType = 'icon';
+      } else {
+        avatarContent = <BrokenImage />;
+        contentType = 'icon';
+      }
     }
+
+    const ariaLabel = props['aria-label'] || alt || 'Avatar';
 
     const avatarElement = (
       <Fade in={mounted} timeout={300}>
@@ -413,14 +435,19 @@ export const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
             onLoad={handleImageLoad}
             tabIndex={interactive || onClick ? 0 : undefined}
             role={interactive || onClick ? 'button' : undefined}
+            aria-label={ariaLabel}
+            data-testid={dataTestId}
             {...props}
-            aria-label={props['aria-label'] || alt || 'Avatar'}
           >
-            {loading || imageLoading ? null : avatarContent}
+            {loading || imageLoading ? null : (
+              <span data-testid={dataTestId ? `${dataTestId}-${contentType}` : undefined}>
+                {avatarContent}
+              </span>
+            )}
           </StyledAvatar>
           {(loading || imageLoading) && (
-            <LoadingOverlay size={size}>
-              <div className="loading-spinner" />
+            <LoadingOverlay size={size} data-testid={dataTestId ? `${dataTestId}-loading` : undefined}>
+              <div className="loading-spinner" data-testid={dataTestId ? `${dataTestId}-loading-spinner` : undefined} />
             </LoadingOverlay>
           )}
         </div>
@@ -436,6 +463,7 @@ export const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
           variant="dot"
           statusColor={getStatusColor(status, theme)}
           avatarSize={size}
+          data-testid={dataTestId ? `${dataTestId}-badge` : undefined}
         >
           {avatarElement}
         </StatusBadge>
@@ -454,13 +482,14 @@ export const AvatarGroup: React.FC<{
   max?: number;
   overlap?: number;
   className?: string;
-}> = ({ children, max = 4, overlap = 8, className }) => {
+  dataTestId?: string;
+}> = ({ children, max = 4, overlap = 8, className, dataTestId }) => {
   const childrenArray = React.Children.toArray(children);
   const visibleChildren = max ? childrenArray.slice(0, max) : childrenArray;
   const remainingCount = childrenArray.length - visibleChildren.length;
 
   return (
-    <AvatarGroupContainer overlap={overlap} className={className}>
+    <AvatarGroupContainer overlap={overlap} className={className} data-testid={dataTestId}>
       {visibleChildren}
       {remainingCount > 0 && (
         <Avatar
@@ -468,6 +497,7 @@ export const AvatarGroup: React.FC<{
           color="neutral"
           fallback={`+${remainingCount}`}
           bordered
+          dataTestId={dataTestId ? `${dataTestId}-overflow` : undefined}
         />
       )}
     </AvatarGroupContainer>

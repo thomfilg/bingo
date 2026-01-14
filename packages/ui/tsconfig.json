@@ -10,7 +10,8 @@
     "declaration": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["google.maps"]
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "**/*.stories.tsx"]

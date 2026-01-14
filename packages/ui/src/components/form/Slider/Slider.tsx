@@ -1,8 +1,9 @@
-import React, { forwardRef } from 'react';
-import { Slider as MuiSlider, Box, Typography, alpha, keyframes, Theme } from '@mui/material';
+import type { Theme} from '@mui/material';
+import { alpha, Box, keyframes, Slider as MuiSlider,Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import React, { forwardRef } from 'react';
 
-import { SliderProps } from './Slider.types';
+import type { SliderProps } from './Slider.types';
 
 const glowAnimation = keyframes`
   0% {
@@ -293,6 +294,7 @@ export const Slider = forwardRef<HTMLSpanElement, SliderProps>(
       formatValue,
       value,
       onChange,
+      dataTestId,
       ...props
     },
     ref,
@@ -307,7 +309,7 @@ export const Slider = forwardRef<HTMLSpanElement, SliderProps>(
         : undefined;
 
     return (
-      <Box sx={{ width: '100%' }}>
+      <Box sx={{ width: '100%' }} data-testid={dataTestId}>
         {(label || showValue) && (
           <Box
             sx={{
@@ -318,12 +320,21 @@ export const Slider = forwardRef<HTMLSpanElement, SliderProps>(
             }}
           >
             {label && (
-              <Typography variant="body2" fontWeight={500} color="text.primary">
+              <Typography
+                variant="body2"
+                fontWeight={500}
+                color="text.primary"
+                data-testid={dataTestId ? `${dataTestId}-label` : undefined}
+              >
                 {label}
               </Typography>
             )}
             {showValue && (
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                data-testid={dataTestId ? `${dataTestId}-value-label` : undefined}
+              >
                 {displayValue}
               </Typography>
             )}
@@ -343,6 +354,15 @@ export const Slider = forwardRef<HTMLSpanElement, SliderProps>(
             onChange={onChange}
             marks={marks}
             valueLabelDisplay={showValue ? 'auto' : 'off'}
+            data-testid={dataTestId ? `${dataTestId}-slider` : undefined}
+            slotProps={{
+              track: {
+                'data-testid': dataTestId ? `${dataTestId}-track` : undefined,
+              } as React.HTMLAttributes<HTMLSpanElement>,
+              thumb: {
+                'data-testid': dataTestId ? `${dataTestId}-thumb` : undefined,
+              } as React.HTMLAttributes<HTMLSpanElement>,
+            }}
             {...props}
           />
         </Box>

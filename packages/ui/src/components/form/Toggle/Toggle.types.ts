@@ -1,5 +1,5 @@
-import { ToggleButtonProps } from '@mui/material';
-import React from 'react';
+import type { ToggleButtonProps } from '@mui/material';
+import type React from 'react';
 
 export interface ToggleProps extends Omit<ToggleButtonProps, 'color' | 'size'> {
   /**
@@ -71,4 +71,9 @@ export interface ToggleProps extends Omit<ToggleButtonProps, 'color' | 'size'> {
    * Change handler
    */
   onChange?: (event: React.MouseEvent<HTMLElement>, value: string | number | undefined) => void;
+
+  /**
+   * Test ID for the toggle button (applied via data-testid)
+   */
+  dataTestId?: string;
 }

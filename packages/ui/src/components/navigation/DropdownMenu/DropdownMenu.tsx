@@ -1,18 +1,18 @@
-import React, { useState, useRef, cloneElement, isValidElement } from 'react';
+import { ChevronRight, MoreVert } from '@mui/icons-material';
 import {
-  Menu,
-  MenuItem,
+  alpha,
+  Box,
+  Divider,
   ListItemIcon,
   ListItemText,
-  Divider,
+  Menu,
+  MenuItem,
   Typography,
-  Box,
-  alpha,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { ChevronRight, MoreVert } from '@mui/icons-material';
+import React, { cloneElement, isValidElement,useRef, useState } from 'react';
 
-import { DropdownMenuProps, DropdownMenuItem } from './DropdownMenu.types';
+import type { DropdownMenuItem,DropdownMenuProps } from './DropdownMenu.types';
 
 const StyledMenu = styled(Menu, {
   shouldForwardProp: (prop) => prop !== 'customVariant' && prop !== 'size',
@@ -249,10 +249,16 @@ export const DropdownMenu = React.forwardRef<HTMLDivElement, DropdownMenuProps>(
 
     const triggerElement = trigger ? (
       isValidElement(trigger) ? (
-        cloneElement(trigger as React.ReactElement, {
-          onClick: handleTriggerClick,
-          ref: anchorRef,
-        })
+        cloneElement(
+          trigger as React.ReactElement<{
+            onClick?: (event: React.MouseEvent<HTMLElement>) => void;
+            ref?: React.Ref<HTMLElement>;
+          }>,
+          {
+            onClick: handleTriggerClick,
+            ref: anchorRef,
+          }
+        )
       ) : (
         <Box ref={anchorRef} onClick={handleTriggerClick}>
           {trigger}
@@ -280,8 +286,8 @@ export const DropdownMenu = React.forwardRef<HTMLDivElement, DropdownMenuProps>(
           size={size}
           PaperProps={{
             sx: {
-              maxHeight: maxHeight,
-              minWidth: minWidth,
+              maxHeight,
+              minWidth,
               overflow: 'auto',
             },
           }}

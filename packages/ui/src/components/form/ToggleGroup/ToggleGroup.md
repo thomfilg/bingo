@@ -55,7 +55,7 @@ interface ToggleOption {
 ### Basic Usage
 
 ```tsx
-import { ToggleGroup } from '@repo/ui';
+import { ToggleGroup } from '@procurement/ui';
 
 const alignOptions = [
   { value: 'left', label: 'Left' },
@@ -161,6 +161,154 @@ The ToggleGroup component follows WCAG guidelines:
 4. **Disabled States**: Provide clear visual feedback for disabled options
 5. **Loading States**: Handle loading scenarios gracefully with appropriate feedback
 6. **Responsive Design**: Test across different screen sizes and orientations
+
+## Testing
+
+The ToggleGroup component includes comprehensive test support with data-testid attributes for reliable automated testing.
+
+### TestId Structure
+
+The component uses a consistent pattern for testIds:
+
+- **Container**: Uses the `dataTestId` prop value (default: `toggle-group`)
+- **Toggle Items**: Format: `${dataTestId}-item-${option.value}`
+
+### Default TestIds
+
+```tsx
+<ToggleGroup
+  options={[
+    { value: 'left', label: 'Left' },
+    { value: 'center', label: 'Center' },
+    { value: 'right', label: 'Right' },
+  ]}
+/>
+```
+
+Generated testIds:
+- Container: `toggle-group`
+- Items: `toggle-group-item-left`, `toggle-group-item-center`, `toggle-group-item-right`
+
+### Custom TestIds
+
+```tsx
+<ToggleGroup
+  options={alignOptions}
+  dataTestId="text-alignment"
+/>
+```
+
+Generated testIds:
+- Container: `text-alignment`
+- Items: `text-alignment-item-left`, `text-alignment-item-center`, `text-alignment-item-right`
+
+### Testing with React Testing Library
+
+```tsx
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+test('should allow selection via testId', async () => {
+  const user = userEvent.setup();
+  const handleChange = vi.fn();
+
+  render(
+    <ToggleGroup
+      options={options}
+      onChange={handleChange}
+      dataTestId="my-toggle"
+    />
+  );
+
+  // Find container
+  const container = screen.getByTestId('my-toggle');
+  expect(container).toBeInTheDocument();
+
+  // Find and interact with specific item
+  const item = screen.getByTestId('my-toggle-item-left');
+  await user.click(item);
+
+  expect(handleChange).toHaveBeenCalled();
+});
+```
+
+### Testing with Playwright
+
+```typescript
+test('toggle selection', async ({ page }) => {
+  // Navigate to page with toggle group
+  await page.goto('/my-page');
+
+  // Find container
+  const toggleGroup = page.getByTestId('toggle-group');
+  await expect(toggleGroup).toBeVisible();
+
+  // Click specific toggle item
+  await page.getByTestId('toggle-group-item-center').click();
+
+  // Verify selection state
+  await expect(page.getByTestId('toggle-group-item-center')).toHaveAttribute('aria-pressed', 'true');
+});
+```
+
+### Testing Multiple States
+
+```tsx
+test('should handle multiple selection mode', async () => {
+  const user = userEvent.setup();
+
+  render(
+    <ToggleGroup
+      variant="multiple"
+      options={formatOptions}
+      dataTestId="format-toggle"
+    />
+  );
+
+  // Select multiple items
+  await user.click(screen.getByTestId('format-toggle-item-bold'));
+  await user.click(screen.getByTestId('format-toggle-item-italic'));
+
+  // Both should be selected
+  expect(screen.getByTestId('format-toggle-item-bold')).toHaveAttribute('aria-pressed', 'true');
+  expect(screen.getByTestId('format-toggle-item-italic')).toHaveAttribute('aria-pressed', 'true');
+});
+```
+
+### Testing Disabled States
+
+```tsx
+test('should respect disabled state', async () => {
+  const user = userEvent.setup();
+
+  render(
+    <ToggleGroup
+      options={[
+        { value: 'enabled', label: 'Enabled' },
+        { value: 'disabled', label: 'Disabled', disabled: true },
+      ]}
+      dataTestId="mixed-toggle"
+    />
+  );
+
+  const disabledItem = screen.getByTestId('mixed-toggle-item-disabled');
+  expect(disabledItem).toBeDisabled();
+
+  // Attempt to click disabled item
+  await user.click(disabledItem);
+
+  // Should remain unselected
+  expect(disabledItem).toHaveAttribute('aria-pressed', 'false');
+});
+```
+
+### Best Practices for Testing
+
+1. **Use descriptive testIds**: Choose testIds that clearly identify the component's purpose
+2. **Test user interactions**: Verify click events, keyboard navigation, and state changes
+3. **Check accessibility**: Ensure proper ARIA attributes are present
+4. **Test edge cases**: Include tests for disabled states, empty options, and special characters
+5. **Verify visual states**: Test glass, gradient, and glow effects when applicable
 
 ## Common Patterns
 

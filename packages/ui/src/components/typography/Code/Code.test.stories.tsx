@@ -1,7 +1,7 @@
+import { Box, createTheme,ThemeProvider, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor, fn } from 'storybook/test';
-import { Box, Typography, ThemeProvider, createTheme } from '@mui/material';
 import React from 'react';
+import { expect, fn,userEvent, waitFor, within } from 'storybook/test';
 
 import { Code } from './Code';
 

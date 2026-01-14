@@ -1,8 +1,9 @@
+import { alpha, Box, ToggleButton, ToggleButtonGroup, useTheme } from '@mui/material';
+import type { Theme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import React, { forwardRef } from 'react';
-import { ToggleButtonGroup, ToggleButton, Box, alpha, useTheme } from '@mui/material';
-import { styled, Theme } from '@mui/material/styles';
 
-import { ToggleGroupProps } from './ToggleGroup.types';
+import type { ToggleGroupProps } from './ToggleGroup.types';
 
 const getColorFromTheme = (theme: Theme, color: string) => {
   if (color === 'neutral') {
@@ -64,6 +65,7 @@ export const ToggleGroup = forwardRef<HTMLDivElement, ToggleGroupProps>(
       gradient = false,
       value,
       onChange,
+      dataTestId = 'toggle-group',
       ...props
     },
     ref,
@@ -88,6 +90,7 @@ export const ToggleGroup = forwardRef<HTMLDivElement, ToggleGroupProps>(
         value={value}
         onChange={onChange}
         exclusive={variant === 'exclusive' || variant === 'single'}
+        data-testid={dataTestId}
         {...props}
       >
         {options.map((option) => (
@@ -95,6 +98,7 @@ export const ToggleGroup = forwardRef<HTMLDivElement, ToggleGroupProps>(
             key={option.value}
             value={option.value}
             disabled={option.disabled}
+            data-testid={`${dataTestId}-item-${option.value}`}
             sx={{
               textTransform: 'none',
               fontWeight: 500,

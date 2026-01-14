@@ -1,5 +1,5 @@
-import { BoxProps } from '@mui/material';
-import { ReactNode } from 'react';
+import type { BoxProps } from '@mui/material';
+import type { ReactNode, RefObject } from 'react';
 
 export type ScrollOrientation = 'vertical' | 'horizontal' | 'both';
 export type ScrollbarSize = 'thin' | 'medium' | 'thick';
@@ -8,6 +8,9 @@ export type ScrollAreaVariant = 'default' | 'overlay' | 'glass';
 export interface ScrollAreaProps extends Omit<BoxProps, 'ref'> {
   /** Content to be rendered inside the scrollable area */
   children: ReactNode;
+
+  /** External ref to attach to the scrollable element - useful for composing with VirtualList */
+  scrollRef?: RefObject<HTMLDivElement | null>;
 
   /** Width of the scroll area container */
   width?: number | string;
@@ -71,4 +74,7 @@ export interface ScrollAreaProps extends Omit<BoxProps, 'ref'> {
 
   /** Test ID for testing */
   testId?: string;
+
+  /** Callback when scroll area is resized - useful for responsive virtualization */
+  onResize?: (dimensions: { width: number; height: number }) => void;
 }

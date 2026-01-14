@@ -1,7 +1,7 @@
-import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Button, Typography, Chip, Stack, Box } from '@mui/material';
 import { Person, Star, Verified } from '@mui/icons-material';
+import { Box,Button, Chip, Stack, Typography } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import React from 'react';
 
 import { HoverCard } from './HoverCard';
 

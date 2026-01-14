@@ -1,5 +1,5 @@
+import { Box, Paper,Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Box, Typography, Paper } from '@mui/material';
 
 import { Spacer } from './Spacer';
 

@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export type SeparatorVariant = 'solid' | 'dashed' | 'dotted' | 'gradient';
 export type SeparatorOrientation = 'horizontal' | 'vertical';

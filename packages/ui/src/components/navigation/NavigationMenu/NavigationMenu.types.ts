@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export interface NavigationMenuItem {
   /**
@@ -67,22 +67,27 @@ export interface NavigationMenuProps {
    * The variant of the navigation menu
    */
   variant?: 'horizontal' | 'vertical' | 'mega';
-  
+
   /**
    * Menu items to display
    */
   items: NavigationMenuItem[];
-  
+
   /**
    * Color scheme of the menu
    */
   color?: 'default' | 'primary' | 'secondary';
-  
+
   /**
    * Size of the menu items
    */
   size?: 'sm' | 'md' | 'lg';
-  
+
+  /**
+   * Minimal style with no borders, shadows, or container backgrounds
+   */
+  minimal?: boolean;
+
   /**
    * Whether the menu is collapsible (vertical only)
    */

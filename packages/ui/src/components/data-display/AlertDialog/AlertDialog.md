@@ -55,7 +55,7 @@ The AlertDialog component provides a modal dialog for alerts, confirmations, and
 ### Basic Confirmation Dialog
 
 ```tsx
-import { AlertDialog } from '@repo/ui';
+import { AlertDialog } from '@procurement/ui';
 
 function DeleteConfirmation() {
   const [open, setOpen] = useState(false);
@@ -263,3 +263,146 @@ The component automatically adapts to your MUI theme:
 - Uses React Portal for optimal rendering
 - Animations use CSS transforms for smooth performance
 - Lazy renders heavy content with loading states
+
+## Testing
+
+### Test IDs
+
+The AlertDialog component includes `data-testid` attributes for reliable testing:
+
+| Test ID                          | Element           | Description                                       |
+| -------------------------------- | ----------------- | ------------------------------------------------- |
+| `alert-dialog`                   | Dialog container  | Root Dialog element (can be customized via prop)  |
+| `{dataTestId}-close-button`      | Close button      | X button in top-right corner                      |
+| `{dataTestId}-title`             | Title section     | Dialog title container                            |
+| `{dataTestId}-icon`              | Icon wrapper      | Wrapper around icon element (when icon is shown)  |
+| `{dataTestId}-content`           | Content section   | Dialog content container                          |
+| `{dataTestId}-description`       | Description text  | Main description text element                     |
+| `{dataTestId}-actions`           | Actions section   | Dialog actions footer container                   |
+| `{dataTestId}-cancel-button`     | Cancel button     | Cancel/dismiss button (when showCancel is true)   |
+| `{dataTestId}-confirm-button`    | Confirm button    | Confirm/submit button                             |
+| `{dataTestId}-loading-spinner`   | Loading indicator | Circular progress spinner (when loading is true)  |
+
+**Note:** By default, `{dataTestId}` is `alert-dialog`, but you can customize it by passing a `data-testid` prop to the component.
+
+### Testing Best Practices
+
+**Wait for Dialog to Appear:**
+
+```typescript
+// Dialog uses Material-UI Modal which may render asynchronously
+const dialog = await canvas.findByTestId('alert-dialog');
+expect(dialog).toBeInTheDocument();
+
+// Wait for dialog to be fully rendered
+await waitFor(() => {
+  expect(canvas.getByTestId('alert-dialog')).toBeVisible();
+});
+```
+
+**Test Dialog Content:**
+
+```typescript
+// Verify title
+const title = await canvas.findByTestId('alert-dialog-title');
+expect(title).toHaveTextContent('Delete Item');
+
+// Verify description
+const description = await canvas.findByTestId('alert-dialog-description');
+expect(description).toHaveTextContent('Are you sure?');
+
+// Check for icon (conditionally rendered)
+const icon = canvas.queryByTestId('alert-dialog-icon');
+if (icon) {
+  expect(icon).toBeInTheDocument();
+}
+```
+
+**Test Button Interactions:**
+
+```typescript
+// Click confirm button
+const confirmBtn = await canvas.findByTestId('alert-dialog-confirm-button');
+await userEvent.click(confirmBtn);
+expect(onConfirm).toHaveBeenCalledTimes(1);
+
+// Click cancel button
+const cancelBtn = await canvas.findByTestId('alert-dialog-cancel-button');
+await userEvent.click(cancelBtn);
+expect(onCancel).toHaveBeenCalledTimes(1);
+
+// Click close button
+const closeBtn = await canvas.findByTestId('alert-dialog-close-button');
+await userEvent.click(closeBtn);
+expect(onClose).toHaveBeenCalled();
+```
+
+**Test Loading State:**
+
+```typescript
+// Check loading spinner appears
+const loadingSpinner = await canvas.findByTestId('alert-dialog-loading-spinner');
+expect(loadingSpinner).toBeInTheDocument();
+
+// Verify buttons are disabled during loading
+const confirmBtn = canvas.getByTestId('alert-dialog-confirm-button');
+const cancelBtn = canvas.getByTestId('alert-dialog-cancel-button');
+expect(confirmBtn).toBeDisabled();
+expect(cancelBtn).toBeDisabled();
+```
+
+**Test Keyboard Navigation:**
+
+```typescript
+// Test Escape key closes dialog
+await userEvent.keyboard('{Escape}');
+await waitFor(() => {
+  expect(onClose).toHaveBeenCalled();
+});
+
+// Test Enter key on focused confirm button
+const confirmBtn = await canvas.findByTestId('alert-dialog-confirm-button');
+confirmBtn.focus();
+await userEvent.keyboard('{Enter}');
+expect(onConfirm).toHaveBeenCalled();
+```
+
+**Test Variants:**
+
+```typescript
+// Destructive variant
+const dialog = await canvas.findByTestId('alert-dialog');
+const confirmBtn = canvas.getByTestId('alert-dialog-confirm-button');
+
+// Check destructive variant styling
+expect(confirmBtn).toHaveAttribute('class', expect.stringContaining('error'));
+
+// Verify error icon appears for destructive variant
+const icon = await canvas.findByTestId('alert-dialog-icon');
+expect(icon).toBeInTheDocument();
+```
+
+**Test Custom Test IDs:**
+
+```typescript
+// When using custom data-testid
+<AlertDialog data-testid="delete-confirmation" {...props} />
+
+// Use custom test ID in tests
+const dialog = await canvas.findByTestId('delete-confirmation');
+const confirmBtn = canvas.getByTestId('delete-confirmation-confirm-button');
+const cancelBtn = canvas.getByTestId('delete-confirmation-cancel-button');
+```
+
+### Common Test Scenarios
+
+1. **Basic Rendering** - Verify dialog appears with title and description
+2. **Button Actions** - Test confirm, cancel, and close button clicks
+3. **Loading State** - Check spinner visibility and button disabled states
+4. **Conditional Elements** - Test showCancel=false, custom icons, children
+5. **Variants** - Test default, destructive, and glass variants
+6. **Keyboard Interaction** - Test Escape key and Enter key
+7. **Disabled States** - Test confirmDisabled prop
+8. **Custom Content** - Verify children render correctly in content section
+9. **Accessibility** - Test ARIA attributes and focus management
+10. **Custom Test IDs** - Verify custom data-testid prop propagates correctly

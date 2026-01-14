@@ -1,9 +1,9 @@
+import { AccountTree, Article, Code,Dashboard, Folder, Home, Settings } from '@mui/icons-material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor, fn } from 'storybook/test';
-import { Home, Dashboard, Folder, Settings, Article, AccountTree, Code } from '@mui/icons-material';
+import { expect, fn,userEvent, waitFor, within } from 'storybook/test';
 
 import { Breadcrumbs } from './Breadcrumbs';
-import { BreadcrumbItem } from './Breadcrumbs.types';
+import type { BreadcrumbItem } from './Breadcrumbs.types';
 
 const meta: Meta<typeof Breadcrumbs> = {
   title: 'Navigation/Breadcrumbs/Tests',

@@ -1,11 +1,11 @@
-export { Calendar as default, Calendar } from './Calendar';
+export { Calendar,Calendar as default } from './Calendar';
 export type {
+  CalendarInternalState,
   CalendarProps,
   DateRange,
-  SelectionMode,
   DayRenderArgs,
   HeaderRenderContext,
   MonthMatrix,
   MonthMatrixDay,
-  CalendarInternalState,
+  SelectionMode,
 } from './Calendar.types';

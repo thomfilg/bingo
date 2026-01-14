@@ -1,25 +1,25 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import {
+  CheckCircle as SuccessIcon,
+  Close as CloseIcon,
+  Error as ErrorIcon,
+  Info as InfoIcon,
+  Warning as WarningIcon,
+} from '@mui/icons-material';
 import {
   Alert,
-  IconButton,
-  Box,
-  Typography,
-  CircularProgress,
-  Button,
-  Slide,
-  useTheme,
   alpha,
+  Box,
+  Button,
+  CircularProgress,
+  IconButton,
   Portal,
+  Slide,
+  Typography,
+  useTheme,
 } from '@mui/material';
-import {
-  Close as CloseIcon,
-  CheckCircle as SuccessIcon,
-  Error as ErrorIcon,
-  Warning as WarningIcon,
-  Info as InfoIcon,
-} from '@mui/icons-material';
+import React, { createContext, useCallback,useContext, useState } from 'react';
 
-import { ToastProps, ToastContainerProps, ToastContextType, ToastItem } from './Toast.types';
+import type { ToastContainerProps, ToastContextType, ToastItem,ToastProps } from './Toast.types';
 
 const ToastContext = createContext<ToastContextType | null>(null);
 
@@ -122,6 +122,7 @@ export const Toast: React.FC<ToastProps> = ({
   action,
   glass = false,
   onClose,
+  dataTestId = 'toast',
 }) => {
   const theme = useTheme();
 
@@ -170,18 +171,30 @@ export const Toast: React.FC<ToastProps> = ({
 
   return (
     <Alert
+      data-testid={dataTestId}
       icon={getIcon()}
       severity={variant === 'default' || variant === 'promise' ? 'info' : variant}
       onClose={closable ? handleClose : undefined}
       action={
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {action && (
-            <Button color="inherit" size="small" onClick={action.onClick}>
+            <Button
+              data-testid={`${dataTestId}-action`}
+              color="inherit"
+              size="small"
+              onClick={action.onClick}
+            >
               {action.label}
             </Button>
           )}
           {closable && (
-            <IconButton aria-label="close" color="inherit" size="small" onClick={handleClose}>
+            <IconButton
+              data-testid={`${dataTestId}-close`}
+              aria-label="close"
+              color="inherit"
+              size="small"
+              onClick={handleClose}
+            >
               <CloseIcon fontSize="small" />
             </IconButton>
           )}
@@ -189,7 +202,7 @@ export const Toast: React.FC<ToastProps> = ({
       }
       sx={getVariantStyles()}
     >
-      <Typography variant="body2">{message}</Typography>
+      <Typography data-testid={`${dataTestId}-message`} variant="body2">{message}</Typography>
     </Alert>
   );
 };
@@ -199,6 +212,7 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({
   maxToasts = 5,
   gap = 8,
   className,
+  dataTestId = 'toast-container',
 }) => {
   const context = useContext(ToastContext);
   
@@ -245,8 +259,8 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({
 
   return (
     <Portal>
-      <Box className={className} sx={getPositionStyles()}>
-        {toasts.slice(0, maxToasts).map((toast) => (
+      <Box data-testid={dataTestId} className={className} sx={getPositionStyles()}>
+        {toasts.slice(0, maxToasts).map((toast, index) => (
           <Slide
             key={toast.id}
             direction={position.includes('left') ? 'right' : 'left'}
@@ -254,8 +268,8 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({
             timeout={300}
             style={{ pointerEvents: 'auto' }}
           >
-            <Box>
-              <Toast {...toast} onClose={removeToast} />
+            <Box data-testid={`${dataTestId}-item-${index}`}>
+              <Toast {...toast} onClose={removeToast} dataTestId={toast.dataTestId || `toast-${index}`} />
             </Box>
           </Slide>
         ))}

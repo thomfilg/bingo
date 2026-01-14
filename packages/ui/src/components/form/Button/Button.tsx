@@ -1,8 +1,9 @@
+import { alpha, Button as MuiButton, CircularProgress, keyframes } from '@mui/material';
+import type { Theme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import * as React from 'react';
-import { Button as MuiButton, CircularProgress, alpha, keyframes } from '@mui/material';
-import { styled, Theme } from '@mui/material/styles';
 
-import { ButtonProps } from './Button.types';
+import type { ButtonProps } from './Button.types';
 
 // Define pulse animation globally
 const pulseAnimation = keyframes`
@@ -78,6 +79,27 @@ const StyledButton = styled(MuiButton, {
     position: 'relative',
     overflow: 'hidden',
 
+    // Icon alignment fixes
+    '& .MuiButton-startIcon, & .MuiButton-endIcon': {
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      margin: 0,
+      verticalAlign: 'middle',
+      '& > *': {
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        lineHeight: 0,
+      },
+    },
+    '& .MuiButton-startIcon': {
+      marginRight: theme.spacing(0.5),
+    },
+    '& .MuiButton-endIcon': {
+      marginLeft: theme.spacing(0.5),
+    },
+
     // Variant styles
     ...(customVariant === 'solid' && {
       backgroundColor: colorPalette.main,
@@ -92,7 +114,7 @@ const StyledButton = styled(MuiButton, {
     ...(customVariant === 'outline' && {
       backgroundColor: 'transparent',
       color: colorPalette.main,
-      border: `2px solid ${colorPalette.main}`,
+      border: `1px solid ${colorPalette.main}`,
       '&:hover': {
         backgroundColor: alpha(colorPalette.main, 0.1),
         borderColor: colorPalette.dark,
@@ -104,6 +126,19 @@ const StyledButton = styled(MuiButton, {
       color: colorPalette.main,
       '&:hover': {
         backgroundColor: alpha(colorPalette.main, 0.1),
+      },
+    }),
+
+    ...(customVariant === 'text' && {
+      backgroundColor: 'transparent',
+      color: colorPalette.main,
+      border: `none`,
+      '&:hover': {
+        backgroundColor: alpha(colorPalette.main, 0.1),
+      },
+      '&.active': {
+        backgroundColor: alpha(colorPalette.main, 0.1),
+        color: colorPalette.main,
       },
     }),
 
@@ -205,7 +240,7 @@ const StyledButton = styled(MuiButton, {
 });
 
 const sizeMap = {
-  xs: { padding: '4px 8px', fontSize: '0.75rem' },
+  xs: { padding: '2px 8px', fontSize: '0.75rem' },
   sm: { padding: '6px 12px', fontSize: '0.875rem' },
   md: { padding: '8px 16px', fontSize: '1rem' },
   lg: { padding: '10px 20px', fontSize: '1.125rem' },
@@ -220,25 +255,37 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       size = 'md',
       loading = false,
       icon,
+      iconPosition = 'left',
       glow = false,
       pulse = false,
       ripple = true,
+      active = false,
       children,
       disabled,
       onClick,
       onFocus,
       onBlur,
+      dataTestId,
       ...props
     },
     ref,
   ) => {
-    const muiVariant = variant === 'outline' ? 'outlined' : 'contained';
+    const muiVariant = variant ==='outline' ? 'outlined' : variant === 'text' ? 'text': 'contained';
     const muiColor =
       color === 'danger'
         ? 'error'
         : color === 'neutral'
           ? 'inherit'
-          : (color as 'primary' | 'secondary' | 'success' | 'warning' | 'info');
+          : (color);
+
+    // Wrap icon with testId if provided
+    const iconWithTestId =
+      !loading && icon ? (
+        <span data-testid={dataTestId ? `${dataTestId}-icon` : 'button-icon'}>{icon}</span>
+      ) : undefined;
+
+    const activeClassName = active ? 'active' : '';
+    const mergedClassName = [activeClassName, props.className].filter(Boolean).join(' ') || undefined;
 
     return (
       <StyledButton
@@ -252,14 +299,25 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ripple={ripple}
         disabled={disabled || loading}
         disableRipple={!ripple}
-        startIcon={!loading && icon}
+        startIcon={iconPosition === 'left' ? iconWithTestId : undefined}
+        endIcon={iconPosition === 'right' ? iconWithTestId : undefined}
         onClick={onClick}
         onFocus={onFocus}
         onBlur={onBlur}
         sx={sizeMap[size]}
+        data-testid={dataTestId || 'button'}
         {...props}
+        className={mergedClassName}
       >
-        {loading ? <CircularProgress size={16} color="inherit" /> : children}
+        {loading ? (
+          <CircularProgress
+            size={16}
+            color="inherit"
+            data-testid={dataTestId ? `${dataTestId}-loading` : 'button-loading'}
+          />
+        ) : (
+          children
+        )}
       </StyledButton>
     );
   },

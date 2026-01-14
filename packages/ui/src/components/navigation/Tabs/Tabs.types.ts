@@ -1,5 +1,5 @@
-import { TabsProps as MuiTabsProps } from '@mui/material';
-import { ReactNode } from 'react';
+import type { TabsProps as MuiTabsProps } from '@mui/material';
+import type { ReactNode } from 'react';
 
 export interface TabItem {
   /**
@@ -171,6 +171,11 @@ export interface TabsProps extends Omit<MuiTabsProps, 'variant' | 'children' | '
    * Blur handler for tabs
    */
   onBlur?: React.FocusEventHandler<HTMLDivElement>;
+
+  /**
+   * Optional test ID for testing purposes
+   */
+  dataTestId?: string;
 }
 
 export interface TabPanelProps {

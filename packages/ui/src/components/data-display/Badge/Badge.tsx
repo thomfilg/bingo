@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Badge as MuiBadge, alpha, keyframes, IconButton, Zoom } from '@mui/material';
-import { styled, Theme } from '@mui/material/styles';
 import { Close as CloseIcon } from '@mui/icons-material';
+import { alpha, Badge as MuiBadge, IconButton, keyframes, Zoom } from '@mui/material';
+import type { Theme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
+import React, { useEffect,useState } from 'react';
 
-import { BadgeProps, BadgeSize, BadgeVariant } from './Badge.types';
+import type { BadgeProps, BadgeSize, BadgeVariant } from './Badge.types';
+export type { BadgeProps } from './Badge.types';
 
 // Define pulse animation
 const pulseAnimation = keyframes`
@@ -79,6 +81,7 @@ const getColorFromTheme = (theme: Theme, color: string) => {
     success: theme.palette.success,
     warning: theme.palette.warning,
     error: theme.palette.error,
+    info: theme.palette.info,
     neutral: {
       main: theme.palette.grey[600],
       light: theme.palette.grey[400],
@@ -434,6 +437,7 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
       'aria-label': ariaLabel,
       'aria-live': ariaLive = 'polite',
       'aria-atomic': ariaAtomic = true,
+      'data-testid': dataTestId,
       className,
       ...props
     },
@@ -490,6 +494,7 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
         contentElements.push(
           <span
             key="icon"
+            data-testid={dataTestId ? `${dataTestId}-icon` : 'badge-icon'}
             style={{ fontSize: sizeStyles.iconSize, display: 'inline-flex', alignItems: 'center' }}
           >
             {icon}
@@ -499,7 +504,11 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
 
       // Add main content
       if (baseContent !== null && baseContent !== undefined) {
-        contentElements.push(<span key="content">{baseContent}</span>);
+        contentElements.push(
+          <span key="content" data-testid={dataTestId ? `${dataTestId}-content` : 'badge-content'}>
+            {baseContent}
+          </span>,
+        );
       }
 
       // Add close button if closable
@@ -517,6 +526,7 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
             key="close"
             size="small"
             onClick={handleClose}
+            data-testid={dataTestId ? `${dataTestId}-close` : 'badge-close'}
             sx={{
               p: 0,
               ml: 0.5,
@@ -576,9 +586,12 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
           variant={variant === 'dot' ? 'dot' : 'standard'}
           anchorOrigin={anchorOrigin}
           invisible={shouldBeInvisible}
+          data-testid={dataTestId || 'badge'}
           slotProps={{
             badge: {
               ...accessibilityProps,
+              // @ts-expect-error - MUI Badge slotProps doesn't include data-testid in types, but it works at runtime
+              'data-testid': dataTestId ? `${dataTestId}-content-wrapper` : 'badge-content-wrapper',
             },
           }}
           {...props}

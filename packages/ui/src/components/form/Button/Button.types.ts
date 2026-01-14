@@ -1,16 +1,16 @@
-import { ButtonProps as MuiButtonProps } from '@mui/material';
-import * as React from 'react';
+import type { ButtonProps as MuiButtonProps } from '@mui/material';
+import type * as React from 'react';
 
 export interface ButtonProps extends Omit<MuiButtonProps, 'variant' | 'color' | 'size'> {
   /**
    * The variant of the button
    */
-  variant?: 'solid' | 'outline' | 'ghost' | 'glass' | 'gradient';
-  
+  variant?: 'solid' | 'outline' | 'ghost' | 'text' | 'glass' | 'gradient';
+
   /**
    * The color of the button
    */
-  color?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'neutral';
+  color?: 'primary' | 'secondary' | 'success' | 'warning' | 'info' | 'danger' | 'neutral';
   
   /**
    * The size of the button
@@ -28,6 +28,11 @@ export interface ButtonProps extends Omit<MuiButtonProps, 'variant' | 'color' | 
   icon?: React.ReactNode;
   
   /**
+   * Position of the icon
+   */
+  iconPosition?: 'left' | 'right';
+
+  /**
    * Whether the button should have a glow effect
    */
   glow?: boolean;
@@ -41,7 +46,12 @@ export interface ButtonProps extends Omit<MuiButtonProps, 'variant' | 'color' | 
    * Whether to show ripple effect on click
    */
   ripple?: boolean;
-  
+
+  /**
+   * Whether the button is in active state
+   */
+  active?: boolean;
+
   /**
    * Click handler
    */
@@ -56,4 +66,9 @@ export interface ButtonProps extends Omit<MuiButtonProps, 'variant' | 'color' | 
    * Blur handler
    */
   onBlur?: React.FocusEventHandler<HTMLButtonElement>;
+
+  /**
+   * Test ID for testing purposes
+   */
+  dataTestId?: string;
 }

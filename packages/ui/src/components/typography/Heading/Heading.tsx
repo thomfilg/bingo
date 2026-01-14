@@ -1,8 +1,8 @@
-import React from 'react';
-import { Theme } from '@mui/material';
+import type { Theme } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import React from 'react';
 
-import { HeadingProps } from './Heading.types';
+import type { HeadingProps } from './Heading.types';
 
 const getColorFromTheme = (theme: Theme, color: string) => {
   if (color === 'neutral') {

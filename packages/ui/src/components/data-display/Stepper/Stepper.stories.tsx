@@ -1,9 +1,9 @@
+import { Box, Chip,Paper, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { Box, Paper, Typography, Chip } from '@mui/material';
 
-import { Stepper } from './';
-import type { Step } from './';
+import type { Step } from ".";
+import { Stepper } from ".";
 
 const meta: Meta<typeof Stepper> = {
   title: 'DataDisplay/Stepper',

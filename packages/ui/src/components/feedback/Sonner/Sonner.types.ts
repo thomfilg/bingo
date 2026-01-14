@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export type SonnerVariant = 'default' | 'glass' | 'minimal';
 export type SonnerType = 'default' | 'success' | 'error' | 'warning' | 'info' | 'loading';

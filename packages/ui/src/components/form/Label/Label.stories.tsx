@@ -1,10 +1,10 @@
-import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Box, TextField, Stack, Typography } from '@mui/material';
-import InfoIcon from '@mui/icons-material/Info';
-import StarIcon from '@mui/icons-material/Star';
 import EmailIcon from '@mui/icons-material/Email';
+import InfoIcon from '@mui/icons-material/Info';
 import PersonIcon from '@mui/icons-material/Person';
+import StarIcon from '@mui/icons-material/Star';
+import { Box, Stack, TextField, Typography } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import React from 'react';
 
 import { Label } from './Label';
 

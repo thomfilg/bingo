@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export type ResizableVariant = 'horizontal' | 'vertical' | 'both';
 export type ResizeHandle =
@@ -24,5 +24,11 @@ export interface ResizableProps {
   disabled?: boolean;
   handles?: ResizeHandle[];
   className?: string;
+  /**
+   * The data-testid attribute for the resizable container.
+   * Also generates testIds for child elements:
+   * - `{dataTestId}-container` - Main resizable container
+   * - `{dataTestId}-handle-{handlePosition}` - Individual resize handles (e.g., "resizable-handle-right")
+   */
   'data-testid'?: string;
 }

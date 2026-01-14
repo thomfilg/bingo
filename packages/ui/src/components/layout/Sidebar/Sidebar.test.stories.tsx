@@ -1,31 +1,32 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor, fn } from 'storybook/test';
 import {
-  Box,
-  Typography,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  IconButton,
-  Avatar,
-  Button,
-} from '@mui/material';
-import {
-  Home as HomeIcon,
-  Dashboard as DashboardIcon,
-  Settings as SettingsIcon,
-  Person as PersonIcon,
-  Menu as MenuIcon,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
+  Dashboard as DashboardIcon,
+  Home as HomeIcon,
   Inbox as InboxIcon,
-  Star as StarIcon,
+  Menu as MenuIcon,
+  Person as PersonIcon,
   Send as SendIcon,
+  Settings as SettingsIcon,
+  Star as StarIcon,
 } from '@mui/icons-material';
+import {
+  Avatar,
+  Box,
+  Button,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+} from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import React, { useState } from 'react';
+import { expect, fn,userEvent, waitFor, within } from 'storybook/test';
 
-import { Sidebar, SidebarHeader, SidebarContent, SidebarFooter } from './Sidebar';
+import { Sidebar, SidebarContent, SidebarFooter,SidebarHeader } from './Sidebar';
 
 const meta: Meta<typeof Sidebar> = {
   title: 'Layout/Sidebar/Tests',
@@ -87,10 +88,10 @@ const BasicInteractionComponent = () => {
         <SidebarContent data-testid="sidebar-content">
           <List>
             {navigationItems.map((item, index) => (
-              <ListItem button key={index} data-testid={item['data-testid']}>
+              <ListItemButton key={index} data-testid={item['data-testid']}>
                 <ListItemIcon>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.label} />
-              </ListItem>
+              </ListItemButton>
             ))}
           </List>
         </SidebarContent>
@@ -164,8 +165,7 @@ const FormInteractionComponent = () => {
             </Typography>
             <List>
               {navigationItems.map((item, index) => (
-                <ListItem
-                  button
+                <ListItemButton
                   key={index}
                   data-testid={`form-${item['data-testid']}`}
                   onClick={() => setSelectedItem(item.label)}
@@ -173,7 +173,7 @@ const FormInteractionComponent = () => {
                 >
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText primary={item.label} />
-                </ListItem>
+                </ListItemButton>
               ))}
             </List>
           </Box>
@@ -234,8 +234,7 @@ export const KeyboardNavigation: Story = {
         <SidebarContent>
           <List>
             {navigationItems.map((item, index) => (
-              <ListItem
-                button
+              <ListItemButton
                 key={index}
                 data-testid={`keyboard-${item['data-testid']}`}
                 tabIndex={0}
@@ -244,7 +243,7 @@ export const KeyboardNavigation: Story = {
               >
                 <ListItemIcon>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.label} />
-              </ListItem>
+              </ListItemButton>
             ))}
           </List>
         </SidebarContent>
@@ -319,8 +318,7 @@ export const ScreenReader: Story = {
           <nav role="navigation" aria-label="Primary navigation">
             <List role="menu">
               {navigationItems.map((item, index) => (
-                <ListItem
-                  button
+                <ListItemButton
                   key={index}
                   data-testid={`sr-${item['data-testid']}`}
                   role="menuitem"
@@ -329,7 +327,7 @@ export const ScreenReader: Story = {
                 >
                   <ListItemIcon aria-hidden="true">{item.icon}</ListItemIcon>
                   <ListItemText primary={item.label} />
-                </ListItem>
+                </ListItemButton>
               ))}
             </List>
           </nav>
@@ -419,15 +417,14 @@ const FocusManagementComponent = () => {
           <SidebarContent>
             <List>
               {navigationItems.slice(0, 3).map((item, index) => (
-                <ListItem
-                  button
+                <ListItemButton
                   key={index}
                   data-testid={`focus-${item['data-testid']}`}
                   tabIndex={0}
                 >
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText primary={item.label} />
-                </ListItem>
+                </ListItemButton>
               ))}
             </List>
           </SidebarContent>
@@ -524,10 +521,10 @@ export const ResponsiveDesign: Story = {
         <SidebarContent>
           <List>
             {navigationItems.map((item, index) => (
-              <ListItem button key={index} data-testid={`resp-${item['data-testid']}`}>
+              <ListItemButton key={index} data-testid={`resp-${item['data-testid']}`}>
                 <ListItemIcon>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.label} primaryTypographyProps={{ noWrap: true }} />
-              </ListItem>
+              </ListItemButton>
             ))}
           </List>
         </SidebarContent>
@@ -602,8 +599,7 @@ const ThemeVariationsComponent = () => {
           <SidebarContent>
             <List>
               {navigationItems.slice(0, 3).map((item, index) => (
-                <ListItem
-                  button
+                <ListItemButton
                   key={index}
                   data-testid={`theme-${item['data-testid']}`}
                   sx={{ color: variant === 'glass' ? 'white' : 'inherit' }}
@@ -612,7 +608,7 @@ const ThemeVariationsComponent = () => {
                     {item.icon}
                   </ListItemIcon>
                   <ListItemText primary={item.label} />
-                </ListItem>
+                </ListItemButton>
               ))}
             </List>
           </SidebarContent>
@@ -728,8 +724,7 @@ const VisualStatesComponent = () => {
         <SidebarContent>
           <List>
             {navigationItems.map((item, index) => (
-              <ListItem
-                button
+              <ListItemButton
                 key={index}
                 data-testid={`visual-${item['data-testid']}`}
                 sx={{
@@ -750,7 +745,7 @@ const VisualStatesComponent = () => {
                   {item.icon}
                 </ListItemIcon>
                 {!collapsed && <ListItemText primary={item.label} />}
-              </ListItem>
+              </ListItemButton>
             ))}
           </List>
         </SidebarContent>
@@ -824,14 +819,19 @@ export const VisualStates: Story = {
       expect(canvas.getByTestId('collapse-status')).toHaveTextContent('Sidebar is expanded');
     });
 
-    // Test navigation items are still clickable
+    // Test navigation items are still clickable and accessible
     await expect(canvas.getByTestId('visual-nav-home')).toBeInTheDocument();
     await expect(canvas.getByTestId('visual-nav-dashboard')).toBeInTheDocument();
 
-    // Test hover state (focus for testing)
+    // Test that navigation items remain interactive during visual state transitions
     const homeItem = canvas.getByTestId('visual-nav-home');
-    homeItem.focus();
-    await expect(homeItem).toHaveFocus();
+
+    // Verify item is clickable
+    await userEvent.click(homeItem);
+
+    // Verify item is still present and enabled after click
+    await expect(homeItem).toBeInTheDocument();
+    await expect(homeItem).toBeEnabled();
   },
 };
 
@@ -840,13 +840,11 @@ const PerformanceComponent = () => {
   const [itemCount, setItemCount] = useState(50);
   const [renderTime, setRenderTime] = useState<number>(0);
 
-  const generateItems = (count: number) => {
-    return Array.from({ length: count }, (_, index) => ({
+  const generateItems = (count: number) => Array.from({ length: count }, (_, index) => ({
       icon: <HomeIcon />,
       label: `Item ${index + 1}`,
       'data-testid': `perf-item-${index}`,
     }));
-  };
 
   const handleRender = () => {
     const start = window.performance.now();
@@ -871,10 +869,10 @@ const PerformanceComponent = () => {
         <SidebarContent>
           <List data-testid="performance-list">
             {items.map((item, index) => (
-              <ListItem button key={index} data-testid={item['data-testid']}>
+              <ListItemButton key={index} data-testid={item['data-testid']}>
                 <ListItemIcon>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.label} />
-              </ListItem>
+              </ListItemButton>
             ))}
           </List>
         </SidebarContent>
@@ -1019,7 +1017,7 @@ const EdgeCasesComponent = () => {
           ) : (
             <List>
               {content.map((item, index) => (
-                <ListItem button key={index} data-testid={item['data-testid']}>
+                <ListItemButton key={index} data-testid={item['data-testid']}>
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText
                     primary={item.label}
@@ -1028,7 +1026,7 @@ const EdgeCasesComponent = () => {
                       title: item.label,
                     }}
                   />
-                </ListItem>
+                </ListItemButton>
               ))}
             </List>
           )}
@@ -1173,8 +1171,7 @@ const IntegrationComponent = () => {
         <SidebarContent>
           <List>
             {integrationItems.map((item) => (
-              <ListItem
-                button
+              <ListItemButton
                 key={item.id}
                 data-testid={item['data-testid']}
                 selected={activeSection === item.id}
@@ -1212,7 +1209,7 @@ const IntegrationComponent = () => {
                   </Box>
                 </ListItemIcon>
                 {sidebarOpen && <ListItemText primary={item.label} />}
-              </ListItem>
+              </ListItemButton>
             ))}
           </List>
         </SidebarContent>

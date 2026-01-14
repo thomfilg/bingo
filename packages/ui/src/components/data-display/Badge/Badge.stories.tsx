@@ -1,32 +1,32 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
 import {
-  Box,
-  Stack,
-  IconButton,
-  Avatar,
-  Typography,
-  Paper,
-  ThemeProvider,
-  createTheme,
-  Button,
-} from '@mui/material';
-import {
-  Mail,
-  Notifications,
-  ShoppingCart,
-  Star,
-  Favorite,
-  FiberManualRecord,
   CheckCircle,
   Error as ErrorIcon,
-  Warning,
+  Favorite,
+  FiberManualRecord,
   Info,
+  Mail,
   NewReleases,
+  Notifications,
+  Schedule,
+  ShoppingCart,
+  Star,
   TrendingUp,
   Verified,
-  Schedule,
+  Warning,
 } from '@mui/icons-material';
+import {
+  Avatar,
+  Box,
+  Button,
+  createTheme,
+  IconButton,
+  Paper,
+  Stack,
+  ThemeProvider,
+  Typography,
+} from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
 
 import { Badge } from './Badge';
 

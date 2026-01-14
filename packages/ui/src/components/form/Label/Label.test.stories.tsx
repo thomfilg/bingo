@@ -1,8 +1,8 @@
-import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor, fn } from 'storybook/test';
-import { Box, TextField, Stack } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
+import { Box, Stack,TextField } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import React from 'react';
+import { expect, fn,userEvent, waitFor, within } from 'storybook/test';
 
 import { Label } from './Label';
 
@@ -18,6 +18,56 @@ const meta: Meta<typeof Label> = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+// ====================================
+// TestId Tests
+// ====================================
+
+export const DataTestIdVerification: Story = {
+  name: '🔍 Data TestId Verification',
+  args: {
+    children: 'Test Label',
+    dataTestId: 'custom-label-testid',
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step('Verify dataTestId prop applies to label element', async () => {
+      const label = canvas.getByTestId('custom-label-testid');
+      await expect(label).toBeInTheDocument();
+      await expect(label.tagName.toLowerCase()).toBe('label');
+      await expect(label).toHaveTextContent('Test Label');
+    });
+
+    await step('Verify dataTestId works with all variants', async () => {
+      const label = canvas.getByTestId('custom-label-testid');
+      await expect(label).toHaveAttribute('data-testid', 'custom-label-testid');
+    });
+  },
+};
+
+export const DataTestIdWithSrOnly: Story = {
+  name: '🔍 Data TestId with Screen Reader Only',
+  args: {
+    children: 'SR Only Label',
+    dataTestId: 'sr-only-testid',
+    srOnly: true,
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step('Verify dataTestId applies to srOnly label', async () => {
+      const label = canvas.getByTestId('sr-only-testid');
+      await expect(label).toBeInTheDocument();
+      await expect(label.tagName.toLowerCase()).toBe('label');
+
+      const computedStyle = window.getComputedStyle(label);
+      await expect(computedStyle.position).toBe('absolute');
+      await expect(computedStyle.width).toBe('1px');
+      await expect(computedStyle.height).toBe('1px');
+    });
+  },
+};
 
 // ====================================
 // Interaction Tests

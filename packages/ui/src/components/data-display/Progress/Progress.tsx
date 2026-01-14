@@ -1,16 +1,18 @@
-import React from 'react';
+import type {
+  PaletteColor} from '@mui/material';
 import {
-  LinearProgress,
-  CircularProgress,
-  Box,
-  Typography,
   alpha,
+  Box,
+  CircularProgress,
   keyframes,
-  PaletteColor,
+  LinearProgress,
+  Typography,
 } from '@mui/material';
-import { styled, Theme, useTheme } from '@mui/material/styles';
+import type { Theme} from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
+import React from 'react';
 
-import { ProgressProps, ProgressSize, ProgressVariant } from './Progress.types';
+import type { ProgressProps, ProgressSize, ProgressVariant } from './Progress.types';
 
 // Define pulse animation
 const pulseAnimation = keyframes`
@@ -161,17 +163,19 @@ const SegmentedProgress: React.FC<{
   size: ProgressSize;
   glow: boolean;
   pulse: boolean;
-}> = ({ value = 0, segments, color, size, glow, pulse }) => {
+  dataTestId?: string;
+}> = ({ value = 0, segments, color, size, glow, pulse, dataTestId }) => {
   const theme = useTheme();
   const colorPalette = getColorFromTheme(theme, color);
   const sizeStyles = getSizeStyles(size);
   const filledSegments = Math.floor((value / 100) * segments);
 
   return (
-    <Box sx={{ display: 'flex', gap: 0.5, width: '100%' }}>
+    <Box sx={{ display: 'flex', gap: 0.5, width: '100%' }} data-testid={`${dataTestId}-segments-container`}>
       {Array.from({ length: segments }, (_, index) => (
         <Box
           key={index}
+          data-testid={`${dataTestId}-segment-${index}`}
           sx={{
             flex: 1,
             height: sizeStyles.height,
@@ -208,6 +212,7 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
       thickness = 4,
       circularSize,
       value,
+      dataTestId = 'progress',
       ...props
     },
     ref,
@@ -220,7 +225,7 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
 
     if (variant === 'circular') {
       return (
-        <Box ref={ref} sx={{ position: 'relative', display: 'inline-flex' }}>
+        <Box ref={ref} sx={{ position: 'relative', display: 'inline-flex' }} data-testid={dataTestId}>
           <StyledCircularProgress
             variant={value !== undefined ? 'determinate' : 'indeterminate'}
             value={displayValue}
@@ -229,6 +234,7 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
             customColor={color}
             glow={glow}
             pulse={pulse}
+            data-testid={`${dataTestId}-circular`}
             {...props}
           />
           {showLabel && value !== undefined && (
@@ -249,6 +255,7 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
                 component="div"
                 color="text.secondary"
                 sx={{ fontSize: sizeStyles.fontSize, fontWeight: 600 }}
+                data-testid={`${dataTestId}-label`}
               >
                 {displayLabel}
               </Typography>
@@ -260,7 +267,7 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
 
     if (variant === 'segmented') {
       return (
-        <Box ref={ref} sx={{ width: '100%' }} {...props}>
+        <Box ref={ref} sx={{ width: '100%' }} data-testid={dataTestId} {...props}>
           <SegmentedProgress
             value={displayValue}
             segments={segments}
@@ -268,6 +275,7 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
             size={size}
             glow={glow}
             pulse={pulse}
+            dataTestId={dataTestId}
           />
           {showLabel && (
             <Typography
@@ -279,6 +287,7 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
                 fontSize: sizeStyles.fontSize,
                 fontWeight: 600,
               }}
+              data-testid={`${dataTestId}-label`}
             >
               {displayLabel}
             </Typography>
@@ -288,7 +297,7 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
     }
 
     return (
-      <Box ref={ref} sx={{ width: '100%' }}>
+      <Box ref={ref} sx={{ width: '100%' }} data-testid={dataTestId}>
         <StyledLinearProgress
           variant={value !== undefined ? 'determinate' : 'indeterminate'}
           value={displayValue}
@@ -297,6 +306,7 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
           customColor={color}
           glow={glow}
           pulse={pulse}
+          data-testid={`${dataTestId}-linear`}
           {...props}
         />
         {showLabel && (
@@ -309,6 +319,7 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
               fontSize: sizeStyles.fontSize,
               fontWeight: 600,
             }}
+            data-testid={`${dataTestId}-label`}
           >
             {displayLabel}
           </Typography>

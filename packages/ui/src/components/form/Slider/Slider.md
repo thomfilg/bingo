@@ -175,3 +175,152 @@ The Slider component follows WAI-ARIA authoring practices:
 - Uses React.memo to prevent unnecessary re-renders
 - Debounced value updates available through controlled mode
 - Efficient event handling for mouse and touch events
+
+## Testing
+
+The Slider component supports comprehensive testing through the `dataTestId` prop. When provided, it automatically generates test identifiers for all interactive elements.
+
+### Test ID Structure
+
+When you pass `dataTestId="my-slider"`, the following test IDs are generated:
+
+| Element | Test ID | Description |
+| --- | --- | --- |
+| Root Container | `my-slider` | Main wrapper containing the entire slider |
+| Slider Component | `my-slider-slider` | The MUI Slider component itself |
+| Track | `my-slider-track` | The filled track showing current value |
+| Thumb | `my-slider-thumb` | The draggable thumb control |
+| Label | `my-slider-label` | The label text (if label prop is provided) |
+| Value Label | `my-slider-value-label` | The displayed value (if showValue is enabled) |
+
+### Testing Examples
+
+#### Basic Component Testing
+
+```tsx
+import { render, screen } from '@testing-library/react';
+import { Slider } from '@/components/form/Slider';
+
+test('renders slider with testId', () => {
+  render(
+    <Slider
+      dataTestId="volume-slider"
+      label="Volume"
+      showValue
+      value={50}
+      onChange={() => {}}
+    />
+  );
+
+  expect(screen.getByTestId('volume-slider')).toBeInTheDocument();
+  expect(screen.getByTestId('volume-slider-label')).toHaveTextContent('Volume');
+  expect(screen.getByTestId('volume-slider-slider')).toBeInTheDocument();
+  expect(screen.getByTestId('volume-slider-track')).toBeInTheDocument();
+  expect(screen.getByTestId('volume-slider-thumb')).toBeInTheDocument();
+});
+```
+
+#### Testing Slider Interaction
+
+```tsx
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Slider } from '@/components/form/Slider';
+
+test('interacts with slider', async () => {
+  const handleChange = jest.fn();
+
+  render(
+    <Slider
+      dataTestId="brightness-slider"
+      value={50}
+      onChange={handleChange}
+    />
+  );
+
+  const thumb = screen.getByTestId('brightness-slider-thumb');
+  await userEvent.hover(thumb);
+
+  // Verify thumb is accessible
+  expect(thumb).toBeInTheDocument();
+});
+```
+
+#### Testing Range Slider
+
+```tsx
+test('renders range slider with testIds', () => {
+  render(
+    <Slider
+      dataTestId="price-range"
+      label="Price Range"
+      showValue
+      value={[20, 80]}
+      onChange={() => {}}
+      unit="$"
+    />
+  );
+
+  const valueLabel = screen.getByTestId('price-range-value-label');
+  expect(valueLabel).toHaveTextContent('20$ - 80$');
+});
+```
+
+#### Testing in Forms
+
+```tsx
+test('slider works in form context', async () => {
+  const onSubmit = jest.fn();
+
+  render(
+    <form onSubmit={onSubmit}>
+      <Slider
+        dataTestId="form-slider"
+        label="Settings"
+        value={75}
+        onChange={() => {}}
+      />
+      <button type="submit">Submit</button>
+    </form>
+  );
+
+  const slider = screen.getByTestId('form-slider-slider');
+  expect(slider).toBeInTheDocument();
+
+  await userEvent.click(screen.getByText('Submit'));
+  expect(onSubmit).toHaveBeenCalled();
+});
+```
+
+### Accessibility Testing
+
+The slider component includes proper ARIA attributes that work seamlessly with testing:
+
+```tsx
+test('slider has correct accessibility attributes', () => {
+  render(
+    <Slider
+      dataTestId="a11y-slider"
+      value={60}
+      min={0}
+      max={100}
+      aria-label="Volume control"
+    />
+  );
+
+  const slider = screen.getByRole('slider');
+  expect(slider).toHaveAttribute('aria-valuenow', '60');
+  expect(slider).toHaveAttribute('aria-valuemin', '0');
+  expect(slider).toHaveAttribute('aria-valuemax', '100');
+  expect(slider).toHaveAttribute('aria-label', 'Volume control');
+});
+```
+
+### Best Practices for Testing
+
+1. **Always use dataTestId**: Makes tests more maintainable and readable
+2. **Test user interactions**: Focus on how users interact with the slider
+3. **Verify accessibility**: Ensure ARIA attributes are present and correct
+4. **Test edge cases**: Min/max values, disabled states, range sliders
+5. **Test visual states**: Different sizes, colors, and variants
+6. **Integration testing**: Test slider within forms and complex UIs

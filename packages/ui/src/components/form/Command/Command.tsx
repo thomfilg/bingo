@@ -1,37 +1,37 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import CloseIcon from '@mui/icons-material/Close';
+import SearchIcon from '@mui/icons-material/Search';
 import {
+  alpha,
+  Box,
+  Chip,
+  CircularProgress,
   Dialog,
   DialogContent,
-  TextField,
-  List,
-  ListItemIcon,
-  ListItemText,
-  ListItemButton,
-  Typography,
-  Box,
-  InputAdornment,
-  Chip,
   Divider,
-  CircularProgress,
-  alpha,
-  useTheme,
   Fade,
   Grow,
   IconButton,
+  InputAdornment,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  TextField,
+  Typography,
+  useTheme,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import CloseIcon from '@mui/icons-material/Close';
+import React, { useCallback, useEffect, useMemo,useRef, useState } from 'react';
 
-import {
-  CommandProps,
-  CommandInputProps,
-  CommandListProps,
-  CommandGroupProps,
-  CommandItemProps,
+import type {
   CommandEmptyProps,
-  CommandLoadingProps,
-  CommandSeparatorProps,
+  CommandGroupProps,
+  CommandInputProps,
   CommandItem,
+  CommandItemProps,
+  CommandListProps,
+  CommandLoadingProps,
+  CommandProps,
+  CommandSeparatorProps,
 } from './Command.types';
 
 export const Command: React.FC<CommandProps> = ({
@@ -63,6 +63,7 @@ export const Command: React.FC<CommandProps> = ({
   onBlur,
   onClick,
   children,
+  dataTestId,
 }) => {
   const theme = useTheme();
   const [internalValue, setInternalValue] = useState(value);
@@ -231,6 +232,7 @@ export const Command: React.FC<CommandProps> = ({
           ...style,
         },
         className,
+        'data-testid': dataTestId,
       }}
       TransitionComponent={variant === 'glass' ? Fade : Grow}
       onClick={onClick}
@@ -245,15 +247,16 @@ export const Command: React.FC<CommandProps> = ({
           disabled={disabled}
           autoFocus={autoFocus}
           onKeyDown={handleKeyDown}
+          dataTestId={dataTestId ? `${dataTestId}-input` : undefined}
         />
-        
+
         <Divider />
-        
+
         <DialogContent sx={{ p: 0, maxHeight, overflow: 'auto' }}>
           {loading ? (
-            <CommandLoading />
+            <CommandLoading dataTestId={dataTestId ? `${dataTestId}-loading` : undefined} />
           ) : filteredItems.length === 0 ? (
-            <CommandEmpty message={emptyMessage} />
+            <CommandEmpty message={emptyMessage} dataTestId={dataTestId ? `${dataTestId}-empty` : undefined} />
           ) : (
             <CommandList
               items={filteredItems}
@@ -262,6 +265,7 @@ export const Command: React.FC<CommandProps> = ({
               showCategories={showCategories}
               showShortcuts={showShortcuts}
               showDescriptions={showDescriptions}
+              dataTestId={dataTestId ? `${dataTestId}-list` : undefined}
             />
           )}
           {children}
@@ -282,8 +286,8 @@ export const CommandInput: React.FC<CommandInputProps> = ({
   onKeyDown,
   className,
   style,
-}) => {
-  return (
+  dataTestId,
+}) => (
     <TextField
       fullWidth
       value={value}
@@ -296,6 +300,9 @@ export const CommandInput: React.FC<CommandInputProps> = ({
       autoFocus={autoFocus}
       variant="standard"
       className={className}
+      inputProps={{
+        'data-testid': dataTestId,
+      }}
       sx={{
         p: 2,
         '& .MuiInput-underline:before': { border: 'none' },
@@ -318,7 +325,6 @@ export const CommandInput: React.FC<CommandInputProps> = ({
       }}
     />
   );
-};
 
 export const CommandList: React.FC<CommandListProps> = ({
   items = [],
@@ -330,10 +336,11 @@ export const CommandList: React.FC<CommandListProps> = ({
   loading,
   className,
   style,
+  dataTestId,
 }) => {
   const groupedItems = useMemo(() => {
     if (!showCategories) return { '': items };
-    
+
     const groups: Record<string, CommandItem[]> = {};
     items.forEach(item => {
       const category = item.category || '';
@@ -343,11 +350,11 @@ export const CommandList: React.FC<CommandListProps> = ({
     return groups;
   }, [items, showCategories]);
 
-  if (loading) return <CommandLoading />;
-  if (items.length === 0) return <CommandEmpty message={emptyMessage} />;
+  if (loading) return <CommandLoading dataTestId={dataTestId ? `${dataTestId}-loading` : undefined} />;
+  if (items.length === 0) return <CommandEmpty message={emptyMessage} dataTestId={dataTestId ? `${dataTestId}-empty` : undefined} />;
 
   return (
-    <List className={className} sx={style}>
+    <List className={className} sx={style} data-testid={dataTestId}>
       {Object.entries(groupedItems).map(([category, categoryItems]) => (
         <CommandGroup
           key={category}
@@ -370,9 +377,12 @@ export const CommandGroup: React.FC<CommandGroupProps> = ({
   showDescriptions,
   className,
   style,
+  dataTestId,
 }) => {
+  const groupTestId = dataTestId || (heading ? `command-group-${heading}` : undefined);
+
   return (
-    <Box className={className} sx={style}>
+    <Box className={className} sx={style} data-testid={groupTestId}>
       {heading && (
         <Typography
           variant="caption"
@@ -395,6 +405,7 @@ export const CommandGroup: React.FC<CommandGroupProps> = ({
           onSelect={() => onSelect?.(item)}
           showShortcut={showShortcuts}
           showDescription={showDescriptions}
+          dataTestId={`command-item-${item.id}`}
         />
       ))}
     </Box>
@@ -413,15 +424,17 @@ const CommandItemComponent: React.FC<CommandItemProps> = ({
   showDescription,
   className,
   style,
+  dataTestId,
 }) => {
   const theme = useTheme();
-  
+
   return (
     <ListItemButton
       onClick={onSelect}
       disabled={disabled}
       selected={selected}
       className={className}
+      data-testid={dataTestId}
       sx={{
         py: 1.5,
         px: 2,
@@ -442,7 +455,7 @@ const CommandItemComponent: React.FC<CommandItemProps> = ({
           {icon}
         </ListItemIcon>
       )}
-      
+
       <ListItemText
         primary={label}
         secondary={showDescription && description}
@@ -454,7 +467,7 @@ const CommandItemComponent: React.FC<CommandItemProps> = ({
           fontSize: '0.75rem',
         }}
       />
-      
+
       {showShortcut && shortcut && (
         <Chip
           label={shortcut}
@@ -475,10 +488,11 @@ export const CommandEmpty: React.FC<CommandEmptyProps> = ({
   message = 'No results found',
   className,
   style,
-}) => {
-  return (
+  dataTestId,
+}) => (
     <Box
       className={className}
+      data-testid={dataTestId}
       sx={{
         p: 4,
         textAlign: 'center',
@@ -489,16 +503,16 @@ export const CommandEmpty: React.FC<CommandEmptyProps> = ({
       <Typography variant="body2">{message}</Typography>
     </Box>
   );
-};
 
 export const CommandLoading: React.FC<CommandLoadingProps> = ({
   message = 'Loading...',
   className,
   style,
-}) => {
-  return (
+  dataTestId,
+}) => (
     <Box
       className={className}
+      data-testid={dataTestId}
       sx={{
         p: 4,
         display: 'flex',
@@ -514,11 +528,8 @@ export const CommandLoading: React.FC<CommandLoadingProps> = ({
       </Typography>
     </Box>
   );
-};
 
 export const CommandSeparator: React.FC<CommandSeparatorProps> = ({
   className,
   style,
-}) => {
-  return <Divider className={className} sx={{ my: 1, ...style }} />;
-};
+}) => <Divider className={className} sx={{ my: 1, ...style }} />;

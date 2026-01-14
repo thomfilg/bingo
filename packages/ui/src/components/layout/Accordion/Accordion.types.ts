@@ -1,5 +1,5 @@
-import { AccordionProps as MuiAccordionProps } from '@mui/material';
-import { ReactNode } from 'react';
+import type { AccordionProps as MuiAccordionProps } from '@mui/material';
+import type { ReactNode } from 'react';
 
 export type AccordionVariant = 'default' | 'glass' | 'bordered' | 'separated';
 

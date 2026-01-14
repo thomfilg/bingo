@@ -1,30 +1,39 @@
-import React from 'react';
+import { CheckCircle } from '@mui/icons-material';
 import {
   Box,
-  Typography,
   Button,
   styled,
+  Typography,
 } from '@mui/material';
-import { CheckCircle } from '@mui/icons-material';
+import React from 'react';
 
-import { StepperProps, StepItemProps } from './Stepper.types';
+import type { StepItemProps,StepperProps } from './Stepper.types';
 
 const StepperRoot = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'orientation',
-})<{ orientation: 'horizontal' | 'vertical' }>(({ orientation }) => ({
+})<{ orientation: 'horizontal' | 'vertical'; component?: React.ElementType }>(({ orientation }) => ({
   display: 'flex',
   flexDirection: orientation === 'horizontal' ? 'row' : 'column',
-  alignItems: orientation === 'horizontal' ? 'center' : 'flex-start',
+  // Use flex-start to align all step circles at the same vertical position
+  alignItems: 'flex-start',
 }));
 
 const StepItem = styled(Box, {
   shouldForwardProp: (prop) => !['orientation', 'isLast'].includes(prop as string),
 })<{ orientation: 'horizontal' | 'vertical'; isLast: boolean }>(({ orientation, isLast }) => ({
   display: 'flex',
-  flexDirection: orientation === 'horizontal' ? 'column' : 'row',
-  alignItems: 'center',
+  // For horizontal: row layout so connector appears beside step content
+  // For vertical: column layout so connector appears below step content
+  flexDirection: orientation === 'horizontal' ? 'row' : 'column',
+  // For horizontal: flex-start to keep circles aligned at top
+  // For vertical: center to align connector with centered circle
+  alignItems: orientation === 'horizontal' ? 'flex-start' : 'center',
   flex: orientation === 'horizontal' && !isLast ? 1 : 'none',
   position: 'relative',
+  // For vertical: ensure consistent width for proper centering
+  ...(orientation === 'vertical' && {
+    width: '100%',
+  }),
 }));
 
 const StepButton = styled(Button, {
@@ -73,15 +82,21 @@ const StepConnector = styled(Box, {
     }),
     ...(orientation === 'horizontal'
       ? {
-          width: '100%',
+          flex: 1,
           height: 2,
-          margin: '0 8px',
+          marginTop: 23, // Center with 48px step button (48/2 - 1)
+          marginLeft: 8,
+          marginRight: 8,
+          minWidth: 24,
         }
       : {
           width: 2,
           height: 32,
-          margin: '8px 0',
-          marginLeft: 23, // Center with step button
+          marginTop: 8,
+          marginBottom: 8,
+          // Use margin auto to center horizontally
+          marginLeft: 'auto',
+          marginRight: 'auto',
         }),
   }),
 );
@@ -89,9 +104,8 @@ const StepConnector = styled(Box, {
 const StepLabel = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'orientation',
 })<{ orientation: 'horizontal' | 'vertical' }>(({ orientation }) => ({
-  textAlign: orientation === 'horizontal' ? 'center' : 'left',
+  textAlign: 'center',
   marginTop: orientation === 'horizontal' ? 8 : 0,
-  marginLeft: orientation === 'vertical' ? 16 : 0,
 }));
 
 const StepperItem: React.FC<StepItemProps> = ({
@@ -116,8 +130,25 @@ const StepperItem: React.FC<StepItemProps> = ({
   };
 
   return (
-    <StepItem orientation={orientation} isLast={isLast} role="listitem">
-      <Box display="flex" flexDirection={orientation === 'horizontal' ? 'column' : 'row'} alignItems="center">
+    <StepItem
+      orientation={orientation}
+      isLast={isLast}
+      role="listitem"
+      data-testid={`stepper-step-${index}`}
+      className={`${isActive ? 'stepper-step-active' : ''} ${isCompleted ? 'stepper-step-completed' : ''} ${step.optional ? 'stepper-step-optional' : ''}`}
+    >
+      {/* Step content: button and label stacked vertically for horizontal, or in row for vertical */}
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        data-testid={`stepper-step-content-${index}`}
+        sx={orientation === 'horizontal' ? {
+          minWidth: 80,
+          maxWidth: 150,
+          flex: '0 1 auto',
+        } : { flexShrink: 0 }}
+      >
         <StepButton
           isActive={isActive}
           isCompleted={isCompleted}
@@ -128,6 +159,7 @@ const StepperItem: React.FC<StepItemProps> = ({
           aria-label={`Step ${index + 1}: ${step.label}${step.optional ? ' (optional)' : ''}${
             isCompleted ? ' (completed)' : isActive ? ' (current)' : ''
           }`}
+          data-testid={`stepper-step-icon-${index}`}
         >
           {isCompleted ? (
             <CheckCircle />
@@ -138,7 +170,7 @@ const StepperItem: React.FC<StepItemProps> = ({
           )}
         </StepButton>
 
-        <StepLabel orientation={orientation}>
+        <StepLabel orientation={orientation} data-testid={`stepper-step-label-${index}`}>
           <Typography
             variant="body2"
             fontWeight={isActive ? 'bold' : 'normal'}
@@ -157,19 +189,24 @@ const StepperItem: React.FC<StepItemProps> = ({
             )}
           </Typography>
           {step.description && (
-            <Typography variant="caption" color="textSecondary" display="block">
+            <Typography
+              variant="caption"
+              color="textSecondary"
+              display="block"
+            >
               {step.description}
             </Typography>
           )}
         </StepLabel>
       </Box>
 
+      {/* Connector: appears beside step content for horizontal layout */}
       {!isLast && (
         <>
           {renderConnector && nextStep ? (
             renderConnector(step, nextStep, { completed: isCompleted, active: isActive })
           ) : (
-            <StepConnector orientation={orientation} isCompleted={isCompleted} />
+            <StepConnector orientation={orientation} isCompleted={isCompleted} data-testid={`stepper-connector-${index}`} />
           )}
         </>
       )}
@@ -197,7 +234,7 @@ export const Stepper: React.FC<StepperProps> = ({
       component="ol"
       orientation={orientation}
       className={className}
-      data-testid={dataTestId}
+      data-testid={dataTestId || 'stepper-container'}
       sx={{
         listStyle: 'none',
         padding: 0,

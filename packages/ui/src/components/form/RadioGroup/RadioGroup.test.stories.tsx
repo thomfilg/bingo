@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Box, Typography } from '@mui/material';
-import { CreditCard, Banknote, Smartphone, Globe, Star, Heart, Zap, Shield } from 'lucide-react';
-import { userEvent, within, expect, fn, waitFor } from 'storybook/test';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Banknote, CreditCard, Globe, Heart, Shield,Smartphone, Star, Zap } from 'lucide-react';
+import { expect, fn, userEvent, waitFor,within } from 'storybook/test';
 
 import { RadioGroup } from './RadioGroup';
 
@@ -67,7 +67,7 @@ export const BasicInteraction: Story = {
     variant: 'default',
     value: '',
     onChange: fn(),
-    'data-testid': 'radio-group',
+    dataTestId: 'radio-group',
   },
   play: async ({ canvasElement, step, args }) => {
     const canvas = within(canvasElement);
@@ -78,6 +78,11 @@ export const BasicInteraction: Story = {
 
       const radioOptions = canvas.getAllByRole('radio');
       await expect(radioOptions).toHaveLength(3);
+
+      // Verify testIds are present
+      await expect(canvas.getByTestId('radio-group')).toBeInTheDocument();
+      await expect(canvas.getByTestId('radio-group-label')).toBeInTheDocument();
+      await expect(canvas.getByTestId('radio-group-group')).toBeInTheDocument();
     });
 
     await step('Click radio option', async () => {
@@ -87,6 +92,11 @@ export const BasicInteraction: Story = {
       // Check that onChange was called - the first argument can be either a SyntheticEvent or a plain object
       const firstCall = args.onChange.mock.calls[0];
       await expect(firstCall[1]).toBe('option1');
+
+      // Verify testIds for individual radio buttons
+      await expect(canvas.getByTestId('radio-group-radio-0')).toBeInTheDocument();
+      await expect(canvas.getByTestId('radio-group-option-0')).toBeInTheDocument();
+      await expect(canvas.getByTestId('radio-group-label-0')).toBeInTheDocument();
     });
 
     await step('Select different option', async () => {

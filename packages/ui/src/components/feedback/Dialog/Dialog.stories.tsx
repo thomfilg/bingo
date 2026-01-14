@@ -1,8 +1,8 @@
+import { Box,Button, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { Button, Typography, Box } from '@mui/material';
 
-import { Dialog, DialogHeader, DialogContent, DialogActions } from './Dialog';
+import { Dialog, DialogActions,DialogContent, DialogHeader } from './Dialog';
 
 const meta: Meta<typeof Dialog> = {
   title: 'Feedback/Dialog',

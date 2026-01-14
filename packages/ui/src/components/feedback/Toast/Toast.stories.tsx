@@ -1,6 +1,6 @@
+import { Box, Button, ButtonGroup,Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import React, { useState, useEffect } from 'react';
-import { Button, Box, Typography, ButtonGroup } from '@mui/material';
+import React, { useEffect,useState } from 'react';
 
 import { Toast, ToastProvider, useToast } from './Toast';
 
@@ -310,8 +310,7 @@ export const PromiseHandling: Story = {
 };
 
 // Required story export: AllVariants
-const AllVariantsComponent = () => {
-  return (
+const AllVariantsComponent = () => (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <Toast message="Default variant" variant="default" />
       <Toast message="Success variant" variant="success" />
@@ -321,7 +320,6 @@ const AllVariantsComponent = () => {
       <Toast message="Promise variant (loading)" variant="promise" />
     </Box>
   );
-};
 
 export const AllVariants: Story = {
   render: () => <AllVariantsComponent />,
@@ -390,8 +388,7 @@ export const AllSizes: Story = {
 };
 
 // Required story export: AllStates
-const AllStatesComponent = () => {
-  return (
+const AllStatesComponent = () => (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <Toast message="Normal state" variant="info" />
       <Toast message="With close button" variant="info" closable={true} />
@@ -410,7 +407,6 @@ const AllStatesComponent = () => {
       <Toast message="Persistent toast (no auto-dismiss)" variant="warning" persistent={true} />
     </Box>
   );
-};
 
 export const AllStates: Story = {
   render: () => <AllStatesComponent />,

@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export type BannerVariant = 'info' | 'success' | 'warning' | 'critical';
 
@@ -36,4 +36,6 @@ export interface BannerProps {
   className?: string;
   /** Children content */
   children?: ReactNode;
+  /** Test ID for component testing */
+  'data-testid'?: string;
 }

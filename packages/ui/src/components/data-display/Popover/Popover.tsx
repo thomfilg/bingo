@@ -1,9 +1,9 @@
-import React from 'react';
-import { Popover as MuiPopover, Paper, alpha, keyframes } from '@mui/material';
 import type { PaperProps } from '@mui/material';
+import { alpha, keyframes,Paper, Popover as MuiPopover } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import React from 'react';
 
-import { PopoverProps } from './Popover.types';
+import type { PopoverProps } from './Popover.types';
 
 // Define pulse animation
 const pulseAnimation = keyframes`
@@ -107,12 +107,13 @@ export const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
     glow = false,
     pulse = false,
     maxWidth = 400,
+    dataTestId,
     children,
     ...props
-  }, ref) => {
-    return (
+  }, ref) => (
       <MuiPopover
         ref={ref}
+        data-testid={dataTestId || 'popover-content'}
         PaperProps={{
           component: StyledPaper as React.ComponentType<PaperProps>,
           customVariant: variant,
@@ -125,8 +126,7 @@ export const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
       >
         {children}
       </MuiPopover>
-    );
-  }
+    )
 );
 
 Popover.displayName = 'Popover';

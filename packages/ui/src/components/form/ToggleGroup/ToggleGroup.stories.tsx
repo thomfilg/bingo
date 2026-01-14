@@ -1,25 +1,25 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Box, Typography } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import {
-  Bold,
-  Italic,
-  Underline,
-  AlignLeft,
   AlignCenter,
+  AlignLeft,
   AlignRight,
+  Bold,
+  Bookmark,
+  Heart,
+  Italic,
   List,
   ListOrdered,
-  Quote,
-  Sun,
-  Moon,
   Monitor,
-  Play,
+  Moon,
   Pause,
-  SkipForward,
+  Play,
+  Quote,
   SkipBack,
-  Heart,
+  SkipForward,
   Star,
-  Bookmark,
+  Sun,
+  Underline,
 } from 'lucide-react';
 import { useState } from 'react';
 

@@ -1,5 +1,5 @@
-import { BadgeProps as MuiBadgeProps } from '@mui/material';
-import React from 'react';
+import type { BadgeProps as MuiBadgeProps } from '@mui/material';
+import type React from 'react';
 
 export type BadgeVariant = 
   | 'default' 
@@ -29,7 +29,7 @@ export interface BadgeProps extends Omit<MuiBadgeProps, 'variant' | 'color' | 'c
   /**
    * The color of the badge
    */
-  color?: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'neutral';
+  color?: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'neutral' | 'info';
   
   /**
    * Whether the badge should have a glow effect
@@ -110,4 +110,9 @@ export interface BadgeProps extends Omit<MuiBadgeProps, 'variant' | 'color' | 'c
    * Custom icon element to display in the badge
    */
   icon?: React.ReactNode;
+
+  /**
+   * Custom test ID for testing
+   */
+  'data-testid'?: string;
 }

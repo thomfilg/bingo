@@ -294,3 +294,406 @@ function ApiPagination() {
   );
 }
 ```
+
+## Testing
+
+The Pagination component includes comprehensive test IDs for automated testing, supporting both unit and end-to-end test scenarios.
+
+### Test IDs
+
+All test IDs follow a consistent pattern and can be customized using the `dataTestId` prop:
+
+| Element | Default Test ID | Custom Test ID Pattern | Description |
+|---------|----------------|------------------------|-------------|
+| Container | `pagination` | `{dataTestId}` | Main pagination container |
+| First button | `pagination-first` | `{dataTestId}-first` | First page button |
+| Previous button | `pagination-prev` | `{dataTestId}-prev` | Previous page button |
+| Next button | `pagination-next` | `{dataTestId}-next` | Next page button |
+| Last button | `pagination-last` | `{dataTestId}-last` | Last page button |
+| Page button | `pagination-page-{N}` | `{dataTestId}-page-{N}` | Individual page button (N = page number) |
+| Page info | `pagination-info` | `{dataTestId}-info` | Page information text |
+| Items per page | `pagination-items-per-page` | `{dataTestId}-items-per-page` | Items per page selector |
+
+### Testing Best Practices
+
+#### Unit Testing with React Testing Library
+
+```tsx
+import { render, screen, fireEvent } from '@testing-library/react';
+import { Pagination } from './Pagination';
+
+describe('Pagination', () => {
+  it('should render with default test IDs', () => {
+    render(
+      <Pagination
+        page={1}
+        count={5}
+        onChange={jest.fn()}
+      />
+    );
+
+    expect(screen.getByTestId('pagination')).toBeInTheDocument();
+    expect(screen.getByTestId('pagination-page-1')).toBeInTheDocument();
+    expect(screen.getByTestId('pagination-prev')).toBeInTheDocument();
+    expect(screen.getByTestId('pagination-next')).toBeInTheDocument();
+  });
+
+  it('should use custom test IDs when provided', () => {
+    render(
+      <Pagination
+        page={2}
+        count={5}
+        onChange={jest.fn()}
+        dataTestId="custom-pagination"
+      />
+    );
+
+    expect(screen.getByTestId('custom-pagination')).toBeInTheDocument();
+    expect(screen.getByTestId('custom-pagination-page-2')).toBeInTheDocument();
+    expect(screen.getByTestId('custom-pagination-prev')).toBeInTheDocument();
+    expect(screen.getByTestId('custom-pagination-next')).toBeInTheDocument();
+  });
+
+  it('should call onChange when page button is clicked', () => {
+    const handleChange = jest.fn();
+    render(
+      <Pagination
+        page={1}
+        count={5}
+        onChange={handleChange}
+      />
+    );
+
+    fireEvent.click(screen.getByTestId('pagination-page-3'));
+    expect(handleChange).toHaveBeenCalledWith(expect.any(Object), 3);
+  });
+
+  it('should show first and last buttons when enabled', () => {
+    render(
+      <Pagination
+        page={3}
+        count={10}
+        onChange={jest.fn()}
+        showFirstButton
+        showLastButton
+      />
+    );
+
+    expect(screen.getByTestId('pagination-first')).toBeInTheDocument();
+    expect(screen.getByTestId('pagination-last')).toBeInTheDocument();
+  });
+
+  it('should show page info when enabled', () => {
+    render(
+      <Pagination
+        page={2}
+        count={10}
+        onChange={jest.fn()}
+        showPageInfo
+      />
+    );
+
+    const pageInfo = screen.getByTestId('pagination-info');
+    expect(pageInfo).toHaveTextContent('Page 2 of 10');
+  });
+
+  it('should show items per page selector when enabled', () => {
+    const handleItemsChange = jest.fn();
+    render(
+      <Pagination
+        page={1}
+        count={10}
+        onChange={jest.fn()}
+        showItemsPerPage
+        itemsPerPage={25}
+        onItemsPerPageChange={handleItemsChange}
+      />
+    );
+
+    const selector = screen.getByTestId('pagination-items-per-page');
+    expect(selector).toBeInTheDocument();
+  });
+});
+```
+
+#### Navigation Testing
+
+```tsx
+describe('Pagination Navigation', () => {
+  it('should navigate to next page', () => {
+    const handleChange = jest.fn();
+    render(
+      <Pagination
+        page={1}
+        count={5}
+        onChange={handleChange}
+      />
+    );
+
+    fireEvent.click(screen.getByTestId('pagination-next'));
+    expect(handleChange).toHaveBeenCalledWith(expect.any(Object), 2);
+  });
+
+  it('should navigate to previous page', () => {
+    const handleChange = jest.fn();
+    render(
+      <Pagination
+        page={3}
+        count={5}
+        onChange={handleChange}
+      />
+    );
+
+    fireEvent.click(screen.getByTestId('pagination-prev'));
+    expect(handleChange).toHaveBeenCalledWith(expect.any(Object), 2);
+  });
+
+  it('should jump to first page', () => {
+    const handleChange = jest.fn();
+    render(
+      <Pagination
+        page={5}
+        count={10}
+        onChange={handleChange}
+        showFirstButton
+      />
+    );
+
+    fireEvent.click(screen.getByTestId('pagination-first'));
+    expect(handleChange).toHaveBeenCalledWith(expect.any(Object), 1);
+  });
+
+  it('should jump to last page', () => {
+    const handleChange = jest.fn();
+    render(
+      <Pagination
+        page={1}
+        count={10}
+        onChange={handleChange}
+        showLastButton
+      />
+    );
+
+    fireEvent.click(screen.getByTestId('pagination-last'));
+    expect(handleChange).toHaveBeenCalledWith(expect.any(Object), 10);
+  });
+
+  it('should disable navigation when disabled prop is true', () => {
+    render(
+      <Pagination
+        page={2}
+        count={5}
+        onChange={jest.fn()}
+        disabled
+      />
+    );
+
+    expect(screen.getByTestId('pagination-prev')).toBeDisabled();
+    expect(screen.getByTestId('pagination-next')).toBeDisabled();
+  });
+});
+```
+
+#### E2E Testing with Playwright
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test.describe('Pagination Component', () => {
+  test('should navigate through pages', async ({ page }) => {
+    await page.goto('/pagination-demo');
+
+    // Click on page 3
+    await page.getByTestId('pagination-page-3').click();
+    await expect(page.locator('[data-testid="pagination-page-3"]')).toHaveClass(/Mui-selected/);
+
+    // Navigate to next page
+    await page.getByTestId('pagination-next').click();
+    await expect(page.locator('[data-testid="pagination-page-4"]')).toHaveClass(/Mui-selected/);
+
+    // Navigate to previous page
+    await page.getByTestId('pagination-prev').click();
+    await expect(page.locator('[data-testid="pagination-page-3"]')).toHaveClass(/Mui-selected/);
+  });
+
+  test('should change items per page', async ({ page }) => {
+    await page.goto('/pagination-demo');
+
+    // Open items per page dropdown
+    await page.getByTestId('pagination-items-per-page').click();
+
+    // Select 50 items per page
+    await page.getByRole('option', { name: '50' }).click();
+
+    // Verify selection
+    await expect(page.getByTestId('pagination-items-per-page')).toContainText('50');
+  });
+
+  test('should display correct page info', async ({ page }) => {
+    await page.goto('/pagination-demo');
+
+    const pageInfo = page.getByTestId('pagination-info');
+    await expect(pageInfo).toHaveText('Page 1 of 10');
+
+    // Navigate to page 5
+    await page.getByTestId('pagination-page-5').click();
+    await expect(pageInfo).toHaveText('Page 5 of 10');
+  });
+
+  test('should support keyboard navigation', async ({ page }) => {
+    await page.goto('/pagination-demo');
+
+    // Focus on page 2 button
+    await page.getByTestId('pagination-page-2').focus();
+
+    // Press Enter to navigate
+    await page.keyboard.press('Enter');
+    await expect(page.locator('[data-testid="pagination-page-2"]')).toHaveClass(/Mui-selected/);
+
+    // Use arrow keys to navigate
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('Enter');
+    await expect(page.locator('[data-testid="pagination-page-3"]')).toHaveClass(/Mui-selected/);
+  });
+});
+```
+
+### Common Test Scenarios
+
+#### Testing with Multiple Pagination Instances
+
+```tsx
+describe('Multiple Pagination Instances', () => {
+  it('should support multiple instances with unique test IDs', () => {
+    render(
+      <>
+        <Pagination
+          dataTestId="users-pagination"
+          page={1}
+          count={5}
+          onChange={jest.fn()}
+        />
+        <Pagination
+          dataTestId="products-pagination"
+          page={2}
+          count={10}
+          onChange={jest.fn()}
+        />
+      </>
+    );
+
+    expect(screen.getByTestId('users-pagination')).toBeInTheDocument();
+    expect(screen.getByTestId('products-pagination')).toBeInTheDocument();
+    expect(screen.getByTestId('users-pagination-page-1')).toBeInTheDocument();
+    expect(screen.getByTestId('products-pagination-page-2')).toBeInTheDocument();
+  });
+});
+```
+
+#### Testing Different Variants
+
+```tsx
+describe('Pagination Variants', () => {
+  it('should render dots variant correctly', () => {
+    render(
+      <Pagination
+        page={3}
+        count={10}
+        onChange={jest.fn()}
+        variant="dots"
+      />
+    );
+
+    // Dots variant hides navigation buttons
+    expect(screen.queryByTestId('pagination-prev')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('pagination-next')).not.toBeInTheDocument();
+
+    // Page dots should still be present
+    expect(screen.getByTestId('pagination-page-3')).toBeInTheDocument();
+  });
+
+  it('should render minimal variant correctly', () => {
+    render(
+      <Pagination
+        page={2}
+        count={5}
+        onChange={jest.fn()}
+        variant="minimal"
+      />
+    );
+
+    expect(screen.getByTestId('pagination')).toBeInTheDocument();
+    expect(screen.getByTestId('pagination-page-2')).toBeInTheDocument();
+  });
+});
+```
+
+#### Testing Accessibility
+
+```tsx
+describe('Pagination Accessibility', () => {
+  it('should have proper ARIA labels', () => {
+    render(
+      <Pagination
+        page={2}
+        count={5}
+        onChange={jest.fn()}
+        showFirstButton
+        showLastButton
+      />
+    );
+
+    expect(screen.getByTestId('pagination-first')).toHaveAttribute('aria-label', 'Go to first page');
+    expect(screen.getByTestId('pagination-last')).toHaveAttribute('aria-label', 'Go to last page');
+    expect(screen.getByTestId('pagination-prev')).toHaveAttribute('aria-label', 'Go to previous page');
+    expect(screen.getByTestId('pagination-next')).toHaveAttribute('aria-label', 'Go to next page');
+  });
+
+  it('should indicate current page', () => {
+    render(
+      <Pagination
+        page={3}
+        count={10}
+        onChange={jest.fn()}
+      />
+    );
+
+    const currentPage = screen.getByTestId('pagination-page-3');
+    expect(currentPage).toHaveClass('Mui-selected');
+    expect(currentPage).toHaveAttribute('aria-current', 'page');
+  });
+});
+```
+
+### Integration Testing Tips
+
+1. **Test with realistic data**: Use actual page counts and data volumes
+2. **Test edge cases**: First page, last page, single page scenarios
+3. **Test state management**: Verify page state updates correctly
+4. **Test async operations**: Mock API calls and test loading states
+5. **Test responsiveness**: Verify behavior across different viewport sizes
+6. **Test accessibility**: Use axe-core or similar tools for a11y testing
+
+### Visual Regression Testing
+
+```typescript
+import { test } from '@playwright/test';
+
+test.describe('Pagination Visual Tests', () => {
+  test('should match snapshot - default variant', async ({ page }) => {
+    await page.goto('/pagination-demo');
+    await expect(page.getByTestId('pagination')).toHaveScreenshot('pagination-default.png');
+  });
+
+  test('should match snapshot - rounded variant', async ({ page }) => {
+    await page.goto('/pagination-demo?variant=rounded');
+    await expect(page.getByTestId('pagination')).toHaveScreenshot('pagination-rounded.png');
+  });
+
+  test('should match snapshot - hover state', async ({ page }) => {
+    await page.goto('/pagination-demo');
+    await page.getByTestId('pagination-page-3').hover();
+    await expect(page.getByTestId('pagination')).toHaveScreenshot('pagination-hover.png');
+  });
+});
+```

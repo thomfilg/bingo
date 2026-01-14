@@ -1,7 +1,7 @@
+import { alpha,Box, Skeleton as MuiSkeleton, Stack, useTheme } from '@mui/material';
 import React from 'react';
-import { Skeleton as MuiSkeleton, Box, Stack, useTheme, alpha } from '@mui/material';
 
-import { SkeletonProps } from './Skeleton.types';
+import type { SkeletonProps } from './Skeleton.types';
 
 export const Skeleton: React.FC<SkeletonProps> = React.memo(
   ({

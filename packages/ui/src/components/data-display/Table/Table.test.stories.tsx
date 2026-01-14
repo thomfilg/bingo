@@ -1,10 +1,10 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor } from 'storybook/test';
-import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
+import { expect, userEvent, waitFor,within } from 'storybook/test';
 
 import { Table } from './Table';
-import { ColumnConfig } from './Table.types';
+import type { ColumnConfig } from './Table.types';
 
 const meta: Meta<typeof Table> = {
   title: 'DataDisplay/Table/Tests',

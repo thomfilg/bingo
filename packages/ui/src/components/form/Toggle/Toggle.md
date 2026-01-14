@@ -56,7 +56,7 @@ Common use cases:
 ### Basic Toggle
 
 ```tsx
-import { Toggle } from '@repo/ui';
+import { Toggle } from '@procurement/ui';
 
 function BasicExample() {
   const [selected, setSelected] = useState(false);
@@ -72,7 +72,7 @@ function BasicExample() {
 ### Toggle Group (Exclusive)
 
 ```tsx
-import { ToggleGroup, Toggle } from '@repo/ui';
+import { ToggleGroup, Toggle } from '@procurement/ui';
 
 function ViewSelector() {
   const [view, setView] = useState('list');
@@ -105,7 +105,7 @@ function ViewSelector() {
 ### Multi-Select Toggle Group
 
 ```tsx
-import { ToggleGroup, Toggle } from '@repo/ui';
+import { ToggleGroup, Toggle } from '@procurement/ui';
 
 function FormatSelector() {
   const [formats, setFormats] = useState<string[]>([]);
@@ -157,6 +157,68 @@ function FormatSelector() {
   - Disabled toggles are skipped in tab order
 - **Color Contrast**: Ensure sufficient contrast between toggle states
 
+## Testing
+
+The Toggle component includes comprehensive test IDs for automated testing:
+
+### Test IDs
+
+| Element | Test ID Pattern | Description |
+| ------- | --------------- | ----------- |
+| Toggle Button | `dataTestId` | The main toggle button container |
+| Icon | `{dataTestId}-icon` | The icon element (when icon prop is provided) |
+
+### Testing Example
+
+```tsx
+import { Toggle } from '@procurement/ui';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+describe('Toggle', () => {
+  it('should toggle selection state on click', async () => {
+    const user = userEvent.setup();
+    const handleChange = jest.fn();
+
+    render(
+      <Toggle
+        dataTestId="my-toggle"
+        selected={false}
+        onChange={handleChange}
+        value="test"
+      >
+        Toggle Me
+      </Toggle>
+    );
+
+    const toggle = screen.getByTestId('my-toggle');
+    expect(toggle).toHaveAttribute('aria-pressed', 'false');
+
+    await user.click(toggle);
+    expect(handleChange).toHaveBeenCalled();
+  });
+
+  it('should render icon with test ID', () => {
+    render(
+      <Toggle
+        dataTestId="icon-toggle"
+        selected={false}
+        icon={<span>★</span>}
+      >
+        Star
+      </Toggle>
+    );
+
+    const icon = screen.getByTestId('icon-toggle-icon');
+    expect(icon).toBeInTheDocument();
+  });
+});
+```
+
+### Integration with Storybook
+
+All test stories use the `dataTestId` prop for interaction testing. See `Toggle.test.stories.tsx` for comprehensive examples.
+
 ## Best Practices
 
 1. **Clear State Indication**: Make it visually obvious when a toggle is selected vs unselected
@@ -169,3 +231,4 @@ function FormatSelector() {
 8. **Mobile Optimization**: Ensure touch targets meet minimum size requirements (44x44px)
 9. **Loading States**: Consider showing loading state if toggle triggers async operations
 10. **Error Handling**: Handle edge cases like null values in exclusive groups gracefully
+11. **Test Coverage**: Always provide `dataTestId` prop for components that need to be tested

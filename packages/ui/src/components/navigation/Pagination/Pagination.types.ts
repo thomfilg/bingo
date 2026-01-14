@@ -1,5 +1,5 @@
-import { PaginationProps as MuiPaginationProps } from '@mui/material';
-import { ReactNode } from 'react';
+import type { PaginationProps as MuiPaginationProps } from '@mui/material';
+import type { ReactNode } from 'react';
 
 export interface PaginationProps extends Omit<MuiPaginationProps, 'variant' | 'size'> {
   /**
@@ -121,4 +121,9 @@ export interface PaginationProps extends Omit<MuiPaginationProps, 'variant' | 's
    * Custom class name
    */
   className?: string;
+
+  /**
+   * Test ID for component testing
+   */
+  dataTestId?: string;
 }

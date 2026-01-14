@@ -1,14 +1,14 @@
-import React from 'react';
 import {
-  TextField,
   alpha,
-  styled,
+  CircularProgress,
   InputAdornment,
   keyframes,
-  CircularProgress,
+  styled,
+  TextField,
 } from '@mui/material';
+import React from 'react';
 
-import { InputProps } from './Input.types';
+import type { InputProps } from './Input.types';
 
 // Define pulse animation
 const pulseAnimation = keyframes`

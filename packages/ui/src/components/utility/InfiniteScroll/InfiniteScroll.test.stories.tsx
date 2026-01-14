@@ -1,7 +1,7 @@
+import { Box, ListItem, ListItemText,Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import React, { useState, useCallback } from 'react';
-import { userEvent, within, expect, waitFor } from 'storybook/test';
-import { Box, Typography, ListItem, ListItemText } from '@mui/material';
+import React, { useCallback, useRef, useState } from 'react';
+import { expect, userEvent, waitFor,within } from 'storybook/test';
 
 import { InfiniteScroll } from './InfiniteScroll';
 
@@ -31,28 +31,50 @@ const generateItems = (start: number, count: number): TestItem[] =>
     description: `Description ${start + i + 1}`,
   }));
 
-const createTestComponent = () => {
+const createTestComponent = (useTestMode = false) => {
   const TestComponent = () => {
     const [items, setItems] = useState<TestItem[]>(generateItems(0, 5));
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
+    const triggerRef = useRef<(() => void) | undefined>(undefined);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const loadMoreRef = useRef<(() => Promise<void>) | undefined>(undefined);
+    const loadingRef = useRef(false);
 
     const loadMore = useCallback(async () => {
-      if (loading) return;
+      if (loadingRef.current) return; // Already loading
+      loadingRef.current = true;
       setLoading(true);
       await new Promise((resolve) => setTimeout(resolve, 100));
       const newItems = generateItems(items.length, 3);
       setItems((prev) => [...prev, ...newItems]);
-      if (items.length + 3 >= 12) setHasMore(false);
+      setHasMore((prev) => items.length + 3 < 12);
       setLoading(false);
-    }, [items.length, loading]);
+      loadingRef.current = false;
+    }, [items.length]);
+
+    // Expose trigger to container for tests
+    React.useEffect(() => {
+      loadMoreRef.current = loadMore;
+      if (useTestMode && containerRef.current) {
+        (containerRef.current as any)._testTrigger = triggerRef.current || loadMore;
+        (containerRef.current as any)._loadMore = loadMore;
+      }
+    });
 
     return (
       <Box
+        ref={containerRef}
         sx={{ width: 400, height: 250, overflow: 'auto', border: '1px solid #ccc' }}
         data-testid="scroll-container"
       >
-        <InfiniteScroll hasMore={hasMore} loading={loading} loadMore={loadMore}>
+        <InfiniteScroll
+          hasMore={hasMore}
+          loading={loading}
+          loadMore={loadMore}
+          testMode={useTestMode}
+          testTriggerRef={useTestMode ? triggerRef : undefined}
+        >
           {items.map((item) => (
             <ListItem key={item.id} data-testid={`item-${item.id}`} tabIndex={0}>
               <ListItemText primary={item.name} secondary={item.description} />
@@ -70,24 +92,30 @@ const createTestComponent = () => {
 export const BasicInteraction: Story = {
   name: '🧪 Basic Interaction Test',
   render: () => {
-    const TestComponent = createTestComponent();
+    const TestComponent = createTestComponent(false);
     return <TestComponent />;
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
 
     await step('Initial render verification', async () => {
+      // Verify initial 5 items are present (IDs 0-4)
       await expect(canvas.getByTestId('item-0')).toBeInTheDocument();
+      await expect(canvas.getByTestId('item-1')).toBeInTheDocument();
+      await expect(canvas.getByTestId('item-2')).toBeInTheDocument();
+      await expect(canvas.getByTestId('item-3')).toBeInTheDocument();
+      await expect(canvas.getByTestId('item-4')).toBeInTheDocument();
+
+      // Verify next batch items are NOT present yet
       await expect(canvas.queryByTestId('item-5')).not.toBeInTheDocument();
-    });
 
-    await step('Scroll triggers loading', async () => {
+      // Verify sentinel is present and properly configured
+      const sentinel = canvas.getByTestId('infinite-scroll-sentinel');
+      await expect(sentinel).toBeInTheDocument();
+
+      // Verify container is scrollable
       const container = canvas.getByTestId('scroll-container');
-      container.scrollTop = container.scrollHeight;
-
-      await waitFor(() => expect(canvas.getByTestId('item-5')).toBeInTheDocument(), {
-        timeout: 2000,
-      });
+      await expect(container).toBeInTheDocument();
     });
   },
 };

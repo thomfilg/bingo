@@ -1,7 +1,7 @@
-import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, fn } from 'storybook/test';
 import { Star } from '@mui/icons-material';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import React from 'react';
+import { expect, fn, Mock, userEvent, within } from 'storybook/test';
 
 import { Chip } from './Chip';
 
@@ -56,7 +56,7 @@ export const KeyboardNavigation: Story = {
     expect(args.onClick).toHaveBeenCalled();
 
     // Clear the mock
-    args.onClick.mockClear();
+    (args.onClick as Mock).mockClear();
 
     // Test Space key
     await userEvent.keyboard(' ');
@@ -154,43 +154,50 @@ export const ThemeVariations: Story = {
 export const VisualStates: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-      <Chip label="Normal" onClick={() => {}} />
-      <Chip label="Selected" selectable selected onClick={() => {}} />
-      <Chip label="Disabled" disabled onClick={() => {}} />
+      <Chip label="Normal" onClick={() => {}} dataTestId="chip-normal" />
+      <Chip label="Selected" selectable selected onClick={() => {}} dataTestId="chip-selected" />
+      <Chip label="Disabled" disabled onClick={() => {}} dataTestId="chip-disabled" />
       <Chip
         label="With Avatar"
         avatarSrc="https://mui.com/static/images/avatar/1.jpg"
         onClick={() => {}}
+        dataTestId="chip-avatar"
       />
-      <Chip label="With Icon" icon={<Star />} onClick={() => {}} />
-      <Chip label="Deletable" deletable onDelete={() => {}} onClick={() => {}} />
+      <Chip label="With Icon" icon={<Star />} onClick={() => {}} dataTestId="chip-icon" />
+      <Chip label="Deletable" deletable onDelete={() => {}} onClick={() => {}} dataTestId="chip-deletable" />
     </div>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // Test different visual states
-    const normalChip = canvas.getByText('Normal');
+    // Test different visual states using testIds
+    const normalChip = canvas.getByTestId('chip-normal');
     expect(normalChip).toBeVisible();
+    expect(normalChip).toHaveTextContent('Normal');
 
-    const selectedChip = canvas.getByRole('option', { name: 'Selected' });
+    const selectedChip = canvas.getByTestId('chip-selected');
+    expect(selectedChip).toBeVisible();
     expect(selectedChip).toHaveAttribute('aria-selected', 'true');
 
-    const disabledChip = canvasElement.querySelector('.MuiChip-root.Mui-disabled');
+    const disabledChip = canvas.getByTestId('chip-disabled');
     expect(disabledChip).toBeInTheDocument();
     expect(disabledChip).toHaveTextContent('Disabled');
 
-    const avatarChip = canvas.getByText('With Avatar');
+    const avatarChip = canvas.getByTestId('chip-avatar');
     expect(avatarChip).toBeVisible();
+    expect(avatarChip).toHaveTextContent('With Avatar');
 
-    const iconChip = canvas.getByText('With Icon');
+    const iconChip = canvas.getByTestId('chip-icon');
     expect(iconChip).toBeVisible();
+    expect(iconChip).toHaveTextContent('With Icon');
 
-    const deletableChip = canvas.getByText('Deletable');
+    const deletableChip = canvas.getByTestId('chip-deletable');
     expect(deletableChip).toBeVisible();
-    // MUI Chip delete button has an svg icon with a test ID
-    const deleteButtons = canvasElement.querySelectorAll('[data-testid="CancelIcon"]');
-    expect(deleteButtons.length).toBeGreaterThan(0);
+    expect(deletableChip).toHaveTextContent('Deletable');
+
+    // Verify the delete icon exists within the deletable chip
+    const deleteIcon = canvas.getByTestId('chip-deletable-delete');
+    expect(deleteIcon).toBeInTheDocument();
   },
 };
 
@@ -198,15 +205,16 @@ export const EdgeCases: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: '8px', flexDirection: 'column' }}>
       <div style={{ display: 'flex', gap: '8px' }}>
-        <Chip label="" onClick={() => {}} /> {/* Empty label */}
-        <Chip label="A" onClick={() => {}} /> {/* Single character */}
+        <Chip label="" onClick={() => {}} dataTestId="chip-empty" /> {/* Empty label */}
+        <Chip label="A" onClick={() => {}} dataTestId="chip-single" /> {/* Single character */}
         <Chip
           label="This is an extremely long label that should be truncated or handled gracefully by the component"
           onClick={() => {}}
+          dataTestId="chip-long"
         />
       </div>
       <div style={{ display: 'flex', gap: '8px' }}>
-        <Chip label="No handlers" onClick={() => {}} /> {/* No click handlers */}
+        <Chip label="No handlers" onClick={() => {}} dataTestId="chip-no-handlers" /> {/* No click handlers */}
         <Chip
           label="Multiple states"
           selectable
@@ -214,38 +222,42 @@ export const EdgeCases: Story = {
           deletable
           onDelete={() => {}}
           onClick={() => {}}
+          dataTestId="chip-multiple"
         />
-        <Chip label="Special chars: !@#$%^&*()_+-=[]{}|;:,.<>?" onClick={() => {}} />
+        <Chip label="Special chars: !@#$%^&*()_+-=[]{}|;:,.<>?" onClick={() => {}} dataTestId="chip-special" />
       </div>
     </div>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // Test empty label handling - get all chips first
-    const allChips = canvas.getAllByRole('button');
-    const emptyChip = allChips[0]; // First chip has empty label
+    // Test empty label handling using testId
+    const emptyChip = canvas.getByTestId('chip-empty');
     expect(emptyChip).toBeInTheDocument();
 
     // Test single character
-    const singleChar = canvas.getByText('A');
-    expect(singleChar).toBeVisible();
+    const singleChip = canvas.getByTestId('chip-single');
+    expect(singleChip).toBeVisible();
+    expect(singleChip).toHaveTextContent('A');
 
     // Test long label
-    const longLabel = canvas.getByText(/This is an extremely long label/);
-    expect(longLabel).toBeVisible();
+    const longChip = canvas.getByTestId('chip-long');
+    expect(longChip).toBeVisible();
+    expect(longChip).toHaveTextContent(/This is an extremely long label/);
 
     // Test special characters
-    const specialChars = canvas.getByText(/Special chars:/);
-    expect(specialChars).toBeVisible();
+    const specialChip = canvas.getByTestId('chip-special');
+    expect(specialChip).toBeVisible();
+    expect(specialChip).toHaveTextContent(/Special chars:/);
 
     // Test multiple states
-    const multipleStates = canvas.getByRole('option', { name: 'Multiple states' });
-    expect(multipleStates).toBeVisible();
-    expect(multipleStates).toHaveAttribute('aria-selected', 'true');
+    const multipleChip = canvas.getByTestId('chip-multiple');
+    expect(multipleChip).toBeVisible();
+    expect(multipleChip).toHaveTextContent('Multiple states');
+    expect(multipleChip).toHaveAttribute('aria-selected', 'true');
 
-    // Check for delete button presence on deletable chip
-    const deleteIcons = canvasElement.querySelectorAll('[data-testid="CancelIcon"]');
-    expect(deleteIcons.length).toBeGreaterThan(0);
+    // Verify delete icon exists on the multiple states chip
+    const deleteIcon = canvas.getByTestId('chip-multiple-delete');
+    expect(deleteIcon).toBeInTheDocument();
   },
 };

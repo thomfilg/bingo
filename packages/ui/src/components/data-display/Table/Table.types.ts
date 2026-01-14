@@ -1,5 +1,5 @@
-import { TableProps as MuiTableProps } from '@mui/material';
-import React from 'react';
+import type { TableProps as MuiTableProps } from '@mui/material';
+import type React from 'react';
 
 // Advanced feature types
 export type TableDensity = 'compact' | 'normal' | 'comfortable';
@@ -57,12 +57,20 @@ export interface SelectionConfig {
   rowKeyExtractor?: (rowData: Record<string, unknown>, index: number) => string | number;
 }
 
+export type TableStripeColor = 'primary' | 'secondary' | 'info' | 'success' | 'warning' | 'error' | 'neutral';
+
 export interface TableProps extends Omit<MuiTableProps, 'variant'> {
   /**
    * The variant of the table
    */
   variant?: 'default' | 'striped' | 'glass' | 'minimal' | 'gradient';
-  
+
+  /**
+   * The color for striped rows (only applies when variant is 'striped')
+   * @default 'neutral'
+   */
+  stripeColor?: TableStripeColor;
+
   /**
    * Whether the table should have a glow effect
    */

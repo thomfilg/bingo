@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Box, IconButton, Tooltip, alpha } from '@mui/material';
+import { Check,ContentCopy } from '@mui/icons-material';
+import { alpha,Box, IconButton, Tooltip } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { ContentCopy, Check } from '@mui/icons-material';
+import React, { useState } from 'react';
 
-import { CodeProps } from './Code.types';
+import type { CodeProps } from './Code.types';
 
 const StyledCodeContainer = styled(Box, {
   shouldForwardProp: (prop) =>
@@ -12,6 +12,7 @@ const StyledCodeContainer = styled(Box, {
   customVariant?: string;
   customSize?: string;
   copyable?: boolean;
+  component?: React.ElementType;
 }>(({ theme, customVariant = 'inline', customSize = 'md', copyable }) => {
   // Size mapping
   const sizeMap = {

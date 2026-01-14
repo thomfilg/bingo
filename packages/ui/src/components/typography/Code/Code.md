@@ -52,7 +52,7 @@ The Code component is a versatile typography element designed for displaying cod
 
 ### Basic Inline Code
 ```tsx
-import { Code } from '@repo/ui';
+import { Code } from '@procurement/ui';
 
 <p>Use the <Code>useState</Code> hook for state management.</p>
 ```
@@ -151,7 +151,7 @@ console.log(greeting);`}
     Install the package using npm:
   </Typography>
   <Code variant="block" copyable language="bash">
-    npm install @repo/ui
+    npm install @procurement/ui
   </Code>
 </Box>
 
@@ -160,7 +160,7 @@ console.log(greeting);`}
   <CardContent>
     <Typography variant="h6">Example Usage</Typography>
     <Code variant="highlight" language="jsx" lineNumbers>
-{`import { Button } from '@repo/ui';
+{`import { Button } from '@procurement/ui';
 
 function App() {
   return <Button>Click me</Button>;
