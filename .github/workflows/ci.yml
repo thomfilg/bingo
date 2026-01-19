@@ -22,12 +22,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install 2>&1 | tee install.log
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm install 2>&1 | tee install.log
 
       - name: Lint
-        run: pnpm lint 2>&1 | tee lint.log
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm lint 2>&1 | tee lint.log
 
   type-check:
     name: Type Check
@@ -46,12 +53,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install 2>&1 | tee install.log
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm install 2>&1 | tee install.log
 
       - name: Type check
-        run: pnpm check-types 2>&1 | tee typecheck.log
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm check-types 2>&1 | tee typecheck.log
 
   build:
     name: Build
@@ -70,12 +84,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install 2>&1 | tee install.log
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm install 2>&1 | tee install.log
 
       - name: Build
-        run: pnpm build 2>&1 | tee build.log
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm build 2>&1 | tee build.log
 
   smoke-tests:
     name: Smoke Tests
@@ -94,9 +115,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install 2>&1 | tee install.log
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm install 2>&1 | tee install.log
 
       - name: Run smoke tests
         shell: bash
@@ -124,9 +149,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install 2>&1 | tee install.log
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm install 2>&1 | tee install.log
 
       - name: Run integration tests
         shell: bash
@@ -154,9 +183,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install 2>&1 | tee install.log
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm install 2>&1 | tee install.log
 
       - name: Check if E2E tests exist
         id: check-e2e
