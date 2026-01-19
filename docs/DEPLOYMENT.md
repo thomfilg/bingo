@@ -88,7 +88,26 @@ Example `apps/web/deploy/config.json`:
 }
 ```
 
-**Note**: For Cloudflare Pages, use `output: 'export'` in your `next.config.js` to generate static files in the `out` directory.
+**Important - Next.js Static Export Required**:
+
+For Cloudflare Pages deployment, your Next.js app **must** use static export mode. Add the following to your `next.config.js`:
+
+```javascript
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  output: 'export',
+  // Other config options...
+};
+
+module.exports = nextConfig;
+```
+
+This generates static files in the `out` directory. Note that static export has limitations:
+- No server-side features (API routes, SSR, ISR)
+- No middleware or dynamic routes with `getServerSideProps`
+- Use Cloudflare Workers for API functionality instead
+
+For full Next.js features, consider using `@cloudflare/next-on-pages` (requires additional setup).
 
 ### Manual Setup (Alternative)
 

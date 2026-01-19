@@ -14,8 +14,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9.0.0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -28,6 +26,33 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+  validate-secrets:
+    name: Validate Secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Cloudflare secrets
+        shell: bash
+        run: |
+          missing_secrets=""
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            missing_secrets="CLOUDFLARE_API_TOKEN"
+          fi
+          if [ -z "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ]; then
+            if [ -n "$missing_secrets" ]; then
+              missing_secrets="$missing_secrets, CLOUDFLARE_ACCOUNT_ID"
+            else
+              missing_secrets="CLOUDFLARE_ACCOUNT_ID"
+            fi
+          fi
+          if [ -n "$missing_secrets" ]; then
+            echo "::error::Missing required secrets: $missing_secrets"
+            echo "Please add the following secrets to your repository settings:"
+            echo "- CLOUDFLARE_API_TOKEN: Create at https://dash.cloudflare.com/profile/api-tokens"
+            echo "- CLOUDFLARE_ACCOUNT_ID: Found in your Cloudflare dashboard"
+            exit 1
+          fi
+          echo "All required secrets are configured"
 
   detect-workers:
     name: Detect Workers
@@ -96,7 +121,7 @@ jobs:
 
   deploy-workers:
     name: Deploy Workers
-    needs: [build, detect-workers]
+    needs: [build, detect-workers, validate-secrets]
     if: needs.detect-workers.outputs.has_workers == 'true'
     runs-on: ubuntu-latest
     strategy:
@@ -109,8 +134,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9.0.0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -130,7 +153,7 @@ jobs:
 
   deploy-apps:
     name: Deploy Apps
-    needs: [build, detect-apps]
+    needs: [build, detect-apps, validate-secrets]
     if: needs.detect-apps.outputs.has_apps == 'true'
     runs-on: ubuntu-latest
     strategy:
@@ -143,8 +166,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9.0.0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
