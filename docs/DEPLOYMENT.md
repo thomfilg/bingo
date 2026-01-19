@@ -11,13 +11,18 @@ This monorepo supports **free deployment** on Cloudflare with automatic worker d
 │  │     Pages (Next.js)     │  │   Workers (APIs)    │   │
 │  └─────────────────────────┘  └─────────────────────┘   │
 └─────────────────────────────────────────────────────────┘
-                            │
-                            ▼
-              ┌─────────────────────────┐
-              │   Neon Postgres (Free)  │
-              │       512MB storage     │
-              └─────────────────────────┘
 ```
+
+## Prerequisites
+
+Before the CD workflow can deploy, you **must** configure these GitHub repository secrets:
+
+| Secret | Description | Where to Get |
+|--------|-------------|--------------|
+| `CLOUDFLARE_API_TOKEN` | API token with "Edit Workers" permission | [Cloudflare API Tokens](https://dash.cloudflare.com/profile/api-tokens) |
+| `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account identifier | Cloudflare dashboard URL or Workers & Pages overview |
+
+**To add secrets:** Go to your GitHub repo → Settings → Secrets and variables → Actions → New repository secret
 
 ## Apps
 
@@ -32,6 +37,22 @@ This monorepo supports **free deployment** on Cloudflare with automatic worker d
 | `ci.yml` | PR to main | Lint, type-check, build |
 | `cd.yml` | Push to main | Build, deploy workers, trigger post-cd |
 | `post-cd.yml` | After cd.yml | Smoke, integration, e2e tests |
+
+### Optional Test Scripts
+
+The CI/CD workflows support optional test scripts. Add these to your root `package.json` when ready:
+
+```json
+{
+  "scripts": {
+    "test:smoke": "your-smoke-test-command",
+    "test:integration": "your-integration-test-command",
+    "test:e2e": "playwright test"
+  }
+}
+```
+
+The workflows gracefully skip tests if these scripts are not defined.
 
 ---
 
@@ -123,7 +144,9 @@ For full Next.js features, consider using `@cloudflare/next-on-pages` (requires 
 
 ---
 
-## Free Database: Neon Postgres
+## Optional: Database Setup (Neon Postgres)
+
+> **Note:** Database setup is optional and requires manual configuration. The CI/CD pipeline does not automatically provision a database.
 
 **Neon** offers 512MB free PostgreSQL with serverless scaling.
 

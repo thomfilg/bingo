@@ -216,10 +216,7 @@ jobs:
   trigger-post-cd:
     name: Trigger Post-CD
     needs: [deploy-workers, deploy-apps]
-    if: |
-      !failure() && !cancelled() &&
-      (needs.deploy-workers.result == 'success' || needs.deploy-workers.result == 'skipped') &&
-      (needs.deploy-apps.result == 'success' || needs.deploy-apps.result == 'skipped')
+    if: "!failure() && !cancelled()"
     runs-on: ubuntu-latest
     steps:
       - name: Trigger post-cd workflow
