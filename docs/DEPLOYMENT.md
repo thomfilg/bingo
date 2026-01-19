@@ -53,10 +53,11 @@ compatibility_date = "2024-12-01"
 3. Add your code in `src/index.ts`
 4. Push to main - it deploys automatically!
 
-### Required Secret
+### Required Secrets
 
 Add to GitHub Settings > Secrets:
 - `CLOUDFLARE_API_TOKEN` - Create at [dash.cloudflare.com/profile/api-tokens](https://dash.cloudflare.com/profile/api-tokens) with "Edit Workers" permission
+- `CLOUDFLARE_ACCOUNT_ID` - Found in Cloudflare dashboard URL or Workers & Pages overview
 
 ### Manual Deploy
 
@@ -71,14 +72,32 @@ npx wrangler deploy
 
 **Free**: Unlimited bandwidth, 500 builds/month
 
-### Setup
+### Automatic Deployment (Recommended)
+
+Apps with a `deploy/config.json` file are automatically deployed when you push to main. The CD workflow handles building and deploying to Cloudflare Pages.
+
+Example `apps/web/deploy/config.json`:
+```json
+{
+  "name": "bingo-web",
+  "provider": "cloudflare-pages",
+  "build": {
+    "command": "pnpm turbo build --filter=web",
+    "outputPath": "apps/web/out"
+  }
+}
+```
+
+**Note**: For Cloudflare Pages, use `output: 'export'` in your `next.config.js` to generate static files in the `out` directory.
+
+### Manual Setup (Alternative)
 
 1. Go to [dash.cloudflare.com](https://dash.cloudflare.com) > Workers & Pages
 2. Create application > Pages > Connect to Git
 3. Select this repository
 4. Configure:
    - **Build command**: `pnpm install && pnpm turbo build --filter=web`
-   - **Build output directory**: `apps/web/.next`
+   - **Build output directory**: `apps/web/out`
    - **Root directory**: `/`
 5. Add environment variable: `NODE_VERSION` = `20`
 6. Deploy
@@ -165,7 +184,7 @@ pnpm check-types
 ### Local Development
 Create `.env.local` in each app:
 ```
-DATABASE_URL=postgresql://user:pass@host/db
+DATABASE_URL=postgresql://username:password@project-name.region.neon.tech/dbname?sslmode=require
 ```
 
 ### Production

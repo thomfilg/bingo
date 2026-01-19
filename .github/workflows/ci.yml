@@ -175,7 +175,7 @@ jobs:
       - name: Run E2E tests
         shell: bash
         run: |
-          if [ "${{ steps.check-e2e.outputs.exists }}" == "true" ]; then
+          if [ "${{ steps.check-e2e.outputs.exists }}" = "true" ]; then
             pnpm run test:e2e
           else
             echo "No e2e tests configured, skipping"

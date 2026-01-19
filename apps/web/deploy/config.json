@@ -3,6 +3,6 @@
   "provider": "cloudflare-pages",
   "build": {
     "command": "pnpm turbo build --filter=web",
-    "outputPath": "apps/web/.next"
+    "outputPath": "apps/web/out"
   }
 }

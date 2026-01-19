@@ -43,22 +43,22 @@ jobs:
         shell: bash
         run: |
           echo "Checking $WEB_URL..."
-          status=$(curl -s -o /dev/null -w "%{http_code}" "$WEB_URL" || echo "000")
-          if [ "$status" = "200" ]; then
-            echo "Web app is healthy (HTTP $status)"
-          else
-            echo "Web app returned HTTP $status (may not be configured yet)"
+          status=$(curl -s -o /dev/null -w "%{http_code}" "$WEB_URL")
+          echo "Web app responded with status code: $status"
+          if [ "$status" -lt 200 ] || [ "$status" -ge 400 ]; then
+            echo "Web app health check failed (status $status)"
+            exit 1
           fi
 
       - name: Health check - API
         shell: bash
         run: |
           echo "Checking $API_URL..."
-          status=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL" || echo "000")
-          if [ "$status" = "200" ]; then
-            echo "API is healthy (HTTP $status)"
-          else
-            echo "API returned HTTP $status (may not be configured yet)"
+          status=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL")
+          echo "API responded with status code: $status"
+          if [ "$status" -lt 200 ] || [ "$status" -ge 400 ]; then
+            echo "API health check failed (status $status)"
+            exit 1
           fi
 
       - name: Run smoke tests
@@ -146,7 +146,7 @@ jobs:
       - name: Run E2E tests
         shell: bash
         run: |
-          if [ "${{ steps.check-e2e.outputs.exists }}" == "true" ]; then
+          if [ "${{ steps.check-e2e.outputs.exists }}" = "true" ]; then
             pnpm run test:e2e
           else
             echo "No e2e tests configured, skipping"

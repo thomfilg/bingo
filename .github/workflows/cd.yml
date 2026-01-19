@@ -67,12 +67,12 @@ jobs:
         shell: bash
         run: |
           apps="[]"
-          while IFS= read -r config; do
+          while IFS= read -r -d '' config; do
             if [ -n "$config" ]; then
-              app=$(cat "$config" | jq -c '.')
+              app=$(jq -c '.' "$config")
               apps=$(echo "$apps" | jq --argjson app "$app" '. + [$app]')
             fi
-          done < <(find . -path "*/deploy/config.json" -not -path "./node_modules/*")
+          done < <(find . -path "*/deploy/config.json" -not -path "./node_modules/*" -print0)
           echo "apps=$apps" >> "$GITHUB_OUTPUT"
           count=$(echo "$apps" | jq 'length')
           if [ "$count" -gt 0 ]; then
@@ -141,10 +141,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build app
-        shell: bash
-        run: |
-          build_cmd="${{ matrix.app.build.command }}"
-          eval "$build_cmd"
+        run: ${{ matrix.app.build.command }}
 
       - name: Deploy to Cloudflare Pages
         if: matrix.app.provider == 'cloudflare-pages'
@@ -157,7 +154,7 @@ jobs:
   trigger-post-cd:
     name: Trigger Post-CD
     needs: [deploy-workers, deploy-apps]
-    if: always() && !cancelled() && !failure()
+    if: always() && (needs.deploy-workers.result == 'success' || needs.deploy-workers.result == 'skipped') && (needs.deploy-apps.result == 'success' || needs.deploy-apps.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       - name: Trigger post-cd workflow
