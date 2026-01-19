@@ -8,6 +8,17 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./app/__tests__/setup.ts"],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        '.next/',
+        '*.config.ts',
+        '*.config.js',
+      ],
+    },
+    include: ['app/**/*.{test,spec}.{ts,tsx}', 'src/**/*.{test,spec}.{ts,tsx}', 'src/**/__tests__/**/*.ts'],
   },
   resolve: {
     alias: {
@@ -22,6 +33,7 @@ export default defineConfig({
       // Base imports
       "@repo/ui": path.resolve(__dirname, "../../packages/ui/src"),
       "@repo/auth": path.resolve(__dirname, "../../packages/auth/src"),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
 });
