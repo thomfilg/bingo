@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"name": "bingo",
+			"path": "."
+		},
+		{
+			"name": "worktrees",
+			"path": "../"
+		}
+	]
+}
