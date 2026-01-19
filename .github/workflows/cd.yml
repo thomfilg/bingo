@@ -43,7 +43,16 @@ jobs:
         id: detect
         shell: bash
         run: |
-          workers=$(find . -name "wrangler.toml" -not -path "./node_modules/*" -exec dirname {} \; | sort -u | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          workers="[]"
+          while IFS= read -r -d '' toml; do
+            if [ -n "$toml" ]; then
+              dir=$(dirname "$toml")
+              # Only add if not already in array (deduplication)
+              if ! echo "$workers" | jq -e --arg d "$dir" 'index($d)' > /dev/null 2>&1; then
+                workers=$(echo "$workers" | jq --arg d "$dir" '. + [$d]')
+              fi
+            fi
+          done < <(find . -name "wrangler.toml" -not -path "./node_modules/*" -print0)
           echo "workers=$workers" >> "$GITHUB_OUTPUT"
           count=$(echo "$workers" | jq 'length')
           if [ "$count" -gt 0 ]; then
@@ -160,7 +169,10 @@ jobs:
   trigger-post-cd:
     name: Trigger Post-CD
     needs: [deploy-workers, deploy-apps]
-    if: always() && (needs.deploy-workers.result == 'success' || needs.deploy-workers.result == 'skipped') && (needs.deploy-apps.result == 'success' || needs.deploy-apps.result == 'skipped')
+    if: |
+      !failure() && !cancelled() &&
+      (needs.deploy-workers.result == 'success' || needs.deploy-workers.result == 'skipped') &&
+      (needs.deploy-apps.result == 'success' || needs.deploy-apps.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       - name: Trigger post-cd workflow
