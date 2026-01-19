@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  tier      UserTier @default(FREE)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  cards          BingoCard[]
+  sessionPlayers BingoSessionPlayer[]
+
+  @@map("users")
+}
+
+enum UserTier {
+  FREE
+  PREMIUM
+}
+
+model BingoSession {
+  id            String        @id @default(uuid())
+  name          String?
+  format        String // '5x5', '3x9'
+  status        SessionStatus @default(ACTIVE)
+  calledNumbers Int[]         @default([]) @map("called_numbers")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  players BingoSessionPlayer[]
+
+  @@map("bingo_sessions")
+}
+
+enum SessionStatus {
+  ACTIVE
+  PAUSED
+  FINISHED
+}
+
+model BingoSessionPlayer {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  sessionId String   @map("session_id")
+  joinedAt  DateTime @default(now()) @map("joined_at")
+
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session BingoSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  cards   BingoCard[]
+
+  @@unique([userId, sessionId])
+  @@index([sessionId]) // Index for "get all players in session" queries
+  @@map("bingo_session_players")
+}
+
+/// Card ownership states (at least one must be non-null):
+/// - userId set, sessionPlayerId null: Standalone scanned card (premium feature)
+/// - userId null, sessionPlayerId set: Session-only card (generated for a game)
+/// - Both set: Card belongs to user AND is used in a session
+/// Note: Both null is invalid but not enforced at DB level - validate in application
+model BingoCard {
+  id              String     @id @default(uuid())
+  userId          String?    @map("user_id")
+  sessionPlayerId String?    @map("session_player_id")
+  source          CardSource
+  format          String // '5x5', '3x9'
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+
+  user          User?               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionPlayer BingoSessionPlayer? @relation(fields: [sessionPlayerId], references: [id], onDelete: Cascade)
+  cells         BingoCell[]
+
+  @@index([sessionPlayerId]) // Index for "get cards by session player" queries
+  @@index([userId]) // Index for "get cards by user" queries
+  @@map("bingo_cards")
+}
+
+enum CardSource {
+  GENERATED
+  SCANNED
+}
+
+model BingoCell {
+  id     String   @id @default(uuid())
+  cardId String   @map("card_id")
+  index  Int // Position in grid (0-24 for 5x5, 0-26 for 3x9)
+  value  Int? // Null for free space
+  type   CellType
+  marked Boolean  @default(false)
+
+  card BingoCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@unique([cardId, index])
+  @@map("bingo_cells")
+}
+
+enum CellType {
+  NUMBER
+  FREE
+}
