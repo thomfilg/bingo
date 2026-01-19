@@ -103,20 +103,46 @@ jobs:
         shell: bash
         run: |
           apps="[]"
+          validation_errors=""
           while IFS= read -r -d '' config; do
             if [ -n "$config" ]; then
-              app=$(jq -c '.' "$config")
+              # Validate JSON syntax
+              if ! app=$(jq -c '.' "$config" 2>/dev/null); then
+                validation_errors="$validation_errors\n- $config: Invalid JSON syntax"
+                continue
+              fi
+              # Validate required fields
+              missing=""
+              if ! echo "$app" | jq -e '.name' > /dev/null 2>&1; then
+                missing="$missing name"
+              fi
+              if ! echo "$app" | jq -e '.provider' > /dev/null 2>&1; then
+                missing="$missing provider"
+              fi
+              if ! echo "$app" | jq -e '.build.command' > /dev/null 2>&1; then
+                missing="$missing build.command"
+              fi
+              if ! echo "$app" | jq -e '.build.outputPath' > /dev/null 2>&1; then
+                missing="$missing build.outputPath"
+              fi
+              if [ -n "$missing" ]; then
+                validation_errors="$validation_errors\n- $config: Missing required fields:$missing"
+                continue
+              fi
               apps=$(echo "$apps" | jq --argjson app "$app" '. + [$app]')
             fi
           done < <(find . -path "*/deploy/config.json" -not -path "./node_modules/*" -print0)
+          if [ -n "$validation_errors" ]; then
+            echo "::warning::Config validation issues:$validation_errors"
+          fi
           echo "apps=$apps" >> "$GITHUB_OUTPUT"
           count=$(echo "$apps" | jq 'length')
           if [ "$count" -gt 0 ]; then
             echo "has_apps=true" >> "$GITHUB_OUTPUT"
-            echo "Found $count app(s)"
+            echo "Found $count valid app(s)"
           else
             echo "has_apps=false" >> "$GITHUB_OUTPUT"
-            echo "No apps found"
+            echo "No valid apps found"
           fi
 
   deploy-workers:
