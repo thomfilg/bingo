@@ -140,6 +140,9 @@ importers:
       '@types/react-dom':
         specifier: 19.2.2
         version: 19.2.2(@types/react@19.2.2)
+      '@vitest/coverage-v8':
+        specifier: ^3.2.4
+        version: 3.2.4(@vitest/browser@3.2.4(playwright@1.57.0)(vite@6.4.1(@types/node@22.15.3)(yaml@1.10.2))(vitest@3.2.4))(vitest@3.2.4(@types/node@22.15.3)(@vitest/browser@3.2.4)(jsdom@26.1.0)(yaml@1.10.2))
       eslint:
         specifier: ^9.39.1
         version: 9.39.1
