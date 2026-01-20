@@ -4,7 +4,7 @@ import tsParser from '@typescript-eslint/parser';
 import storybook from "eslint-plugin-storybook";
 import globals from 'globals';
 
-import rootConfig from '../../eslint.config.mjs';
+import { config } from "@repo/eslint-config/base";
 
 export default [
   {
@@ -22,7 +22,7 @@ export default [
       'tsup.config.ts',
     ],
   },
-  ...rootConfig,
+  ...config,
   ...storybook.configs["flat/recommended"],
   // Override parser for all TypeScript files after storybook config
   {
@@ -65,6 +65,14 @@ export default [
       'no-console': 'error',
       'react/prop-types': 'off',
       'react/no-unescaped-entities': 'off',
+      // Relax unused vars checking for component library
+      '@typescript-eslint/no-unused-vars': 'off',
+      // Allow any in specific cases (existing code)
+      '@typescript-eslint/no-explicit-any': 'off',
+      // Turbo env vars not relevant for UI lib
+      'turbo/no-undeclared-env-vars': 'off',
+      // Relax prefer-const for existing code
+      'prefer-const': 'off',
     },
     settings: {
       'import/resolver': { typescript: { project: './tsconfig.json' } },

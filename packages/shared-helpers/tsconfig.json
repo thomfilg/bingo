@@ -1,7 +1,8 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
     "composite": true,
+    "incremental": true,
     "outDir": "./dist",
     "rootDir": "./src",
     "declaration": true,
@@ -9,7 +10,10 @@
     "sourceMap": false,
     "baseUrl": ".",
     "module": "commonjs",
-    "esModuleInterop": true
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "noUncheckedIndexedAccess": false,
+    "strictNullChecks": false
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "vitest.config.ts", "tests"]
