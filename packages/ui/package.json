@@ -15,6 +15,7 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": "./src/index.ts",
+    "./button": "./src/button.tsx",
     "./utils": "./src/utils/index.ts",
     "./data-display/Alert": "./src/components/data-display/Alert/index.ts",
     "./data-display/AlertDialog": "./src/components/data-display/AlertDialog/index.ts",
@@ -182,6 +183,7 @@
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-storybook": "9.1.10",
     "glob": "^13.0.0",
+    "globals": "^16.5.0",
     "http-server": "^14.1.1",
     "lucide-react": "^0.545.0",
     "pa11y": "^9.0.0",

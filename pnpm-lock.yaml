@@ -300,6 +300,9 @@ importers:
       glob:
         specifier: ^13.0.0
         version: 13.0.0
+      globals:
+        specifier: ^16.5.0
+        version: 16.5.0
       http-server:
         specifier: ^14.1.1
         version: 14.1.1
