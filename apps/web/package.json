@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@repo/auth": "workspace:*",
+    "@repo/shared-helpers": "workspace:*",
     "@repo/ui": "workspace:*",
     "next": "16.1.0",
     "next-auth": "^5.0.0-beta.25",

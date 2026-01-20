@@ -1,4 +1,5 @@
 export * from './aws';
+export * from './bingo';
 export * from './cache';
 export * from './db';
 export * from './fileManagement';
