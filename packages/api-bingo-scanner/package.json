@@ -1,0 +1,47 @@
+{
+  "name": "@repo/api-bingo-scanner",
+  "version": "0.1.0",
+  "description": "A library to scan bingo cards and detect numbers using OCR",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "tesseract.js": "^5.1.1",
+    "sharp": "^0.33.5"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^22.15.3",
+    "tsup": "^8.3.5",
+    "typescript": "^5.9.2",
+    "vitest": "^2.1.8"
+  },
+  "keywords": [
+    "bingo",
+    "ocr",
+    "scanner",
+    "tesseract",
+    "image-recognition"
+  ],
+  "license": "MIT"
+}
