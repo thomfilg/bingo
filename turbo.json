@@ -14,14 +14,27 @@
         "FACEBOOK_CLIENT_ID",
         "FACEBOOK_CLIENT_SECRET",
         "APPLE_CLIENT_ID",
-        "APPLE_CLIENT_SECRET"
+        "APPLE_CLIENT_SECRET",
+        "SKIP_ENV_VALIDATION",
+        "NODE_ENV",
+        "AZURE_AD_TENANT_ID",
+        "AZURE_AD_CLIENT_ID",
+        "AZURE_AD_CLIENT_SECRET",
+        "WRITE_HEAP_SNAPSHOTS",
+        "CACHE_DEBUG",
+        "SNOW_TIMEOUT_MS",
+        "SNOW_CONNECT_TIMEOUT_MS",
+        "MAXMIND_ACCOUNT_ID",
+        "MAXMIND_LICENSE_KEY",
+        "LOG_LEVEL",
+        "NEXT_PHASE"
       ]
     },
     "lint": {
       "dependsOn": ["^lint"]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": ["^build", "^check-types"]
     },
     "dev": {
       "cache": false,

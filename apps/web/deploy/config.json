@@ -1,0 +1,8 @@
+{
+  "name": "bingo-web",
+  "provider": "cloudflare-pages",
+  "build": {
+    "command": "pnpm turbo build --filter=web...",
+    "outputPath": "apps/web/out"
+  }
+}

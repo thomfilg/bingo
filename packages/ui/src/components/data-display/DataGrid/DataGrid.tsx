@@ -69,7 +69,7 @@ export const DataGrid = <T extends Record<string, unknown> = Record<string, unkn
 }: DataGridProps<T>) => {
   const theme = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
-  const [containerHeight, setContainerHeight] = useState(400);
+  const [_containerHeight, setContainerHeight] = useState(400);
   
   // Internal state for uncontrolled scenarios
   const [internalSortBy, setInternalSortBy] = useState<GridSort[]>(

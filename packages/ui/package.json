@@ -15,6 +15,9 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": "./src/index.ts",
+    "./button": "./src/button.tsx",
+    "./social-login-button": "./src/social-login-button.tsx",
+    "./user-avatar": "./src/user-avatar.tsx",
     "./utils": "./src/utils/index.ts",
     "./data-display/Alert": "./src/components/data-display/Alert/index.ts",
     "./data-display/AlertDialog": "./src/components/data-display/AlertDialog/index.ts",
@@ -169,6 +172,8 @@
     "recharts": "^3.5.1"
   },
   "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "@playwright/test": "^1.55.0",
     "@storybook/addon-docs": "^9.1.10",
     "@storybook/addon-links": "^9.1.10",

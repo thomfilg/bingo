@@ -22,7 +22,7 @@ export const VirtualList: React.FC<VirtualListProps> = ({
 }) => {
   const [scrollTop, setScrollTop] = useState(0);
   const internalContainerRef = useRef<HTMLDivElement>(null);
-  const containerRef = scrollContainerRef || internalContainerRef;
+  const _containerRef = scrollContainerRef || internalContainerRef;
   const itemHeights = useRef<Map<number, number>>(new Map());
 
   const getItemHeight = useCallback(

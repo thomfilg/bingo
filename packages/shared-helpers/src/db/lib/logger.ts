@@ -1,18 +1,12 @@
 import type { DatabaseLogger } from './types';
 
 const DEFAULT_LOGGER: DatabaseLogger = {
-  info: (message: string, data?: unknown) => {
-    console.info(message, data);
-  },
-  error: (message: string, error?: unknown, data?: unknown) => {
-    console.error(message, error, data);
-  },
-  warn: (message: string, data?: unknown) => {
-    console.warn(message, data);
-  },
-  debug: (message: string, data?: unknown) => {
-    console.debug(message, data);
-  },
+  // eslint-disable-next-line no-console
+  info: (message: string, data?: unknown) => console.info(message, data),
+  error: (message: string, error?: unknown, data?: unknown) => console.error(message, error, data),
+  warn: (message: string, data?: unknown) => console.warn(message, data),
+  // eslint-disable-next-line no-console
+  debug: (message: string, data?: unknown) => console.debug(message, data),
 };
 
 let currentLogger: DatabaseLogger = DEFAULT_LOGGER;

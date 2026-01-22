@@ -551,9 +551,9 @@ export const PerformanceTest: Story = {
     const canvas = within(canvasElement);
     
     await step('Measure render time', async () => {
-      const startTime = (window as any).performance.now();
+      const startTime = window.performance.now();
       const elements = canvas.getAllByTestId(/item-/);
-      const endTime = (window as any).performance.now();
+      const endTime = window.performance.now();
       
       const renderTime = endTime - startTime;
       // eslint-disable-next-line no-console
@@ -637,7 +637,7 @@ export const EdgeCases: Story = {
     
     await step('Input limits testing', async () => {
        
-      const input = canvas.getByTestId('limited-input') as any;
+      const input = canvas.getByTestId('limited-input') as HTMLInputElement;
       const testText = 'a'.repeat(100); // 100 characters
       
       await userEvent.clear(input);

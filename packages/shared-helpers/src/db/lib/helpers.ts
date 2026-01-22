@@ -4,7 +4,7 @@ export function getFirstRow<T extends QueryResultRow = QueryResultRow>(result?: 
   if (!result || !result.rows || result.rows.length === 0) {
     return null;
   }
-  return result.rows[0];
+  return result.rows[0] ?? null;
 }
 
 export function getRows<T extends QueryResultRow = QueryResultRow>(result?: QueryResult<T>): T[] {

@@ -83,7 +83,7 @@ export const BasicInteraction: Story = {
     );
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+    const _canvas = within(canvasElement);
     // Tutorial is portaled to document.body
     const body = within(document.body);
 
@@ -155,7 +155,7 @@ export const FormInteraction: Story = {
     );
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+    const _canvas = within(canvasElement);
     // Tutorial is portaled to document.body
     const body = within(document.body);
 
@@ -201,7 +201,7 @@ export const KeyboardNavigation: Story = {
     );
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+    const _canvas = within(canvasElement);
     // Tutorial is portaled to document.body
     const body = within(document.body);
 
@@ -246,7 +246,7 @@ export const ScreenReaderTest: Story = {
     </TestEnvironment>
   ),
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+    const _canvas = within(canvasElement);
     // Tutorial is portaled to document.body
     const body = within(document.body);
 
@@ -288,7 +288,7 @@ export const FocusManagement: Story = {
     );
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+    const _canvas = within(canvasElement);
     // Tutorial is portaled to document.body
     const body = within(document.body);
 
@@ -333,7 +333,7 @@ export const ResponsiveDesign: Story = {
     </TestEnvironment>
   ),
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+    const _canvas = within(canvasElement);
     // Tutorial is portaled to document.body
     const body = within(document.body);
 
@@ -368,7 +368,7 @@ export const ThemeVariations: Story = {
     </TestEnvironment>
   ),
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+    const _canvas = within(canvasElement);
     // Tutorial is portaled to document.body
     const body = within(document.body);
 
@@ -421,7 +421,7 @@ export const VisualStates: Story = {
     );
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+    const _canvas = within(canvasElement);
     // Tutorial is portaled to document.body
     const body = within(document.body);
 
@@ -465,7 +465,7 @@ export const PerformanceTest: Story = {
     );
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+    const _canvas = within(canvasElement);
     // Tutorial is portaled to document.body
     const body = within(document.body);
     const startTime = window.performance.now();
@@ -531,7 +531,7 @@ export const EdgeCases: Story = {
     );
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+    const _canvas = within(canvasElement);
     // Tutorial is portaled to document.body
     const body = within(document.body);
 
@@ -608,7 +608,7 @@ export const IntegrationTest: Story = {
     );
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+    const _canvas = within(canvasElement);
     // Tutorial is portaled to document.body
     const body = within(document.body);
 

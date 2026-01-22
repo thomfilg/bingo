@@ -25,6 +25,20 @@ type EnvConfig = z.infer<typeof envSchema>;
 let _envCache: EnvConfig | null = null;
 
 /**
+ * Check if we're in a build-time context where env vars may not be available
+ * This includes CI builds, static generation, etc.
+ */
+function isBuildTime(): boolean {
+  // Explicit skip flag
+  if (process.env.SKIP_ENV_VALIDATION === "true") return true;
+  // Next.js build phase indicator
+  if (process.env.NEXT_PHASE === "phase-production-build") return true;
+  // AUTH_SECRET not available (likely build time)
+  if (!process.env.AUTH_SECRET) return true;
+  return false;
+}
+
+/**
  * Get validated environment variables (lazy evaluation)
  * Only validates when first accessed, avoiding build-time failures
  */
@@ -32,7 +46,7 @@ function getEnv(): EnvConfig {
   if (_envCache) return _envCache;
 
   // Skip validation during build time when env vars may not be available
-  if (process.env.SKIP_ENV_VALIDATION === "true") {
+  if (isBuildTime()) {
     return {
       AUTH_SECRET: process.env.AUTH_SECRET ?? "",
       GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,

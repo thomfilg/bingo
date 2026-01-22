@@ -43,7 +43,7 @@ export const BasicInteraction: Story = {
     const canvas = within(canvasElement);
 
     // Wait for map container to render with extended timeout
-    const mapContainer = await waitFor(
+    const _mapContainer = await waitFor(
       async () => {
         const container = await canvas.findByTestId('map-preview-container');
         expect(container).toBeInTheDocument();
@@ -93,7 +93,7 @@ export const MarkerInteraction: Story = {
     );
 
     // Test marker renders with extended wait
-    const marker = await waitFor(
+    const _marker = await waitFor(
       async () => {
         const markerElement = await canvas.findByTestId('map-marker-0');
         expect(markerElement).toBeInTheDocument();
@@ -117,7 +117,7 @@ export const KeyboardNavigation: Story = {
     const canvas = within(canvasElement);
 
     // Wait for map to render and test container is focusable
-    const mapContainer = await waitFor(
+    const _mapContainer = await waitFor(
       async () => {
         const container = await canvas.findByTestId('map-preview-container');
         expect(container).toBeInTheDocument();
@@ -142,7 +142,7 @@ export const ScreenReader: Story = {
     const canvas = within(canvasElement);
 
     // Wait for map and test ARIA labels
-    const mapContainer = await waitFor(
+    const _mapContainer = await waitFor(
       async () => {
         const container = await canvas.findByTestId('map-preview-container');
         expect(container).toBeInTheDocument();
@@ -168,7 +168,7 @@ export const FocusManagement: Story = {
     const canvas = within(canvasElement);
 
     // Wait for map and test initial focus
-    const mapContainer = await waitFor(
+    const _mapContainer = await waitFor(
       async () => {
         const container = await canvas.findByTestId('map-preview-container');
         expect(container).toBeInTheDocument();

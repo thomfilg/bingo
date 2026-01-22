@@ -135,7 +135,7 @@ export const VariantChanges: Story = {
 
     // Test fade variant (default)
     const toggleButton = canvas.getByLabelText('Toggle');
-    let content = canvas.getByText('Variant: fade');
+    const content = canvas.getByText('Variant: fade');
     expect(content).toBeInTheDocument();
 
     await userEvent.click(toggleButton);

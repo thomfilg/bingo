@@ -1,0 +1,239 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+  validate-secrets:
+    name: Validate Secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Cloudflare secrets
+        shell: bash
+        run: |
+          missing_secrets=""
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            missing_secrets="CLOUDFLARE_API_TOKEN"
+          fi
+          if [ -z "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ]; then
+            if [ -n "$missing_secrets" ]; then
+              missing_secrets="$missing_secrets, CLOUDFLARE_ACCOUNT_ID"
+            else
+              missing_secrets="CLOUDFLARE_ACCOUNT_ID"
+            fi
+          fi
+          if [ -n "$missing_secrets" ]; then
+            echo "::error::Missing required secrets: $missing_secrets"
+            echo "Please add the following secrets to your repository settings:"
+            echo "- CLOUDFLARE_API_TOKEN: Create at https://dash.cloudflare.com/profile/api-tokens"
+            echo "- CLOUDFLARE_ACCOUNT_ID: Found in your Cloudflare dashboard"
+            exit 1
+          fi
+          echo "All required secrets are configured"
+
+  detect-workers:
+    name: Detect Workers
+    runs-on: ubuntu-latest
+    outputs:
+      workers: ${{ steps.detect.outputs.workers }}
+      has_workers: ${{ steps.detect.outputs.has_workers }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Detect workers
+        id: detect
+        shell: bash
+        run: |
+          workers="[]"
+          while IFS= read -r -d '' toml; do
+            if [ -n "$toml" ]; then
+              dir=$(dirname "$toml")
+              # Only add if not already in array (deduplication)
+              if ! echo "$workers" | jq -e --arg d "$dir" 'index($d)' > /dev/null 2>&1; then
+                workers=$(echo "$workers" | jq --arg d "$dir" '. + [$d]')
+              fi
+            fi
+          done < <(find . -name "wrangler.toml" -not -path "./node_modules/*" -print0)
+          echo "workers=$workers" >> "$GITHUB_OUTPUT"
+          count=$(echo "$workers" | jq 'length')
+          if [ "$count" -gt 0 ]; then
+            echo "has_workers=true" >> "$GITHUB_OUTPUT"
+            echo "Found $count worker(s)"
+          else
+            echo "has_workers=false" >> "$GITHUB_OUTPUT"
+            echo "No workers found"
+          fi
+
+  detect-apps:
+    name: Detect Apps
+    runs-on: ubuntu-latest
+    outputs:
+      apps: ${{ steps.detect.outputs.apps }}
+      has_apps: ${{ steps.detect.outputs.has_apps }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Detect apps with deploy config
+        id: detect
+        shell: bash
+        run: |
+          apps="[]"
+          validation_errors=""
+          while IFS= read -r -d '' config; do
+            if [ -n "$config" ]; then
+              # Validate JSON syntax
+              if ! app=$(jq -c '.' "$config" 2>/dev/null); then
+                validation_errors="$validation_errors\n- $config: Invalid JSON syntax"
+                continue
+              fi
+              # Validate required fields
+              missing=""
+              if ! echo "$app" | jq -e '.name' > /dev/null 2>&1; then
+                missing="$missing name"
+              fi
+              if ! echo "$app" | jq -e '.provider' > /dev/null 2>&1; then
+                missing="$missing provider"
+              fi
+              if ! echo "$app" | jq -e '.build.command' > /dev/null 2>&1; then
+                missing="$missing build.command"
+              fi
+              if ! echo "$app" | jq -e '.build.outputPath' > /dev/null 2>&1; then
+                missing="$missing build.outputPath"
+              fi
+              if [ -n "$missing" ]; then
+                validation_errors="$validation_errors\n- $config: Missing required fields:$missing"
+                continue
+              fi
+              apps=$(echo "$apps" | jq --argjson app "$app" '. + [$app]')
+            fi
+          done < <(find . -path "*/deploy/config.json" -not -path "./node_modules/*" -print0)
+          if [ -n "$validation_errors" ]; then
+            echo "::warning::Config validation issues:$validation_errors"
+          fi
+          echo "apps=$apps" >> "$GITHUB_OUTPUT"
+          count=$(echo "$apps" | jq 'length')
+          if [ "$count" -gt 0 ]; then
+            echo "has_apps=true" >> "$GITHUB_OUTPUT"
+            echo "Found $count valid app(s)"
+          else
+            echo "has_apps=false" >> "$GITHUB_OUTPUT"
+            echo "No valid apps found"
+          fi
+
+  deploy-workers:
+    name: Deploy Workers
+    needs: [build, detect-workers, validate-secrets]
+    if: needs.detect-workers.outputs.has_workers == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        worker: ${{ fromJson(needs.detect-workers.outputs.workers) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Deploy to Cloudflare
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: ${{ matrix.worker }}
+          command: deploy
+
+  deploy-apps:
+    name: Deploy Apps
+    needs: [build, detect-apps, validate-secrets]
+    if: needs.detect-apps.outputs.has_apps == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJson(needs.detect-apps.outputs.apps) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build app
+        run: ${{ matrix.app.build.command }}
+
+      - name: Deploy to Cloudflare Pages
+        if: matrix.app.provider == 'cloudflare-pages'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy ${{ matrix.app.build.outputPath }} --project-name=${{ matrix.app.name }}
+
+  trigger-post-cd:
+    name: Trigger Post-CD
+    needs: [build, deploy-workers, deploy-apps]
+    if: |
+      always() &&
+      needs.build.result == 'success' &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger post-cd workflow
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'post-cd.yml',
+              ref: context.ref,
+              inputs: {
+                deployment_sha: context.sha
+              }
+            })

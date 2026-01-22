@@ -604,7 +604,7 @@ export const Sheet: React.FC<SheetProps> = ({
   const isSwipeable = swipeable && !isDraggableVariant;
 
   // Create a proper BackdropComponent that accepts refs and matches BackdropProps
-  const NoBackdrop = React.forwardRef<HTMLDivElement, BackdropProps>((props, ref) => null) as React.ComponentType<BackdropProps>;
+  const NoBackdrop = React.forwardRef<HTMLDivElement, BackdropProps>((_props, _ref) => null) as React.ComponentType<BackdropProps>;
   NoBackdrop.displayName = 'NoBackdrop';
 
   return (

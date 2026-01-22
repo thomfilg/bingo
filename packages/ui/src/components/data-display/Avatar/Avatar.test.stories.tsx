@@ -357,7 +357,7 @@ export const VisualStates: Story = {
     });
 
     await step('Loading state', async () => {
-      const loadingAvatar = canvas.getByTestId('loading-avatar');
+      const _loadingAvatar = canvas.getByTestId('loading-avatar');
       // Check for loading overlay and spinner by testid
       const loadingOverlay = canvas.getByTestId('loading-avatar-loading');
       await expect(loadingOverlay).toBeInTheDocument();
@@ -769,7 +769,7 @@ export const AccessibilityCompliance: Story = {
     });
 
     await step('Screen reader support', async () => {
-      const imageAvatar = canvas.getByTestId('sr-image');
+      const _imageAvatar = canvas.getByTestId('sr-image');
       const initialsAvatar = canvas.getByTestId('sr-initials');
       const iconAvatar = canvas.getByTestId('sr-icon');
 

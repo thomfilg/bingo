@@ -1,7 +1,7 @@
 "use client";
 
 import type { JSX } from "react";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { SocialLoginButton, SocialLoginContainer } from "@repo/ui/social-login-button";
 import { Alert } from "@repo/ui/data-display/Alert";
@@ -11,7 +11,7 @@ import { Text } from "@repo/ui/typography/Text";
 import { Spacer } from "@repo/ui/layout/Spacer";
 import { useAuth, useSocialLogin, useDeviceDetection } from "@repo/auth/hooks";
 
-export default function LoginPage(): JSX.Element {
+function LoginContent(): JSX.Element {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated, isLoading: sessionLoading } = useAuth();
@@ -103,6 +103,24 @@ export default function LoginPage(): JSX.Element {
         </Text>
       </SocialLoginContainer>
     </Container>
+  );
+}
+
+export default function LoginPage(): JSX.Element {
+  return (
+    <Suspense
+      fallback={
+        <Container variant="centered" padding="lg">
+          <LoadingState
+            variant="spinner"
+            message="Loading..."
+            size="md"
+          />
+        </Container>
+      }
+    >
+      <LoginContent />
+    </Suspense>
   );
 }
 

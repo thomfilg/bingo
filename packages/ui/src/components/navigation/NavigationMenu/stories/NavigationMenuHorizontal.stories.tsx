@@ -1,21 +1,17 @@
 import {
-  AccountBalance,
   Analytics,
   Business,
-  Category,
   Dashboard,
   Help,
   Home,
   Inventory,
-  LocalShipping,
   Notifications,
   People,
-  Receipt,
   Report,
   Settings,
   ShoppingCart,
 } from '@mui/icons-material';
-import { Avatar,Box, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { NavigationMenu } from '../NavigationMenu';

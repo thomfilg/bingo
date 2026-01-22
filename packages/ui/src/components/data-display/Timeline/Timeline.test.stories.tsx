@@ -130,8 +130,8 @@ export const BasicInteraction: Story = {
     // Verify the expand button rotated back
     // The collapsed state should not have the same transform as when expanded
     await waitFor(() => {
-      const collapsedButtonStyle = window.getComputedStyle(expandButtons[0]);
-      const expandedButtonStyle = window.getComputedStyle(expandButtons[0]);
+      const _collapsedButtonStyle = window.getComputedStyle(expandButtons[0]);
+      const _expandedButtonStyle = window.getComputedStyle(expandButtons[0]);
       // Just verify the animation has completed - description is not visible
       expect(canvas.queryByText(firstDescription)).not.toBeVisible();
     });
@@ -747,7 +747,6 @@ export const Performance: Story = {
       const container = canvas.getByTestId('timeline-container');
       expect(container).toBeInTheDocument();
     }, { timeout: 3000 });
-    const container = canvas.getByTestId('timeline-container') as HTMLElement;
     
     // Verify all titles are rendered correctly
     for (let i = 0; i < 5; i++) { // Check first 5 items

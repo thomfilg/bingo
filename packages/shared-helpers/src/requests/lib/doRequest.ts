@@ -3,7 +3,7 @@ interface IdoRequest {
   authToken?: string;
   signal?: AbortSignal;
 }
-export async function doRequest<T extends unknown>({ url, authToken, signal }: IdoRequest): Promise<T> {
+export async function doRequest<T>({ url, authToken, signal }: IdoRequest): Promise<T> {
   const headers = new Headers();
   headers.set('Accept', 'application/json');
   headers.set('Content-Type', 'application/json');

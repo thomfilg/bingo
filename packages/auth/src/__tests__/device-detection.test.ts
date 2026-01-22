@@ -7,7 +7,7 @@ import {
 
 describe("device-detection", () => {
   const originalNavigator = global.navigator;
-  const originalWindow = global.window;
+  const _originalWindow = global.window;
 
   beforeEach(() => {
     // Reset mocks before each test

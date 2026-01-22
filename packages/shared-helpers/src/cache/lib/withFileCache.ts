@@ -41,7 +41,7 @@ export function withFileCache<A extends any[], K extends string | number, V>(opt
       if (parsed && typeof parsed === 'object' && parsed.entries) {
         data = parsed;
       }
-    } catch (_) {
+    } catch {
       logger.error(`Failure parsing cache ${filePath}`);
     }
     prune();
@@ -72,7 +72,9 @@ export function withFileCache<A extends any[], K extends string | number, V>(opt
         const tmp = `${filePath}.tmp`;
         await fs.writeFile(tmp, JSON.stringify(data, null, 2), 'utf8');
         await fs.rename(tmp, filePath);
-      } catch (_) {}
+      } catch {
+        // Silently ignore file write errors
+      }
     }, 250);
   }
 

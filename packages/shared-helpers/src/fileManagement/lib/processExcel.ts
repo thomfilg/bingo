@@ -6,8 +6,14 @@ import * as XLSX from 'xlsx';
 export async function processExcel<T = string[]>(file: File, worksheetIndex: number): Promise<T[]> {
   const data = await file.arrayBuffer();
   const workbook = XLSX.read(data);
-  const firstSheetName = workbook.SheetNames[worksheetIndex];
-  const worksheet = workbook.Sheets[firstSheetName];
+  const sheetName = workbook.SheetNames[worksheetIndex];
+  if (!sheetName) {
+    throw new Error(`Worksheet at index ${worksheetIndex} not found`);
+  }
+  const worksheet = workbook.Sheets[sheetName];
+  if (!worksheet) {
+    throw new Error(`Worksheet '${sheetName}' not found`);
+  }
 
   // Convert worksheet to JSON
   const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });

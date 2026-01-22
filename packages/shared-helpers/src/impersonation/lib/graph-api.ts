@@ -222,7 +222,7 @@ export async function validateUserInAzureAD(
       };
     }
 
-    const user = users[0];
+    const user = users[0]!;
 
     // Optionally get user's group memberships
     const groups = await getUserGroups(user.id, accessToken);

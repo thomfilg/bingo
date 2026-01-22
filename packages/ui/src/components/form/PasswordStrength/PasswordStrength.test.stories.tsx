@@ -1,6 +1,6 @@
 import { Stack, TextField } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor } from 'storybook/test';
+import { userEvent, within, expect } from 'storybook/test';
 import React, { useState } from 'react';
 
 import { PasswordStrength } from './PasswordStrength';

@@ -573,7 +573,7 @@ export const VisualStates: Story = {
           const computedStyle = window.getComputedStyle(glassCard);
           // Glass effect should have backdrop filter
           const backdropFilter = computedStyle.backdropFilter ||
-            (computedStyle as any).webkitBackdropFilter;
+            (computedStyle as CSSStyleDeclaration & Record<string, string>).webkitBackdropFilter;
           expect(backdropFilter).toContain('blur');
         },
         { timeout: 500 },

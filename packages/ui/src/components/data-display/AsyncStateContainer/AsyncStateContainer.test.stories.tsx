@@ -210,7 +210,7 @@ export const CustomLoadingWithRetry: Story = {
     ),
     children: <TestContent />,
   },
-  play: async ({ canvasElement, args, step }) => {
+  play: async ({ canvasElement, _args, step }) => {
     const canvas = within(canvasElement);
 
     await step('Verify custom error component', async () => {

@@ -324,10 +324,10 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
       subheader={subtitle}
       titleTypographyProps={{
         'data-testid': dataTestId ? `${dataTestId}-title` : 'card-title',
-      } as any}
+      } as Record<string, unknown>}
       subheaderTypographyProps={{
         'data-testid': dataTestId ? `${dataTestId}-subtitle` : 'card-subtitle',
-      } as any}
+      } as Record<string, unknown>}
       {...props}
     />
   );

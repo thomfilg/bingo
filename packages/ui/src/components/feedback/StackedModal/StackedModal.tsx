@@ -2,17 +2,14 @@ import { ChevronLeft as ChevronLeftIcon, Close as CloseIcon } from '@mui/icons-m
 import {
   alpha,
   Box,
-  Button,
   CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   IconButton,
-  Paper,
   Skeleton,
   Slide,
-  Stack,
   styled,
   Typography,
   useMediaQuery,
@@ -165,7 +162,7 @@ export const ModalStackProvider: FC<{ children: ReactNode }> = ({ children }) =>
     [stack],
   );
 
-  const getModalRole = useCallback(
+  const _getModalRole = useCallback(
     (modalId: string) => {
       const modal = stack.find((m) => m.id === modalId);
       return modal?.role || null;
@@ -454,7 +451,7 @@ export const StackedModal: FC<StackedModalProps> = ({
   const dialogRef = useRef<HTMLDivElement>(null);
   const previousRoleRef = useRef(modalRole);
   const hasRegisteredRef = useRef(false);
-  const { stack, pushModal, popModal, getModalRole, isModalInStack } = useModalStack();
+  const { stack, pushModal, popModal, getModalRole: _getModalRole, isModalInStack } = useModalStack();
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));

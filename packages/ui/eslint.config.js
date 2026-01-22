@@ -1,10 +1,9 @@
 // For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
-import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import storybook from "eslint-plugin-storybook";
 import globals from 'globals';
 
-import rootConfig from '../../eslint.config.mjs';
+import { config } from "@repo/eslint-config/base";
 
 export default [
   {
@@ -22,7 +21,7 @@ export default [
       'tsup.config.ts',
     ],
   },
-  ...rootConfig,
+  ...config,
   ...storybook.configs["flat/recommended"],
   // Override parser for all TypeScript files after storybook config
   {
@@ -50,9 +49,6 @@ export default [
         module: 'readonly',
       },
     },
-    plugins: {
-      '@typescript-eslint': tsPlugin,
-    },
     rules: {
       // Use TypeScript's unused vars instead of base rule
       'no-unused-vars': 'off',
@@ -65,6 +61,14 @@ export default [
       'no-console': 'error',
       'react/prop-types': 'off',
       'react/no-unescaped-entities': 'off',
+      // Turbo env vars not relevant for UI lib
+      'turbo/no-undeclared-env-vars': 'off',
+      // Allow underscore-prefixed unused vars (intentionally unused params)
+      '@typescript-eslint/no-unused-vars': ['warn', {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+      }],
     },
     settings: {
       'import/resolver': { typescript: { project: './tsconfig.json' } },

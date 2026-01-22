@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect,userEvent, within } from 'storybook/test';
 
 import { Textarea } from './Textarea';
-import { TextareaHTMLAttributes } from 'react';
 
 const meta: Meta<typeof Textarea> = {
   title: 'Form/Textarea/Tests',

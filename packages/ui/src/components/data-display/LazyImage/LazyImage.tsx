@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Skeleton } from '../../layout/Skeleton';
 import type { LazyImageProps, LazyImageState } from './LazyImage.types';
 
-const ImageContainer = styled(Box)(({ theme }) => ({
+const ImageContainer = styled(Box)(() => ({
   position: 'relative',
   display: 'inline-block',
   overflow: 'hidden',
@@ -76,7 +76,7 @@ export const LazyImage = React.memo<LazyImageProps>(function LazyImage({
   retryDelay = 1000,
   decoding = 'async',
   loading: nativeLoading,
-  fetchPriority,
+  fetchPriority: _fetchPriority,
   skeletonProps = {},
   spinnerProps = {},
   sx = {},

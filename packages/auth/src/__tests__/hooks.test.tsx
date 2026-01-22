@@ -75,8 +75,11 @@ describe("auth hooks", () => {
 
   describe("useSocialLogin", () => {
     beforeEach(() => {
-      mockedSignIn.mockResolvedValue(undefined);
-      mockedSignOut.mockResolvedValue(undefined);
+      // signIn/signOut with redirect:true don't actually return - they redirect the browser
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockedSignIn.mockResolvedValue(undefined as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockedSignOut.mockResolvedValue(undefined as any);
     });
 
     it("should have initial state with no loading and no error", () => {

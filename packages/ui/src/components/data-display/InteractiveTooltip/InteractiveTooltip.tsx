@@ -139,7 +139,7 @@ export const InteractiveTooltip = React.forwardRef<HTMLDivElement, InteractiveTo
     const [isPinned, setIsPinned] = useState(false);
     const [isControlledOpen, setIsControlledOpen] = useState(false);
     const wrapperRef = useRef<HTMLDivElement>(null);
-    const tooltipId = useId();
+    const _tooltipId = useId();
 
     // Handle outside clicks to unpin
     useEffect(() => {

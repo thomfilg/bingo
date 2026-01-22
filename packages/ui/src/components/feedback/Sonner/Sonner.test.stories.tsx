@@ -636,7 +636,7 @@ export const ThemeVariations: Story = {
         
         if (toastContainer) {
           const styles = window.getComputedStyle(toastContainer);
-          const backdropFilter = styles.backdropFilter || (styles as any).webkitBackdropFilter;
+          const backdropFilter = styles.backdropFilter || (styles as CSSStyleDeclaration & Record<string, string>).webkitBackdropFilter;
           
           // Glass variant should have glass characteristics - check multiple possible indicators
           const hasBlur = backdropFilter && backdropFilter !== 'none' && backdropFilter.includes('blur');

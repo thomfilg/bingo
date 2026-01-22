@@ -126,7 +126,8 @@ export function getClientIpFromHeaders(
   const forwarded = getHeader('x-forwarded-for');
   if (forwarded) {
     // Take first IP from comma-separated list (original client)
-    return forwarded.split(',')[0].trim();
+    const firstIp = forwarded.split(',')[0];
+    return firstIp?.trim() ?? 'unknown';
   }
 
   return (

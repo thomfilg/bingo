@@ -27,7 +27,7 @@ export function createRateLimiter({ max, windowMs = 60000 }: RateLimitOptions) {
 
   function prune(now: number) {
     // Remove timestamps outside the window
-    while (starts.length && (now - starts[0]) >= windowMs) {
+    while (starts.length && starts[0] !== undefined && (now - starts[0]) >= windowMs) {
       starts.shift();
     }
   }
@@ -46,7 +46,7 @@ export function createRateLimiter({ max, windowMs = 60000 }: RateLimitOptions) {
       timer = setTimeout(() => { timer = null; drain(); }, 0);
       return;
     }
-    const waitMs = (starts[0] + windowMs) - now; // when earliest leaves window
+    const waitMs = ((starts[0] ?? now) + windowMs) - now; // when earliest leaves window
     timer = setTimeout(() => { timer = null; drain(); }, Math.max(waitMs, 0));
   }
 

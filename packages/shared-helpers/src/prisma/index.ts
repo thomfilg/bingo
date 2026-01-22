@@ -183,7 +183,9 @@ export const getPrismaClient = async (): Promise<PrismaClient> => {
 
   try {
     // Attempt to dynamically import @prisma/client
-    const { PrismaClient: RealPrismaClient } = await import('@prisma/client');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const prismaModule = await import('@prisma/client') as any;
+    const RealPrismaClient = prismaModule.PrismaClient || prismaModule.default?.PrismaClient;
     prismaInstance = new RealPrismaClient({
       log: process.env.NODE_ENV === 'development'
         ? ['query', 'error', 'warn']

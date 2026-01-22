@@ -264,7 +264,7 @@ export function formatDateWithPattern(date: Date | null, pattern: string, timeZo
       }
     }
     return result;
-  } catch (_error) {
+  } catch {
     return '';
   }
 }
