@@ -1,0 +1,90 @@
+name: Ephemeral Test Server
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'create'
+        type: choice
+        options:
+          - create
+          - destroy
+      keep_server:
+        description: 'Keep server after creation (for debugging)'
+        required: false
+        default: 'true'
+        type: boolean
+
+jobs:
+  ephemeral-server:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup SSH Key
+        run: |
+          echo "${{ secrets.DO_SSH_PRIVATE_KEY_B64 }}" | tr -d ' \n\r\t' | base64 -d > /tmp/do_key
+          chmod 600 /tmp/do_key
+
+      - name: Create Server
+        if: inputs.action == 'create'
+        env:
+          DO_API_TOKEN: ${{ secrets.DO_API_KEY }}
+          DO_SSH_PRIVATE_KEY_B64: ${{ secrets.DO_SSH_PRIVATE_KEY_B64 }}
+        run: |
+          ./scripts/ephemeral/create-server.sh hello-world-test s-1vcpu-1gb
+
+          # Get server info
+          SERVER_IP=$(jq -r '.ip' /tmp/server-info.json)
+          echo "SERVER_IP=$SERVER_IP" >> $GITHUB_ENV
+          echo "## Server Created! 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**IP:** \`$SERVER_IP\`" >> $GITHUB_STEP_SUMMARY
+
+      - name: Deploy Hello World
+        if: inputs.action == 'create'
+        run: |
+          ssh -i /tmp/do_key -o StrictHostKeyChecking=no root@${{ env.SERVER_IP }} << 'EOF'
+          apt-get update && apt-get install -y nginx
+          echo '<html><head><title>Hello World</title></head><body><h1>Hello World!</h1><p>Ephemeral test server running on Digital Ocean</p></body></html>' > /var/www/html/index.html
+          systemctl start nginx
+          systemctl enable nginx
+          EOF
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**URL:** http://${{ env.SERVER_IP }}/" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### To destroy later:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          cat /tmp/server-info.json >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+      - name: Destroy Server
+        if: inputs.action == 'destroy'
+        env:
+          DO_API_TOKEN: ${{ secrets.DO_API_KEY }}
+        run: |
+          # Get droplet ID from input or find existing
+          DROPLET_ID="${{ github.event.inputs.droplet_id }}"
+          if [ -z "$DROPLET_ID" ]; then
+            echo "Looking for ephemeral droplets..."
+            DROPLETS=$(curl -s "https://api.digitalocean.com/v2/droplets" \
+              -H "Authorization: Bearer $DO_API_TOKEN" | jq -r '.droplets[] | select(.name | startswith("hello-world")) | "\(.id) \(.name) \(.networks.v4[0].ip_address)"')
+            echo "Found droplets:"
+            echo "$DROPLETS"
+            DROPLET_ID=$(echo "$DROPLETS" | head -1 | awk '{print $1}')
+          fi
+
+          if [ -n "$DROPLET_ID" ]; then
+            echo "Destroying droplet $DROPLET_ID..."
+            curl -s -X DELETE "https://api.digitalocean.com/v2/droplets/$DROPLET_ID" \
+              -H "Authorization: Bearer $DO_API_TOKEN"
+            echo "## Server Destroyed! 🗑️" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No droplet found to destroy"
+            echo "## No Server Found" >> $GITHUB_STEP_SUMMARY
+          fi
