@@ -28,6 +28,11 @@ SERVER_INFO_FILE="/tmp/server-info.json"
 SSH_KEY_FILE="/tmp/do_ephemeral_key"
 
 # Validate required environment
+if [ -z "$DO_API_TOKEN" ]; then
+    echo "Error: DO_API_TOKEN environment variable is required"
+    exit 1
+fi
+
 if [ -z "$DO_SSH_PRIVATE_KEY_B64" ]; then
     echo "Error: DO_SSH_PRIVATE_KEY_B64 environment variable is required"
     echo "Encode your key with: cat ~/.ssh/your_key | base64 -w 0"

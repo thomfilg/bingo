@@ -20,10 +20,9 @@ REGION="nyc1"
 SERVER_INFO_FILE="/tmp/server-info.json"
 SSH_KEY_FILE="/tmp/do_ephemeral_key"
 
-# Validate required environment (accept both DO_API_TOKEN and DO_API_KEY)
-DO_API_TOKEN="${DO_API_TOKEN:-$DO_API_KEY}"
+# Validate required environment
 if [ -z "$DO_API_TOKEN" ]; then
-    echo "Error: DO_API_TOKEN or DO_API_KEY environment variable is required"
+    echo "Error: DO_API_TOKEN environment variable is required"
     echo "Get your token from: https://cloud.digitalocean.com/account/api/tokens"
     exit 1
 fi

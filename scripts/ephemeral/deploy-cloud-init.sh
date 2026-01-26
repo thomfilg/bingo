@@ -57,9 +57,9 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Validate
+# Validate required environment
 if [ -z "$DO_API_TOKEN" ]; then
-    echo "Error: DO_API_TOKEN required"
+    echo "Error: DO_API_TOKEN environment variable is required"
     exit 1
 fi
 

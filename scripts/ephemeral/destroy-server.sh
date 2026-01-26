@@ -24,10 +24,9 @@ else
     exit 1
 fi
 
-# Validate required environment (accept both DO_API_TOKEN and DO_API_KEY)
-DO_API_TOKEN="${DO_API_TOKEN:-$DO_API_KEY}"
+# Validate required environment
 if [ -z "$DO_API_TOKEN" ]; then
-    echo "Error: DO_API_TOKEN or DO_API_KEY environment variable is required"
+    echo "Error: DO_API_TOKEN environment variable is required"
     exit 1
 fi
 

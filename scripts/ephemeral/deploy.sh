@@ -96,7 +96,7 @@ if [ -n "$DESTROY_ID" ]; then
     exit 0
 fi
 
-# Validate environment
+# Validate required environment
 if [ -z "$DO_API_TOKEN" ]; then
     echo "Error: DO_API_TOKEN environment variable is required"
     exit 1
