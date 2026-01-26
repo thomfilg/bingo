@@ -1,0 +1,52 @@
+{
+  "name": "codegraph",
+  "version": "1.0.0",
+  "description": "API Cost Optimization Plugin - Reduces Claude Code exploration costs by 40% using AST-based code graph indexing",
+  "author": "bingo-team",
+  "license": "MIT",
+  "keywords": [
+    "cost-optimization",
+    "code-graph",
+    "ast",
+    "tree-sitter",
+    "semantic-search"
+  ],
+  "commands": [
+    {
+      "name": "codegraph:index",
+      "description": "Index the codebase to build the code graph",
+      "file": "commands/index.md"
+    },
+    {
+      "name": "codegraph:search",
+      "description": "Search the code graph semantically",
+      "file": "commands/search.md"
+    },
+    {
+      "name": "codegraph:impact",
+      "description": "Analyze impact of changing a symbol",
+      "file": "commands/impact.md"
+    },
+    {
+      "name": "codegraph:stats",
+      "description": "Show code graph statistics and cost savings",
+      "file": "commands/stats.md"
+    }
+  ],
+  "hooks": [
+    {
+      "event": "PreToolUse",
+      "script": "hooks/optimize-exploration.js",
+      "description": "Intercepts Explore agents to use cached code graph instead"
+    },
+    {
+      "event": "SessionStart",
+      "script": "hooks/session-start.js",
+      "description": "Loads code graph into memory on session start"
+    }
+  ],
+  "mcp": {
+    "enabled": true,
+    "config": ".mcp.json"
+  }
+}

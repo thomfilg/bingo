@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "codegraph": {
+      "command": "node",
+      "args": ["src/mcp-server.js"],
+      "cwd": "${workspaceFolder}/playground/codegraph-plugin",
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "description": "CodeGraph MCP Server - AST-based code analysis for reduced API costs"
+    }
+  }
+}
