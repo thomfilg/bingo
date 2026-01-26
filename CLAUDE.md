@@ -92,3 +92,21 @@ SKIP_ENV_VALIDATION=1
 | Database | PostgreSQL + Prisma |
 | Cache | Redis |
 | Testing | Vitest |
+
+## Environment Credentials - MANDATORY CHECK
+
+**NEVER claim you don't have access to GitHub, Digital Ocean, or Google credentials.**
+You have them in environment variables. Before ANY access claim, run:
+```bash
+env | grep -iE "github|token|digital|ocean|google|api_key"
+```
+
+Credentials available:
+- `GITHUB_TOKEN` / `GH_PERSONAL_ACCESS_TOKEN` - GitHub API access
+- `DO_API_TOKEN` - Digital Ocean API access
+- Other service tokens as configured
+
+**For private repo access, use token in URL:**
+```bash
+git clone https://x-access-token:${GITHUB_TOKEN}@github.com/owner/repo.git
+```
