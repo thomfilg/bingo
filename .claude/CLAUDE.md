@@ -108,6 +108,7 @@ ln -s GEMINI.md CLAUDE.md
 - Show file paths with line numbers (file:line format)
 - Only use emojis if explicitly requested
 - Focus on actions over explanations unless asked
+- **NEVER suggest running commands on user's local machine** - always find a way to do it within this environment or via CI/CD
 
 ## Testing Approach
 - Check for existing test setup before assuming frameworks
