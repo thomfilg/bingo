@@ -9,6 +9,7 @@
       "env": [
         "AUTH_SECRET",
         "AUTH_URL",
+        "AUTH_TRUST_HOST",
         "GOOGLE_CLIENT_ID",
         "GOOGLE_CLIENT_SECRET",
         "FACEBOOK_CLIENT_ID",
@@ -42,6 +43,7 @@
       "env": [
         "AUTH_SECRET",
         "AUTH_URL",
+        "AUTH_TRUST_HOST",
         "GOOGLE_CLIENT_ID",
         "GOOGLE_CLIENT_SECRET",
         "FACEBOOK_CLIENT_ID",

@@ -164,8 +164,8 @@ export const authConfig: NextAuthConfig = {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
-  // Only trust host in development; production should verify the host header
-  trustHost: process.env.NODE_ENV === "development",
+  // Trust host when AUTH_TRUST_HOST is set (needed for reverse proxy) or in development
+  trustHost: process.env.AUTH_TRUST_HOST === "true" || process.env.NODE_ENV === "development",
   debug: process.env.NODE_ENV === "development",
 };
 
