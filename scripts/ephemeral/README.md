@@ -56,6 +56,81 @@ GITHUB_TOKEN=ghp_xxxxxxxxxxxx
 | `create-server.sh` | Create a new Digital Ocean droplet |
 | `destroy-server.sh` | Destroy the current droplet |
 | `connect.sh` | SSH into the droplet |
+| `deploy-cloud-init.sh` | Deploy app via cloud-init (no SSH required) |
+| `deploy.sh` | Deploy app via SSH (creates droplet, SSH-based provisioning) |
+
+## Deployment Scripts
+
+### deploy-cloud-init.sh (Recommended)
+
+Creates a new droplet and deploys the app automatically using cloud-init. No SSH access required.
+
+```bash
+# Basic usage
+./deploy-cloud-init.sh
+
+# With options
+./deploy-cloud-init.sh -n my-app -b main
+
+# With Google OAuth
+export GOOGLE_CLIENT_ID="your-client-id"
+export GOOGLE_CLIENT_SECRET="your-client-secret"
+./deploy-cloud-init.sh -n bingo-prod -b main
+
+# List active droplets
+./deploy-cloud-init.sh -l
+
+# Destroy a droplet
+./deploy-cloud-init.sh -d 123456789
+```
+
+**Options:**
+- `-n, --name NAME` - Droplet name (default: bingo-TIMESTAMP)
+- `-s, --size SIZE` - Droplet size (default: s-2vcpu-4gb)
+- `-b, --branch BRANCH` - Git branch to deploy (default: main)
+- `-d, --destroy ID` - Destroy droplet by ID
+- `-l, --list` - List running droplets
+
+**Endpoints (after deployment):**
+- `http://<IP>/` - Web app
+- `http://<IP>/docs` - Documentation
+- `http://<IP>/api` - API endpoints
+- `http://<IP>/health` - Health check
+
+### deploy.sh (SSH-based)
+
+Creates a new DigitalOcean droplet and deploys the app to it via SSH. Similar to `deploy-cloud-init.sh`, but uses SSH-based provisioning instead of cloud-init.
+
+**Options:**
+
+- `-b, --branch BRANCH` - Git branch to deploy (defaults to current branch)
+- `-k, --keep` - Keep the droplet running after deployment (do not destroy)
+- `--db-only` - Only start or migrate databases, do not deploy application code
+- `-n, --name NAME` - Droplet name to create or target
+- `-s, --size SIZE` - Droplet size slug (e.g. `s-1vcpu-1gb`, `s-2vcpu-4gb`)
+- `-d, --destroy ID` - Destroy an existing droplet by ID and exit
+- `-h, --help` - Show detailed usage information
+
+**Examples:**
+
+```bash
+# Deploy current branch with default name/size
+./deploy.sh
+
+# Deploy specific branch, keep server running
+./deploy.sh -b main -k
+
+# Only start databases (no app deployment)
+./deploy.sh --db-only
+
+# Deploy to a named droplet with a larger size
+./deploy.sh -n my-app-droplet -s s-4vcpu-8gb
+
+# Destroy an existing droplet by ID
+./deploy.sh -d 123456789
+```
+
+**Requires:** `DO_API_TOKEN` and `DO_SSH_PRIVATE_KEY_B64` environment variables
 
 ## Droplet Sizes
 
