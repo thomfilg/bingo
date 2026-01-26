@@ -47,9 +47,14 @@ while [[ $# -gt 0 ]]; do
             ;;
         -l|--list)
             echo "Active droplets:"
-            curl -sk "https://api.digitalocean.com/v2/droplets" \
-                -H "Authorization: Bearer $DO_API_TOKEN" | \
-                jq -r '.droplets[] | "  \(.id) | \(.name) | \(.networks.v4[0].ip_address) | \(.status)"'
+            RESPONSE=$(curl -sk "https://api.digitalocean.com/v2/droplets" \
+                -H "Authorization: Bearer $DO_API_TOKEN")
+            if echo "$RESPONSE" | jq -e '.droplets' > /dev/null 2>&1; then
+                echo "$RESPONSE" | jq -r '.droplets[] | "  \(.id) | \(.name) | \(.networks.v4[0].ip_address // "no-ip") | \(.status)"'
+            else
+                echo "Error: API returned invalid response"
+                echo "$RESPONSE" | head -5
+            fi
             exit 0
             ;;
         -h|--help) head -25 "$0" | tail -20; exit 0 ;;
@@ -180,8 +185,15 @@ for i in {1..30}; do
     DROPLET_INFO=$(curl -sk "https://api.digitalocean.com/v2/droplets/$DROPLET_ID" \
         -H "Authorization: Bearer $DO_API_TOKEN")
 
-    STATUS=$(echo "$DROPLET_INFO" | jq -r '.droplet.status')
-    IP=$(echo "$DROPLET_INFO" | jq -r '.droplet.networks.v4[] | select(.type=="public") | .ip_address' | head -1)
+    # Check if response is valid JSON
+    if ! echo "$DROPLET_INFO" | jq -e '.droplet' > /dev/null 2>&1; then
+        echo "  API error, retrying... ($i/30)"
+        sleep 5
+        continue
+    fi
+
+    STATUS=$(echo "$DROPLET_INFO" | jq -r '.droplet.status // "unknown"')
+    IP=$(echo "$DROPLET_INFO" | jq -r '.droplet.networks.v4[]? | select(.type=="public") | .ip_address' 2>/dev/null | head -1)
 
     if [ "$STATUS" = "active" ] && [ -n "$IP" ] && [ "$IP" != "null" ]; then
         break
