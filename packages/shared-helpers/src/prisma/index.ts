@@ -168,6 +168,12 @@ export interface BingoCardInclude {
 // Type alias for PrismaClient interface
 export type PrismaClient = PrismaClientMethods;
 
+/** Dynamic Prisma module type for runtime import */
+interface DynamicPrismaModule {
+  PrismaClient?: new (options?: { log?: string[] }) => PrismaClient;
+  default?: { PrismaClient?: new (options?: { log?: string[] }) => PrismaClient };
+}
+
 // Lazy-loaded Prisma client singleton
 let prismaInstance: PrismaClient | null = null;
 
@@ -183,14 +189,16 @@ export const getPrismaClient = async (): Promise<PrismaClient> => {
 
   try {
     // Attempt to dynamically import @prisma/client
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const prismaModule = await import('@prisma/client') as any;
-    const RealPrismaClient = prismaModule.PrismaClient || prismaModule.default?.PrismaClient;
+    const prismaModule = await import('@prisma/client') as unknown as DynamicPrismaModule;
+    const RealPrismaClient = prismaModule.PrismaClient ?? prismaModule.default?.PrismaClient;
+    if (!RealPrismaClient) {
+      throw new Error('PrismaClient not found in module');
+    }
     prismaInstance = new RealPrismaClient({
       log: process.env.NODE_ENV === 'development'
         ? ['query', 'error', 'warn']
         : ['error'],
-    }) as unknown as PrismaClient;
+    }) as PrismaClient;
     return prismaInstance;
   } catch {
     throw new Error(

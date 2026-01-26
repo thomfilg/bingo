@@ -43,3 +43,5 @@ credentials/*
 .DS_Store
 *.pem
 tasks
+# Local PR tracking files
+.tasks/
