@@ -34,6 +34,7 @@ export const ScrollArea: React.FC<ScrollAreaProps> = ({
 }) => {
   const theme = useTheme();
   const internalScrollRef = useRef<HTMLDivElement>(null);
+  const topSentinelRef = useRef<HTMLDivElement>(null);
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: 0 });
 
@@ -53,6 +54,29 @@ export const ScrollArea: React.FC<ScrollAreaProps> = ({
     resizeObserver.observe(internalScrollRef.current);
     return () => resizeObserver.disconnect();
   }, [onResize]);
+
+  // Use IntersectionObserver for scroll-to-top button visibility (much better performance than scroll listeners)
+  useEffect(() => {
+    if (!scrollToTopButton || !topSentinelRef.current || !internalScrollRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Show button when sentinel is NOT intersecting (user has scrolled past threshold)
+        if (entry) {
+          setShowScrollToTop(!entry.isIntersecting);
+        }
+      },
+      {
+        root: internalScrollRef.current,
+        // Use rootMargin to set the threshold distance from the top
+        rootMargin: `-${scrollToTopThreshold}px 0px 0px 0px`,
+        threshold: 0,
+      },
+    );
+
+    observer.observe(topSentinelRef.current);
+    return () => observer.disconnect();
+  }, [scrollToTopButton, scrollToTopThreshold]);
 
   // Callback ref that updates both internal and external refs
   const setScrollRef = useCallback(
@@ -128,7 +152,7 @@ export const ScrollArea: React.FC<ScrollAreaProps> = ({
     }
   };
 
-  // Handle scroll event
+  // Handle scroll event (scroll-to-top button now uses IntersectionObserver for better performance)
   const handleScroll = useCallback(
     (event: React.UIEvent<HTMLDivElement>) => {
       if (disabled) return;
@@ -144,26 +168,12 @@ export const ScrollArea: React.FC<ScrollAreaProps> = ({
         }, autoHideDelay);
       }
 
-      // Check if should show scroll to top button
-      if (scrollToTopButton && scrollRef.current) {
-        const scrollTop = scrollRef.current.scrollTop;
-        setShowScrollToTop(scrollTop > scrollToTopThreshold);
-      }
-
       // Call user's onScroll handler
       if (onScroll) {
         onScroll(event);
       }
     },
-    [
-      disabled,
-      autoHide,
-      alwaysShowScrollbar,
-      autoHideDelay,
-      scrollToTopButton,
-      scrollToTopThreshold,
-      onScroll,
-    ],
+    [disabled, autoHide, alwaysShowScrollbar, autoHideDelay, onScroll],
   );
 
   // Scroll to top function
@@ -397,6 +407,15 @@ export const ScrollArea: React.FC<ScrollAreaProps> = ({
           scrollBehavior: smoothScroll ? 'smooth' : 'auto',
         }}
       >
+        {/* Sentinel element for IntersectionObserver - detects when user scrolls past threshold */}
+        {scrollToTopButton && (
+          <div
+            ref={topSentinelRef}
+            data-testid="scroll-area-top-sentinel"
+            style={{ height: 1, width: '100%', pointerEvents: 'none' }}
+            aria-hidden="true"
+          />
+        )}
         {renderContent()}
       </Box>
 

@@ -22,8 +22,9 @@ export const VirtualList: React.FC<VirtualListProps> = ({
 }) => {
   const [scrollTop, setScrollTop] = useState(0);
   const internalContainerRef = useRef<HTMLDivElement>(null);
-  const _containerRef = scrollContainerRef || internalContainerRef;
   const itemHeights = useRef<Map<number, number>>(new Map());
+  const rafIdRef = useRef<number | null>(null);
+  const pendingScrollTopRef = useRef<number | null>(null);
 
   const getItemHeight = useCallback(
     (index: number): number => {
@@ -118,6 +119,7 @@ export const VirtualList: React.FC<VirtualListProps> = ({
     [variant, itemHeight, getItemHeight],
   );
 
+  // Throttled scroll handler using requestAnimationFrame for better performance
   const handleScroll = useCallback(
     (event: React.UIEvent<HTMLDivElement> | Event) => {
       // Handle both React synthetic events and native DOM events
@@ -125,11 +127,33 @@ export const VirtualList: React.FC<VirtualListProps> = ({
         (event as React.UIEvent<HTMLDivElement>).currentTarget ||
         (event as Event).target;
       const newScrollTop = (target as HTMLElement).scrollTop;
-      setScrollTop(newScrollTop);
-      onScroll?.(newScrollTop);
+
+      // Store the latest scroll position
+      pendingScrollTopRef.current = newScrollTop;
+
+      // Only schedule a new RAF if one isn't already pending
+      if (rafIdRef.current === null) {
+        rafIdRef.current = requestAnimationFrame(() => {
+          if (pendingScrollTopRef.current !== null) {
+            setScrollTop(pendingScrollTopRef.current);
+            onScroll?.(pendingScrollTopRef.current);
+            pendingScrollTopRef.current = null;
+          }
+          rafIdRef.current = null;
+        });
+      }
     },
     [onScroll],
   );
+
+  // Cleanup RAF on unmount
+  useEffect(() => {
+    return () => {
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+      }
+    };
+  }, []);
 
   // Listen to external scroll container if provided
   useEffect(() => {
@@ -138,7 +162,7 @@ export const VirtualList: React.FC<VirtualListProps> = ({
     const element = scrollContainerRef.current;
     const scrollHandler = (e: Event) => handleScroll(e);
 
-    element.addEventListener('scroll', scrollHandler);
+    element.addEventListener('scroll', scrollHandler, { passive: true });
     return () => element.removeEventListener('scroll', scrollHandler);
   }, [scrollContainerRef, handleScroll]);
 
@@ -237,6 +261,8 @@ export const VirtualGrid: React.FC<VirtualGridProps> = ({
 }) => {
   const [scrollTop, setScrollTop] = useState(0);
   const internalContainerRef = useRef<HTMLDivElement>(null);
+  const rafIdRef = useRef<number | null>(null);
+  const pendingScrollRef = useRef<{ top: number; left: number } | null>(null);
 
   const rowCount = Math.ceil(items.length / columnCount);
   const totalHeight = rowCount * (rowHeight + gap) - gap;
@@ -258,6 +284,7 @@ export const VirtualGrid: React.FC<VirtualGridProps> = ({
     return { startRow, endRow };
   }, [scrollTop, height, rowHeight, gap, overscan, rowCount]);
 
+  // Throttled scroll handler using requestAnimationFrame for better performance
   const handleScroll = useCallback(
     (event: React.UIEvent<HTMLDivElement> | Event) => {
       // Handle both React synthetic events and native DOM events
@@ -267,11 +294,32 @@ export const VirtualGrid: React.FC<VirtualGridProps> = ({
       const newScrollTop = (target as HTMLElement).scrollTop;
       const newScrollLeft = (target as HTMLElement).scrollLeft;
 
-      setScrollTop(newScrollTop);
-      onScroll?.(newScrollTop, newScrollLeft);
+      // Store the latest scroll position
+      pendingScrollRef.current = { top: newScrollTop, left: newScrollLeft };
+
+      // Only schedule a new RAF if one isn't already pending
+      if (rafIdRef.current === null) {
+        rafIdRef.current = requestAnimationFrame(() => {
+          if (pendingScrollRef.current !== null) {
+            setScrollTop(pendingScrollRef.current.top);
+            onScroll?.(pendingScrollRef.current.top, pendingScrollRef.current.left);
+            pendingScrollRef.current = null;
+          }
+          rafIdRef.current = null;
+        });
+      }
     },
     [onScroll],
   );
+
+  // Cleanup RAF on unmount
+  useEffect(() => {
+    return () => {
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+      }
+    };
+  }, []);
 
   // Listen to external scroll container if provided
   useEffect(() => {
@@ -280,7 +328,7 @@ export const VirtualGrid: React.FC<VirtualGridProps> = ({
     const element = scrollContainerRef.current;
     const scrollHandler = (e: Event) => handleScroll(e);
 
-    element.addEventListener('scroll', scrollHandler);
+    element.addEventListener('scroll', scrollHandler, { passive: true });
     return () => element.removeEventListener('scroll', scrollHandler);
   }, [scrollContainerRef, handleScroll]);
 
