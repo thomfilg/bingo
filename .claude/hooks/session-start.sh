@@ -1,8 +1,25 @@
 #!/bin/bash
 set -euo pipefail
 
-MARKETPLACE_REPO="tigredonorte/claude-plugin-work"
-PLUGIN_SPEC="work-workflow@work-workflow"
+# Marketplaces to register. Format: <github-owner>/<repo> or any source
+# accepted by `claude plugin marketplace add` (URL, path, npm spec).
+MARKETPLACES=(
+  "tigredonorte/claude-plugin-work"
+)
 
-claude plugin marketplace add "$MARKETPLACE_REPO" >/dev/null 2>&1 || true
-claude plugin install "$PLUGIN_SPEC" --scope user >/dev/null
+# Plugins to install. Format: <plugin-name>@<marketplace-name>
+# (marketplace-name comes from the `name` field in marketplace.json,
+# not the GitHub repo name).
+PLUGINS=(
+  "work-workflow@work-workflow"
+)
+
+for source in "${MARKETPLACES[@]}"; do
+  claude plugin marketplace add "$source" >/dev/null 2>&1 || true
+done
+
+for spec in "${PLUGINS[@]}"; do
+  if ! claude plugin install "$spec" --scope user >/dev/null; then
+    echo "session-start hook: failed to install $spec" >&2
+  fi
+done
