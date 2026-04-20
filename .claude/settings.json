@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "work-workflow": {
+      "source": {
+        "source": "github",
+        "repo": "tigredonorte/claude-plugin-work"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "work-workflow@work-workflow": true
+  }
+}
